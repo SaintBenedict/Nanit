@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+///using System.Linq;
+///using System.Text;
+///using System.Threading.Tasks;
 using System.Management;
 using System.IO;
 using System.Windows.Forms;
@@ -146,7 +146,7 @@ namespace NaNiT
                         file.WriteLine(result[i]);
                         dataResult[pNumber, i, 0] = result[i];
                         dataResult[pNumber, i, 1] = result.Count.ToString();
-                        file.WriteLine("DEBUG *номер запроса*"+ pNumber + "DEBUG *значение*" + dataResult[pNumber, i, 0] + "DEBUG *номер значения в листе*" + (i + 1) + "DEBUG *число значений в листе*" + dataResult[pNumber, i, 1]);
+                        file.WriteLine(" DEBUG *номер запроса* "+ pNumber + " DEBUG *значение* " + dataResult[pNumber, i, 0] + " DEBUG *номер значения в листе* " + (i + 1) + " DEBUG *число значений в листе* " + dataResult[pNumber, i, 1]);
                     }
                 }
             }
