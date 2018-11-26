@@ -1,4 +1,4 @@
-﻿namespace getHardwareInformation
+﻿namespace NaNiT
 {
     partial class Form1
     {

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Windows.Forms;
-using getHardwareInformation.Properties;
+using NaNiT.Properties;
 using System.Drawing;
 
-namespace getHardwareInformation
+namespace NaNiT
 {
 	class ContextMenus
 	{

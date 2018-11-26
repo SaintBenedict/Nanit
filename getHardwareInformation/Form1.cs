@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace getHardwareInformation
+namespace NaNiT
 {
     public partial class Form1 : Form
     {

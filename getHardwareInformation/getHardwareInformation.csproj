@@ -7,8 +7,8 @@
     <ProjectGuid>{6CF2FBB3-5521-4AF5-9EEB-9BCE4478F960}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>getHardwareInformation</RootNamespace>
-    <AssemblyName>getHardwareInformation</AssemblyName>
+    <RootNamespace>NaNiT</RootNamespace>
+    <AssemblyName>Nanit</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>

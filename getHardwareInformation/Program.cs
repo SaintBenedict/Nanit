@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Net;
 
-namespace getHardwareInformation
+namespace NaNiT
 {
     class Program
     {
