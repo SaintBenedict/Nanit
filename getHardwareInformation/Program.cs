@@ -16,6 +16,7 @@ namespace getHardwareInformation
         private static Form1 form1 = null;
         public static NotifyIcon notifyIcon = null;
         public static string nameFile = "";
+        public static string[,,] dataResult = new string[50, 10, 2];
 
         static void Main()
         {
@@ -28,7 +29,6 @@ namespace getHardwareInformation
             notifyIcon.Visible = true;
             notifyIcon.ContextMenuStrip = new ContextMenus().Create();
             notifyIcon.Text = "Сетевой агент НИИ Телевидения";
-
 
             Application.Run();
         }
@@ -55,46 +55,46 @@ namespace getHardwareInformation
             }
 
             OutputIniBlock("Операционная система");
-            OutputResult("• Операционная система:", GetHardwareInfo("Win32_OperatingSystem", "Caption"));
-            OutputResult("Версия:", GetHardwareInfo("Win32_OperatingSystem", "Version"));
-            OutputResult("Сервис-пак:", GetHardwareInfo("Win32_OperatingSystem", "ServicePackMajorVersion"));
-            OutputResult("Серийный номер:", GetHardwareInfo("Win32_OperatingSystem", "SerialNumber"));
-            OutputResult("Дата установки:", GetHardwareInfo("Win32_OperatingSystem", "InstallDate"));
+            OutputResult("• Операционная система:", GetHardwareInfo("Win32_OperatingSystem", "Caption"), 1);
+            OutputResult("Версия:", GetHardwareInfo("Win32_OperatingSystem", "Version"), 2);
+            OutputResult("Сервис-пак:", GetHardwareInfo("Win32_OperatingSystem", "ServicePackMajorVersion"), 3);
+            OutputResult("Серийный номер:", GetHardwareInfo("Win32_OperatingSystem", "SerialNumber"), 4);
+            OutputResult("Дата установки:", GetHardwareInfo("Win32_OperatingSystem", "InstallDate"), 5);
             OutputSimple("");
-            OutputResult("Рабочая группа:", GetHardwareInfo("Win32_ComputerSystem", "Domain"));
+            OutputResult("Рабочая группа:", GetHardwareInfo("Win32_ComputerSystem", "Domain"), 6);
 
             OutputIniBlock("Системные устройства");
-            OutputResult("• Процессор:", GetHardwareInfo("Win32_Processor", "Name"));
-            OutputResult("Производитель:", GetHardwareInfo("Win32_Processor", "Manufacturer"));
-            OutputResult("Описание:", GetHardwareInfo("Win32_Processor", "Description"));
+            OutputResult("• Процессор:", GetHardwareInfo("Win32_Processor", "Name"), 7);
+            OutputResult("Производитель:", GetHardwareInfo("Win32_Processor", "Manufacturer"), 8);
+            OutputResult("Описание:", GetHardwareInfo("Win32_Processor", "Description"), 9);
             OutputSimple("");
-            OutputResult("• Материнская плата:", GetHardwareInfo("Win32_BaseBoard", "Product"));
-            OutputResult("Производитель:", GetHardwareInfo("Win32_BaseBoard", "Manufacturer"));
-            OutputResult("Описание:", GetHardwareInfo("Win32_BaseBoard", "Description"));
+            OutputResult("• Материнская плата:", GetHardwareInfo("Win32_BaseBoard", "Product"), 10);
+            OutputResult("Производитель:", GetHardwareInfo("Win32_BaseBoard", "Manufacturer"), 11);
+            OutputResult("Описание:", GetHardwareInfo("Win32_BaseBoard", "Description"), 12);
             OutputSimple("");
-            OutputResult("• Оперативная память:", GetHardwareInfo("Win32_PhysicalMemory", "Manufacturer"));
-            OutputResult("Серийный номер:", GetHardwareInfo("Win32_PhysicalMemory", "SerialNumber"));
-            OutputResult("Объём (в байтах):", GetHardwareInfo("Win32_PhysicalMemory", "Capacity"));
+            OutputResult("• Оперативная память:", GetHardwareInfo("Win32_PhysicalMemory", "Manufacturer"), 13);
+            OutputResult("Серийный номер:", GetHardwareInfo("Win32_PhysicalMemory", "SerialNumber"), 14);
+            OutputResult("Объём (в байтах):", GetHardwareInfo("Win32_PhysicalMemory", "Capacity"), 15);
             OutputSimple("");
-            OutputResult("• Видеокарта:", GetHardwareInfo("Win32_VideoController", "Name"));
-            OutputResult("Видеопроцессор:", GetHardwareInfo("Win32_VideoController", "VideoProcessor"));
-            OutputResult("Версия драйвера:", GetHardwareInfo("Win32_VideoController", "DriverVersion"));
-            OutputResult("Объем памяти (в байтах):", GetHardwareInfo("Win32_VideoController", "AdapterRAM"));
+            OutputResult("• Видеокарта:", GetHardwareInfo("Win32_VideoController", "Name"), 16);
+            OutputResult("Видеопроцессор:", GetHardwareInfo("Win32_VideoController", "VideoProcessor"), 17);
+            OutputResult("Версия драйвера:", GetHardwareInfo("Win32_VideoController", "DriverVersion"), 18);
+            OutputResult("Объем памяти (в байтах):", GetHardwareInfo("Win32_VideoController", "AdapterRAM"), 19);
             OutputSimple("");
-            OutputResult("• Жесткий диск:", GetHardwareInfo("Win32_DiskDrive", "Caption"));
-            OutputResult("Интерфейс:", GetHardwareInfo("Win32_DiskDrive", "InterfaceType"));
-            OutputResult("Объем (в байтах):", GetHardwareInfo("Win32_DiskDrive", "Size"));
+            OutputResult("• Жесткий диск:", GetHardwareInfo("Win32_DiskDrive", "Caption"), 20);
+            OutputResult("Интерфейс:", GetHardwareInfo("Win32_DiskDrive", "InterfaceType"), 21);
+            OutputResult("Объем (в байтах):", GetHardwareInfo("Win32_DiskDrive", "Size"), 22);
 
             OutputIniBlock("Периферийные устройства");
-            OutputResult("• Клавиатура:", GetHardwareInfo("Win32_Keyboard", "Description"));
+            OutputResult("• Клавиатура:", GetHardwareInfo("Win32_Keyboard", "Description"), 23);
             OutputSimple("");
-            OutputResult("• Мышь:", GetHardwareInfo("Win32_PointingDevice", "Description"));
-            OutputResult("Производитель:", GetHardwareInfo("Win32_PointingDevice", "Manufacturer"));
+            OutputResult("• Мышь:", GetHardwareInfo("Win32_PointingDevice", "Description"), 24);
+            OutputResult("Производитель:", GetHardwareInfo("Win32_PointingDevice", "Manufacturer"), 25);
             OutputSimple("");
-            OutputResult("• Дисковод:", GetHardwareInfo("Win32_CDROMDrive", "Name"));
-            OutputResult("Буква привода:", GetHardwareInfo("Win32_CDROMDrive", "Drive"));
+            OutputResult("• Дисковод:", GetHardwareInfo("Win32_CDROMDrive", "Name"), 26);
+            OutputResult("Буква привода:", GetHardwareInfo("Win32_CDROMDrive", "Drive"), 27);
             OutputSimple("");
-            OutputResult("• Монитор:", GetHardwareInfo("Win32_DesktopMonitor", "DeviceID"));
+            OutputResult("• Монитор:", GetHardwareInfo("Win32_DesktopMonitor", "DeviceID"), 28);
 
             ///OutputIniBlock("Soft");
             ///OutputResult("OS:", GetHardwareInfo("Win32_OperatingSystem", "Name"));
@@ -132,7 +132,7 @@ namespace getHardwareInformation
             return result;
         }
 
-        private static void OutputResult(string info, List<string> result)
+        private static void OutputResult(string info, List<string> result, int pNumber)
         {
             using (StreamWriter file = new StreamWriter(nameFile, true))
             {
@@ -144,6 +144,9 @@ namespace getHardwareInformation
                     for (int i = 0; i < result.Count; ++i)
                     {
                         file.WriteLine(result[i]);
+                        dataResult[pNumber, i, 0] = result[i];
+                        dataResult[pNumber, i, 1] = result.Count.ToString();
+                        file.WriteLine("DEBUG *номер запроса*"+ pNumber + "DEBUG *значение*" + dataResult[pNumber, i, 0] + "DEBUG *номер значения в листе*" + (i + 1) + "DEBUG *число значений в листе*" + dataResult[pNumber, i, 1]);
                     }
                 }
             }

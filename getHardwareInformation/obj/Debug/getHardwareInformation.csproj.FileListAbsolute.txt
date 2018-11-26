@@ -27,3 +27,13 @@ D:\GoogleDrive\Projects\NetMonitor\getHardwareInformation (1)\getHardwareInforma
 D:\GoogleDrive\Projects\NetMonitor\getHardwareInformation (1)\getHardwareInformation\obj\Debug\getHardwareInformation.Form1.resources
 D:\GoogleDrive\Projects\NetMonitor\getHardwareInformation (1)\getHardwareInformation\obj\Debug\getHardwareInformation.Properties.Resources.resources
 D:\GoogleDrive\Projects\NetMonitor\getHardwareInformation (1)\getHardwareInformation\obj\Debug\getHardwareInformation.csproj.GenerateResource.cache
+D:\Repositories\N.A.N.I.T\getHardwareInformation\bin\Debug\getHardwareInformation.exe.config
+D:\Repositories\N.A.N.I.T\getHardwareInformation\bin\Debug\getHardwareInformation.exe
+D:\Repositories\N.A.N.I.T\getHardwareInformation\bin\Debug\getHardwareInformation.pdb
+D:\Repositories\N.A.N.I.T\getHardwareInformation\obj\Debug\getHardwareInformation.csprojAssemblyReference.cache
+D:\Repositories\N.A.N.I.T\getHardwareInformation\obj\Debug\getHardwareInformation.Form1.resources
+D:\Repositories\N.A.N.I.T\getHardwareInformation\obj\Debug\getHardwareInformation.Properties.Resources.resources
+D:\Repositories\N.A.N.I.T\getHardwareInformation\obj\Debug\getHardwareInformation.csproj.GenerateResource.cache
+D:\Repositories\N.A.N.I.T\getHardwareInformation\obj\Debug\getHardwareInformation.csproj.CoreCompileInputs.cache
+D:\Repositories\N.A.N.I.T\getHardwareInformation\obj\Debug\getHardwareInformation.exe
+D:\Repositories\N.A.N.I.T\getHardwareInformation\obj\Debug\getHardwareInformation.pdb
