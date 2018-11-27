@@ -1,1 +1,3 @@
 *.lock
+.vs/
+getHardwareInformation/bin/Debug/
