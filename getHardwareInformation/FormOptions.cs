@@ -15,6 +15,12 @@ namespace NaNiT
         {
             InitializeComponent();
             ControlBoxIpServ.Text = Globals.servIP;
+            ControlBoxPortServ.Text = Globals.servPort;
+            CheckRoleAdmin.Checked = Globals.RoleAdmin;
+            CheckRoleOperate.Checked = Globals.RoleOperate;
+            CheckRoleMessager.Checked = Globals.RoleMessager;
+            CheckRoleSecurity.Checked = Globals.RoleSecurity;
+            CheckRoleAgent.Checked = Globals.RoleAgent;
         }
 
         private void FormOptions_FormClosing(object sender, FormClosingEventArgs e)
@@ -27,10 +33,27 @@ namespace NaNiT
         private void ButOptSave_Click(object sender, EventArgs e)
         {
             Globals.servIP = ControlBoxIpServ.Text;
+            Globals.servPort = ControlBoxPortServ.Text;
+            Globals.RoleAdmin = CheckRoleAdmin.Checked;
+            Globals.RoleOperate = CheckRoleOperate.Checked;
+            Globals.RoleMessager = CheckRoleMessager.Checked;
+            Globals.RoleSecurity = CheckRoleSecurity.Checked;
+            Globals.RoleAgent = CheckRoleAgent.Checked;
+            Globals.md5PortIp = Program.MD5Code(Globals.servPort + Globals.servIP);
+            Globals.md5Clients = Program.MD5Code(Globals.RoleSecurity.ToString().ToLower() + Globals.RoleMessager.ToString().ToLower() + Globals.RoleOperate.ToString().ToLower() + Globals.RoleAdmin.ToString().ToLower() + Globals.RoleAgent.ToString().ToLower());
+
             RegistryKey localMachineKey = Registry.LocalMachine;
             RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
             RegistryKey regNanit = localMachineSoftKey.CreateSubKey(@"N.A.N.I.T");
-            regNanit.SetValue("ipserver", Globals.servIP);
+            regNanit.SetValue("ip_server", Globals.servIP);
+            regNanit.SetValue("port_server", Globals.servPort);
+            regNanit.SetValue("validate_ip_port", Globals.md5PortIp);
+            regNanit.SetValue("RoleSecurity", Globals.RoleSecurity.ToString().ToLower());
+            regNanit.SetValue("RoleMessager", Globals.RoleMessager.ToString().ToLower());
+            regNanit.SetValue("RoleOperate", Globals.RoleOperate.ToString().ToLower());
+            regNanit.SetValue("RoleAdmin", Globals.RoleAdmin.ToString().ToLower());
+            regNanit.SetValue("RoleAgent", Globals.RoleAgent.ToString().ToLower());
+            regNanit.SetValue("validate_clients", Globals.md5Clients);
             regNanit.Close();
 
             this.Close();

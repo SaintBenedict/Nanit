@@ -1,3 +1,5 @@
 *.lock
 .vs/
 getHardwareInformation/bin/Debug/
+getHardwareInformation/obj/Debug/Nanit.pdb
+getHardwareInformation/obj/Debug/Nanit.csproj.GenerateResource.cache

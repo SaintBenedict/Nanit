@@ -31,7 +31,7 @@
         {
             this.ButOptSave = new System.Windows.Forms.Button();
             this.ButOptClose = new System.Windows.Forms.Button();
-            this.LabelIPserv = new System.Windows.Forms.Label();
+            this.LabelIpServ = new System.Windows.Forms.Label();
             this.ControlBoxIpServ = new System.Windows.Forms.TextBox();
             this.BoxPassOld = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -41,14 +41,21 @@
             this.BoxPassNew2 = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.ButChangePass = new System.Windows.Forms.Button();
+            this.LabelPortServ = new System.Windows.Forms.Label();
+            this.ControlBoxPortServ = new System.Windows.Forms.TextBox();
+            this.CheckRoleAgent = new System.Windows.Forms.CheckBox();
+            this.CheckRoleAdmin = new System.Windows.Forms.CheckBox();
+            this.CheckRoleOperate = new System.Windows.Forms.CheckBox();
+            this.CheckRoleMessager = new System.Windows.Forms.CheckBox();
+            this.CheckRoleSecurity = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // ButOptSave
             // 
-            this.ButOptSave.Location = new System.Drawing.Point(233, 150);
+            this.ButOptSave.Location = new System.Drawing.Point(347, 150);
             this.ButOptSave.Name = "ButOptSave";
-            this.ButOptSave.Size = new System.Drawing.Size(159, 32);
+            this.ButOptSave.Size = new System.Drawing.Size(126, 32);
             this.ButOptSave.TabIndex = 1;
             this.ButOptSave.Text = "Сохранить";
             this.ButOptSave.UseVisualStyleBackColor = true;
@@ -56,28 +63,28 @@
             // 
             // ButOptClose
             // 
-            this.ButOptClose.Location = new System.Drawing.Point(233, 188);
+            this.ButOptClose.Location = new System.Drawing.Point(347, 188);
             this.ButOptClose.Name = "ButOptClose";
-            this.ButOptClose.Size = new System.Drawing.Size(159, 32);
+            this.ButOptClose.Size = new System.Drawing.Size(126, 32);
             this.ButOptClose.TabIndex = 2;
             this.ButOptClose.Text = "Закрыть";
             this.ButOptClose.UseVisualStyleBackColor = true;
             this.ButOptClose.Click += new System.EventHandler(this.ButOptClose_Click);
             // 
-            // LabelIPserv
+            // LabelIpServ
             // 
-            this.LabelIPserv.AutoSize = true;
-            this.LabelIPserv.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.LabelIPserv.Location = new System.Drawing.Point(252, 9);
-            this.LabelIPserv.Name = "LabelIPserv";
-            this.LabelIPserv.Size = new System.Drawing.Size(140, 20);
-            this.LabelIPserv.TabIndex = 3;
-            this.LabelIPserv.Text = "IP адрес сервера";
+            this.LabelIpServ.AutoSize = true;
+            this.LabelIpServ.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.LabelIpServ.Location = new System.Drawing.Point(183, 12);
+            this.LabelIpServ.Name = "LabelIpServ";
+            this.LabelIpServ.Size = new System.Drawing.Size(140, 20);
+            this.LabelIpServ.TabIndex = 3;
+            this.LabelIpServ.Text = "IP адрес сервера";
             // 
             // ControlBoxIpServ
             // 
             this.ControlBoxIpServ.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.ControlBoxIpServ.Location = new System.Drawing.Point(256, 32);
+            this.ControlBoxIpServ.Location = new System.Drawing.Point(337, 12);
             this.ControlBoxIpServ.Name = "ControlBoxIpServ";
             this.ControlBoxIpServ.Size = new System.Drawing.Size(136, 24);
             this.ControlBoxIpServ.TabIndex = 4;
@@ -168,15 +175,94 @@
             this.ButChangePass.UseVisualStyleBackColor = true;
             this.ButChangePass.Click += new System.EventHandler(this.ButChangePass_Click);
             // 
+            // LabelPortServ
+            // 
+            this.LabelPortServ.AutoSize = true;
+            this.LabelPortServ.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.LabelPortServ.Location = new System.Drawing.Point(183, 50);
+            this.LabelPortServ.Name = "LabelPortServ";
+            this.LabelPortServ.Size = new System.Drawing.Size(148, 20);
+            this.LabelPortServ.TabIndex = 13;
+            this.LabelPortServ.Text = "TCP Порт сервера";
+            // 
+            // ControlBoxPortServ
+            // 
+            this.ControlBoxPortServ.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.ControlBoxPortServ.Location = new System.Drawing.Point(337, 50);
+            this.ControlBoxPortServ.Name = "ControlBoxPortServ";
+            this.ControlBoxPortServ.Size = new System.Drawing.Size(136, 24);
+            this.ControlBoxPortServ.TabIndex = 14;
+            this.ControlBoxPortServ.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // CheckRoleAgent
+            // 
+            this.CheckRoleAgent.AutoSize = true;
+            this.CheckRoleAgent.Checked = true;
+            this.CheckRoleAgent.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.CheckRoleAgent.Enabled = false;
+            this.CheckRoleAgent.Location = new System.Drawing.Point(347, 95);
+            this.CheckRoleAgent.Name = "CheckRoleAgent";
+            this.CheckRoleAgent.Size = new System.Drawing.Size(99, 17);
+            this.CheckRoleAgent.TabIndex = 15;
+            this.CheckRoleAgent.Text = "Сетевой агент";
+            this.CheckRoleAgent.UseVisualStyleBackColor = true;
+            // 
+            // CheckRoleAdmin
+            // 
+            this.CheckRoleAdmin.AutoSize = true;
+            this.CheckRoleAdmin.Location = new System.Drawing.Point(170, 95);
+            this.CheckRoleAdmin.Name = "CheckRoleAdmin";
+            this.CheckRoleAdmin.Size = new System.Drawing.Size(149, 17);
+            this.CheckRoleAdmin.TabIndex = 16;
+            this.CheckRoleAdmin.Text = "Клиент администратора";
+            this.CheckRoleAdmin.UseVisualStyleBackColor = true;
+            // 
+            // CheckRoleOperate
+            // 
+            this.CheckRoleOperate.AutoSize = true;
+            this.CheckRoleOperate.Location = new System.Drawing.Point(170, 130);
+            this.CheckRoleOperate.Name = "CheckRoleOperate";
+            this.CheckRoleOperate.Size = new System.Drawing.Size(118, 17);
+            this.CheckRoleOperate.TabIndex = 17;
+            this.CheckRoleOperate.Text = "Клиент оператора";
+            this.CheckRoleOperate.UseVisualStyleBackColor = true;
+            // 
+            // CheckRoleMessager
+            // 
+            this.CheckRoleMessager.AutoSize = true;
+            this.CheckRoleMessager.Location = new System.Drawing.Point(170, 165);
+            this.CheckRoleMessager.Name = "CheckRoleMessager";
+            this.CheckRoleMessager.Size = new System.Drawing.Size(137, 17);
+            this.CheckRoleMessager.TabIndex = 18;
+            this.CheckRoleMessager.Text = "Рассылка сообщений";
+            this.CheckRoleMessager.UseVisualStyleBackColor = true;
+            // 
+            // CheckRoleSecurity
+            // 
+            this.CheckRoleSecurity.AutoSize = true;
+            this.CheckRoleSecurity.Location = new System.Drawing.Point(170, 200);
+            this.CheckRoleSecurity.Name = "CheckRoleSecurity";
+            this.CheckRoleSecurity.Size = new System.Drawing.Size(166, 17);
+            this.CheckRoleSecurity.TabIndex = 19;
+            this.CheckRoleSecurity.Text = "Повышенная безопасность";
+            this.CheckRoleSecurity.UseVisualStyleBackColor = true;
+            // 
             // FormOptions
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(404, 232);
+            this.ClientSize = new System.Drawing.Size(485, 232);
             this.ControlBox = false;
+            this.Controls.Add(this.CheckRoleSecurity);
+            this.Controls.Add(this.CheckRoleMessager);
+            this.Controls.Add(this.CheckRoleOperate);
+            this.Controls.Add(this.CheckRoleAdmin);
+            this.Controls.Add(this.CheckRoleAgent);
+            this.Controls.Add(this.ControlBoxPortServ);
+            this.Controls.Add(this.LabelPortServ);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.ControlBoxIpServ);
-            this.Controls.Add(this.LabelIPserv);
+            this.Controls.Add(this.LabelIpServ);
             this.Controls.Add(this.ButOptClose);
             this.Controls.Add(this.ButOptSave);
             this.MaximizeBox = false;
@@ -197,7 +283,7 @@
 
         private System.Windows.Forms.Button ButOptSave;
         private System.Windows.Forms.Button ButOptClose;
-        private System.Windows.Forms.Label LabelIPserv;
+        private System.Windows.Forms.Label LabelIpServ;
         private System.Windows.Forms.TextBox ControlBoxIpServ;
         private System.Windows.Forms.TextBox BoxPassOld;
         private System.Windows.Forms.Label label1;
@@ -207,5 +293,12 @@
         private System.Windows.Forms.TextBox BoxPassNew2;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button ButChangePass;
+        private System.Windows.Forms.Label LabelPortServ;
+        private System.Windows.Forms.TextBox ControlBoxPortServ;
+        private System.Windows.Forms.CheckBox CheckRoleAgent;
+        private System.Windows.Forms.CheckBox CheckRoleAdmin;
+        private System.Windows.Forms.CheckBox CheckRoleOperate;
+        private System.Windows.Forms.CheckBox CheckRoleMessager;
+        private System.Windows.Forms.CheckBox CheckRoleSecurity;
     }
 }

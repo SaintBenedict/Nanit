@@ -52,8 +52,6 @@ namespace NaNiT
                 Globals.isAboutLoaded = true;
                 Globals.form1 = new FormLogin();
                 Globals.form1.Show();
-                ///new AboutBox().ShowDialog();
-                ///Globals.isAboutLoaded = false;
 			}
 		}
 

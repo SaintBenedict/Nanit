@@ -20,8 +20,16 @@ namespace NaNiT
         public static string optionsPasswordDefault = "478632";
         public static string optionsPasswordReg = "";
         public static string servIP = "127.0.0.1";
+        public static string servPort = "51782";
+        public static string md5PortIp = Program.MD5Code(servPort + servIP);
         public static FormLogin form1 = null;
-        public static FormOptions form2 = null;       
+        public static FormOptions form2 = null;
+        public static bool RoleSecurity = false;
+        public static bool RoleMessager = false;
+        public static bool RoleOperate = false;
+        public static bool RoleAdmin = false;
+        public static bool RoleAgent = true;
+        public static string md5Clients = Program.MD5Code(RoleSecurity.ToString().ToLower() + RoleMessager.ToString().ToLower() + RoleOperate.ToString().ToLower() + RoleAdmin.ToString().ToLower() + RoleAgent.ToString().ToLower());
         public static bool isAboutLoaded = false;
     }
     class Program
@@ -46,15 +54,57 @@ namespace NaNiT
             if (regNanit.GetValue("install") == null)
             {
                 regNanit.SetValue("install", "1");
-                regNanit.SetValue("ipserver", Globals.servIP);
+                regNanit.SetValue("ip_server", Globals.servIP);
+                regNanit.SetValue("port_server", Globals.servPort);
+                regNanit.SetValue("validate_ip_port", Globals.md5PortIp);
                 regNanit.SetValue("password", MD5Code(Globals.optionsPasswordDefault));
                 Globals.optionsPasswordReg = MD5Code(Globals.optionsPasswordDefault);
+                regNanit.SetValue("RoleSecurity", Globals.RoleSecurity.ToString().ToLower());
+                regNanit.SetValue("RoleMessager", Globals.RoleMessager.ToString().ToLower());
+                regNanit.SetValue("RoleOperate", Globals.RoleOperate.ToString().ToLower());
+                regNanit.SetValue("RoleAdmin", Globals.RoleAdmin.ToString().ToLower());
+                regNanit.SetValue("RoleAgent", Globals.RoleAgent.ToString().ToLower());
+                regNanit.SetValue("validate_clients", Globals.md5Clients);
                 regNanit.Close();
             }
             else
             {
-                Globals.servIP = regNanit.GetValue("ipserver").ToString();
-                Globals.optionsPasswordReg = regNanit.GetValue("password").ToString();
+                Globals.servIP = regNanit.GetValue("ip_server").ToString();
+                Globals.servPort = regNanit.GetValue("port_server").ToString();
+                Globals.md5PortIp = regNanit.GetValue("validate_ip_port").ToString();
+                Globals.md5Clients = regNanit.GetValue("validate_clients").ToString();
+                Globals.RoleSecurity = regNanit.GetValue("RoleSecurity").Equals("true");
+                Globals.RoleMessager = regNanit.GetValue("RoleMessager").Equals("true");
+                Globals.RoleOperate = regNanit.GetValue("RoleOperate").Equals("true");
+                Globals.RoleAdmin = regNanit.GetValue("RoleAdmin").Equals("true");
+                Globals.RoleAgent = regNanit.GetValue("RoleAgent").Equals("true");
+                if (Globals.md5PortIp != Program.MD5Code(Globals.servPort + Globals.servIP))
+                {
+                    const string message = "Указаны неверные настройки. Отправлено сообщение администратору.";
+                    const string caption = "";
+                    var result = MessageBox.Show(message, caption, MessageBoxButtons.OK);
+                    if (result == DialogResult.OK)
+                    {
+                        Program.notifyIcon.Dispose();
+                        Application.Exit();
+                        Process.GetCurrentProcess().Kill();
+                    }
+                }
+                if (Globals.md5Clients != Program.MD5Code(Globals.RoleSecurity.ToString().ToLower() + Globals.RoleMessager.ToString().ToLower() + Globals.RoleOperate.ToString().ToLower() + Globals.RoleAdmin.ToString().ToLower() + Globals.RoleAgent.ToString().ToLower()))
+                {
+                    const string message = "Указаны неверные политики. Отправлено сообщение администратору.";
+                    const string caption = "";
+                    var result = MessageBox.Show(message, caption, MessageBoxButtons.OK);
+                    if (result == DialogResult.OK)
+                    {
+                        Program.notifyIcon.Dispose();
+                        Application.Exit();
+                        Process.GetCurrentProcess().Kill();
+                    }
+                }
+
+                Globals.optionsPasswordReg = regNanit.GetValue("password").ToString();               
+
                 regNanit.Close();
             }
             Application.Run();
@@ -122,9 +172,6 @@ namespace NaNiT
             OutputResult("Буква привода:", GetHardwareInfo("Win32_CDROMDrive", "Drive"), 27);
             OutputSimple("");
             OutputResult("• Монитор:", GetHardwareInfo("Win32_DesktopMonitor", "DeviceID"), 28);
-
-            ///OutputIniBlock("Soft");
-            ///OutputResult("OS:", GetHardwareInfo("Win32_OperatingSystem", "Name"));
 
             Process.Start(Globals.nameFile);
             /*
