@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-///using System.Linq;
 using System.Text;
-///using System.Threading.Tasks;
 using System.Management;
 using System.IO;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Net;
 using System.Security.Cryptography;
-using System.Security.Permissions;
 using Microsoft.Win32;
 
 namespace NaNiT
@@ -31,12 +28,15 @@ namespace NaNiT
         public static bool RoleAgent = true;
         public static string md5Clients = Program.MD5Code(RoleSecurity.ToString().ToLower() + RoleMessager.ToString().ToLower() + RoleOperate.ToString().ToLower() + RoleAdmin.ToString().ToLower() + RoleAgent.ToString().ToLower());
         public static bool isAboutLoaded = false;
+        public static string version = Application.ProductVersion;
+        public static short errCatch = 0;
+        public static string exMessage = null;
     }
     class Program
     {
         public static NotifyIcon notifyIcon = null;        
         public static string[,,] dataResult = new string[50, 10, 2];
-
+        
         static void Main()
         {
             Application.EnableVisualStyles();
@@ -107,7 +107,8 @@ namespace NaNiT
 
                 regNanit.Close();
             }
-            Application.Run();
+            ///InfoGet(); /* Кусок кода для версии со сбором данных и не более того */
+            Application.Run();           
         }
 
         public static void InfoGet()
@@ -174,6 +175,11 @@ namespace NaNiT
             OutputResult("• Монитор:", GetHardwareInfo("Win32_DesktopMonitor", "DeviceID"), 28);
 
             Process.Start(Globals.nameFile);
+
+            ///Application.Exit(); /* Кусок кода для версии со сбором данных и не более того */
+            ///Process.GetCurrentProcess().Kill(); /*Кусок кода для версии со сбором данных и не более того */
+
+
             /*
             ManagementObjectSearcher searcher_soft =
             new ManagementObjectSearcher("root\\CIMV2",
@@ -193,17 +199,19 @@ namespace NaNiT
             ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM " + WIN32_Class);
             try
             {
+                Globals.errCatch = 0;
                 foreach (ManagementObject obj in searcher.Get())
                 {
-                    result.Add(obj[ClassItemField].ToString().Trim());
-                }
+                    if (Globals.errCatch == 0)
+                        result.Add(obj[ClassItemField].ToString().Trim());                                       
+                }                
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                ///Console.WriteLine(ex.Message);
-            }
-
-            return result;
+                result.Add("Не удалось определить значение");
+                Globals.errCatch = 1;
+            }                          
+                return result;
         }
 
         private static void OutputResult(string info, List<string> result, int pNumber)
@@ -220,7 +228,7 @@ namespace NaNiT
                         file.WriteLine(result[i]);
                         dataResult[pNumber, i, 0] = result[i];
                         dataResult[pNumber, i, 1] = result.Count.ToString();
-                        file.WriteLine(" DEBUG *номер запроса* "+ pNumber + " DEBUG *значение* " + dataResult[pNumber, i, 0] + " DEBUG *номер значения в листе* " + (i + 1) + " DEBUG *число значений в листе* " + dataResult[pNumber, i, 1]);
+                        ///file.WriteLine(" DEBUG *номер запроса* "+ pNumber + " DEBUG *значение* " + dataResult[pNumber, i, 0] + " DEBUG *номер значения в листе* " + (i + 1) + " DEBUG *число значений в листе* " + dataResult[pNumber, i, 1]);
                     }
                 }
             }
@@ -253,7 +261,7 @@ namespace NaNiT
             if (File.Exists(Globals.nameFile))
             {
                 File.Delete(Globals.nameFile);
-            }
+            }            
         }
 
         public static string MD5Code(string getCode)

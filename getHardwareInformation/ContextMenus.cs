@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Windows.Forms;
-using NaNiT.Properties;
-using System.Drawing;
 
 namespace NaNiT
 {
@@ -57,7 +54,6 @@ namespace NaNiT
 
 		void Exit_Click(object sender, EventArgs e)
 		{
-            // Quit without further ado.
             Program.notifyIcon.Dispose();
             Application.Exit();
 		}
