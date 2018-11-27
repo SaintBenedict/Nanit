@@ -1,5 +1,4 @@
 D:\Repositories\N.A.N.I.T\getHardwareInformation\obj\Debug\Nanit.csprojAssemblyReference.cache
-D:\Repositories\N.A.N.I.T\getHardwareInformation\obj\Debug\NaNiT.Form1.resources
 D:\Repositories\N.A.N.I.T\getHardwareInformation\obj\Debug\NaNiT.Properties.Resources.resources
 D:\Repositories\N.A.N.I.T\getHardwareInformation\obj\Debug\Nanit.csproj.GenerateResource.cache
 D:\Repositories\N.A.N.I.T\getHardwareInformation\obj\Debug\Nanit.csproj.CoreCompileInputs.cache
@@ -19,3 +18,5 @@ G:\N.A.N.I.T\getHardwareInformation\obj\Debug\Nanit.exe
 G:\N.A.N.I.T\getHardwareInformation\obj\Debug\Nanit.pdb
 G:\N.A.N.I.T\getHardwareInformation\obj\Debug\NaNiT.FormLogin.resources
 G:\N.A.N.I.T\getHardwareInformation\obj\Debug\NaNiT.FormOptions.resources
+D:\Repositories\N.A.N.I.T\getHardwareInformation\obj\Debug\NaNiT.FormLogin.resources
+D:\Repositories\N.A.N.I.T\getHardwareInformation\obj\Debug\NaNiT.FormOptions.resources
