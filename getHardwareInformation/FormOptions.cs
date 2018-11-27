@@ -27,6 +27,11 @@ namespace NaNiT
         private void ButOptSave_Click(object sender, EventArgs e)
         {
             Globals.servIP = ControlBoxIpServ.Text;
+            RegistryKey localMachineKey = Registry.LocalMachine;
+            RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
+            RegistryKey regNanit = localMachineSoftKey.CreateSubKey(@"N.A.N.I.T");
+            regNanit.SetValue("ipserver", Globals.servIP);
+            regNanit.Close();
 
             this.Close();
             Globals.isAboutLoaded = false;
@@ -65,6 +70,7 @@ namespace NaNiT
                     RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
                     RegistryKey regNanit = localMachineSoftKey.CreateSubKey(@"N.A.N.I.T");
                     regNanit.SetValue("password", Globals.optionsPasswordReg);
+                    regNanit.Close();
                     const string message = "Пароль успешно изменён";
                     const string caption = "";
                     var result = MessageBox.Show(message, caption, MessageBoxButtons.OK);
