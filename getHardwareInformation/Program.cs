@@ -13,6 +13,7 @@ namespace NaNiT
 {
     static class Globals
     {
+        public static string appVersion = "1.2.2";
         public static string nameFile = "";
         public static string optionsPasswordDefault = "478632";
         public static string optionsPasswordReg = "";
@@ -197,21 +198,16 @@ namespace NaNiT
         {
             List<string> result = new List<string>();
             ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM " + WIN32_Class);
-            try
             {
-                Globals.errCatch = 0;
                 foreach (ManagementObject obj in searcher.Get())
                 {
-                    if (Globals.errCatch == 0)
-                        result.Add(obj[ClassItemField].ToString().Trim());                                       
+                    if (obj[ClassItemField] != null)
+                        result.Add(obj[ClassItemField].ToString().Trim());
+                    else
+                        result.Add("Ошибка при получении параметра (NULL)");
                 }                
-            }
-            catch (Exception)
-            {
-                result.Add("Не удалось определить значение");
-                Globals.errCatch = 1;
-            }                          
-                return result;
+            }              
+            return result;
         }
 
         private static void OutputResult(string info, List<string> result, int pNumber)
