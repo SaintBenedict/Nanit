@@ -1,35 +1,62 @@
 ﻿using System;
 using System.Collections.Generic;
 ///using System.Linq;
-///using System.Text;
+using System.Text;
 ///using System.Threading.Tasks;
 using System.Management;
 using System.IO;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Net;
+using System.Security.Cryptography;
+using System.Security.Permissions;
+using Microsoft.Win32;
 
 namespace NaNiT
 {
+    static class Globals
+    {
+        public static string nameFile = "";
+        public static string optionsPasswordDefault = "478632";
+        public static string optionsPasswordReg = "";
+        public static string servIP = "127.0.0.1";
+        public static FormLogin form1 = null;
+        public static FormOptions form2 = null;       
+        public static bool isAboutLoaded = false;
+    }
     class Program
     {
-        private static Form1 form1 = null;
-        public static NotifyIcon notifyIcon = null;
-        public static string nameFile = "";
+        public static NotifyIcon notifyIcon = null;        
         public static string[,,] dataResult = new string[50, 10, 2];
 
         static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            notifyIcon = new NotifyIcon
-            {
-                Icon = Properties.Resources.net2
-            };
+            notifyIcon = new NotifyIcon();
+            notifyIcon.Icon = Properties.Resources.net2;
             notifyIcon.Visible = true;
             notifyIcon.ContextMenuStrip = new ContextMenus().Create();
             notifyIcon.Text = "Сетевой агент НИИ Телевидения";
 
+            ///Проверка наличия настроек в реестре
+            RegistryKey localMachineKey = Registry.LocalMachine;
+            RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
+            RegistryKey regNanit = localMachineSoftKey.CreateSubKey(@"N.A.N.I.T");
+            if (regNanit.GetValue("install") == null)
+            {
+                regNanit.SetValue("install", "1");
+                regNanit.SetValue("ipserver", Globals.servIP);
+                regNanit.SetValue("password", MD5Code(Globals.optionsPasswordDefault));
+                Globals.optionsPasswordReg = MD5Code(Globals.optionsPasswordDefault);
+                regNanit.Close();
+            }
+            else
+            {
+                Globals.servIP = regNanit.GetValue("ipserver").ToString();
+                Globals.optionsPasswordReg = regNanit.GetValue("password").ToString();
+                regNanit.Close();
+            }
             Application.Run();
         }
 
@@ -99,7 +126,7 @@ namespace NaNiT
             ///OutputIniBlock("Soft");
             ///OutputResult("OS:", GetHardwareInfo("Win32_OperatingSystem", "Name"));
 
-            Process.Start(nameFile);
+            Process.Start(Globals.nameFile);
             /*
             ManagementObjectSearcher searcher_soft =
             new ManagementObjectSearcher("root\\CIMV2",
@@ -134,7 +161,7 @@ namespace NaNiT
 
         private static void OutputResult(string info, List<string> result, int pNumber)
         {
-            using (StreamWriter file = new StreamWriter(nameFile, true))
+            using (StreamWriter file = new StreamWriter(Globals.nameFile, true))
             {
                 if (info.Length > 0)
                     file.WriteLine(info);
@@ -154,7 +181,7 @@ namespace NaNiT
 
         private static void OutputSimple(string name)
         {
-            using (StreamWriter file = new StreamWriter(nameFile, true))
+            using (StreamWriter file = new StreamWriter(Globals.nameFile, true))
             {
                 file.WriteLine(name);
             }
@@ -162,7 +189,7 @@ namespace NaNiT
 
         private static void OutputIniBlock(string name)
         {
-            using (StreamWriter file = new StreamWriter(nameFile, true))
+            using (StreamWriter file = new StreamWriter(Globals.nameFile, true))
             {
                 file.WriteLine("");
                 file.WriteLine("*****[" + name + "]*****");
@@ -174,13 +201,25 @@ namespace NaNiT
         {
             string date2 = DateTime.Now.ToString();
             date2 = date2.Replace(":", "-");
-            nameFile = @date2 + @".txt";
-            nameFile = @".\" + nameFile;
-            if (File.Exists(nameFile))
+            Globals.nameFile = @date2 + @".txt";
+            Globals.nameFile = @".\" + Globals.nameFile;
+            if (File.Exists(Globals.nameFile))
             {
-                File.Delete(nameFile);
+                File.Delete(Globals.nameFile);
             }
         }
 
+        public static string MD5Code(string getCode)
+        {
+            byte[] hash = Encoding.ASCII.GetBytes(getCode);
+            MD5 md5 = new MD5CryptoServiceProvider();
+            byte[] hashenc = md5.ComputeHash(hash);
+            string result = "";
+            foreach (var b in hashenc)
+            {
+                result += b.ToString("x2");
+            }
+            return result;
+        }
     }
 }
