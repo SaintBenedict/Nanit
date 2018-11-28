@@ -13,7 +13,7 @@ namespace NaNiT
 {
     static class Globals
     {
-        public static string appVersion = "1.2.2";
+        public static string appVersion = "1.2.3";
         public static string version = Application.ProductVersion; /// Изменять в AssemblyInfo.cs версию, чтобы была такой же как ^^ app.Version
         public static string pathUpdate = null;
         public static string nameFile = "";
@@ -24,6 +24,7 @@ namespace NaNiT
         public static string md5PortIp = Program.MD5Code(servPort + servIP);
         public static FormLogin form1 = null;
         public static FormOptions form2 = null;
+        public static FormUpdater form3 = null;
         public static bool RoleSecurity = false;
         public static bool RoleMessager = false;
         public static bool RoleOperate = false;
@@ -31,6 +32,7 @@ namespace NaNiT
         public static bool RoleAgent = true;
         public static string md5Clients = Program.MD5Code(RoleSecurity.ToString().ToLower() + RoleMessager.ToString().ToLower() + RoleOperate.ToString().ToLower() + RoleAdmin.ToString().ToLower() + RoleAgent.ToString().ToLower());
         public static bool isAboutLoaded = false;
+        public static bool isUpdOpen = false;
         public static short errCatch = 0;
         public static string exMessage = null;
     }

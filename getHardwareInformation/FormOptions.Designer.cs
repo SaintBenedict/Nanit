@@ -37,10 +37,10 @@
             this.CheckRoleMessager = new System.Windows.Forms.CheckBox();
             this.CheckRoleSecurity = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.ButServiceChange = new System.Windows.Forms.Button();
+            this.ButServiceInstall = new System.Windows.Forms.Button();
             this.LabelServiceStart = new System.Windows.Forms.Label();
             this.LabelServiceInstall = new System.Windows.Forms.Label();
-            this.ButServiceInstall = new System.Windows.Forms.Button();
-            this.ButServiceChange = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -254,6 +254,25 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Служба Windows (для обновлений)";
             // 
+            // ButServiceChange
+            // 
+            this.ButServiceChange.Location = new System.Drawing.Point(107, 18);
+            this.ButServiceChange.Name = "ButServiceChange";
+            this.ButServiceChange.Size = new System.Drawing.Size(26, 26);
+            this.ButServiceChange.TabIndex = 22;
+            this.ButServiceChange.Text = "...";
+            this.ButServiceChange.UseVisualStyleBackColor = true;
+            this.ButServiceChange.Click += new System.EventHandler(this.ButServiceChange_Click);
+            // 
+            // ButServiceInstall
+            // 
+            this.ButServiceInstall.Location = new System.Drawing.Point(7, 18);
+            this.ButServiceInstall.Name = "ButServiceInstall";
+            this.ButServiceInstall.Size = new System.Drawing.Size(94, 26);
+            this.ButServiceInstall.TabIndex = 21;
+            this.ButServiceInstall.Text = "Установить";
+            this.ButServiceInstall.UseVisualStyleBackColor = true;
+            // 
             // LabelServiceStart
             // 
             this.LabelServiceStart.AutoSize = true;
@@ -275,24 +294,6 @@
             this.LabelServiceInstall.Size = new System.Drawing.Size(22, 13);
             this.LabelServiceInstall.TabIndex = 0;
             this.LabelServiceInstall.Text = "***";
-            // 
-            // ButServiceInstall
-            // 
-            this.ButServiceInstall.Location = new System.Drawing.Point(7, 18);
-            this.ButServiceInstall.Name = "ButServiceInstall";
-            this.ButServiceInstall.Size = new System.Drawing.Size(94, 26);
-            this.ButServiceInstall.TabIndex = 21;
-            this.ButServiceInstall.Text = "Установить";
-            this.ButServiceInstall.UseVisualStyleBackColor = true;
-            // 
-            // ButServiceChange
-            // 
-            this.ButServiceChange.Location = new System.Drawing.Point(107, 18);
-            this.ButServiceChange.Name = "ButServiceChange";
-            this.ButServiceChange.Size = new System.Drawing.Size(26, 26);
-            this.ButServiceChange.TabIndex = 22;
-            this.ButServiceChange.Text = "...";
-            this.ButServiceChange.UseVisualStyleBackColor = true;
             // 
             // FormOptions
             // 
@@ -353,7 +354,7 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label LabelServiceStart;
         private System.Windows.Forms.Label LabelServiceInstall;
-        private System.Windows.Forms.Button ButServiceChange;
+        public System.Windows.Forms.Button ButServiceChange;
         private System.Windows.Forms.Button ButServiceInstall;
     }
 }

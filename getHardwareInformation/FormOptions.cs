@@ -157,5 +157,16 @@ namespace NaNiT
             else
                 ButServiceInstall.Enabled = true;
         }
+
+        private void ButServiceChange_Click(object sender, EventArgs e)
+        {
+            if (!Globals.isUpdOpen)
+            {
+                Globals.form3 = new FormUpdater();
+                Globals.form3.Show();
+                Globals.isUpdOpen = true;
+                ButServiceChange.Enabled = false;
+            }
+        }
     }
 }
