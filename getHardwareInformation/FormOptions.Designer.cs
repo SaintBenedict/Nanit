@@ -36,7 +36,13 @@
             this.CheckRoleOperate = new System.Windows.Forms.CheckBox();
             this.CheckRoleMessager = new System.Windows.Forms.CheckBox();
             this.CheckRoleSecurity = new System.Windows.Forms.CheckBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.LabelServiceStart = new System.Windows.Forms.Label();
+            this.LabelServiceInstall = new System.Windows.Forms.Label();
+            this.ButServiceInstall = new System.Windows.Forms.Button();
+            this.ButServiceChange = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // ButOptSave
@@ -235,12 +241,66 @@
             this.CheckRoleSecurity.Text = "Повышенная безопасность";
             this.CheckRoleSecurity.UseVisualStyleBackColor = true;
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.ButServiceChange);
+            this.groupBox2.Controls.Add(this.ButServiceInstall);
+            this.groupBox2.Controls.Add(this.LabelServiceStart);
+            this.groupBox2.Controls.Add(this.LabelServiceInstall);
+            this.groupBox2.Location = new System.Drawing.Point(12, 230);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(460, 50);
+            this.groupBox2.TabIndex = 20;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Служба Windows (для обновлений)";
+            // 
+            // LabelServiceStart
+            // 
+            this.LabelServiceStart.AutoSize = true;
+            this.LabelServiceStart.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.LabelServiceStart.ForeColor = System.Drawing.Color.Green;
+            this.LabelServiceStart.Location = new System.Drawing.Point(350, 21);
+            this.LabelServiceStart.Name = "LabelServiceStart";
+            this.LabelServiceStart.Size = new System.Drawing.Size(22, 13);
+            this.LabelServiceStart.TabIndex = 1;
+            this.LabelServiceStart.Text = "***";
+            // 
+            // LabelServiceInstall
+            // 
+            this.LabelServiceInstall.AutoSize = true;
+            this.LabelServiceInstall.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.LabelServiceInstall.ForeColor = System.Drawing.Color.Red;
+            this.LabelServiceInstall.Location = new System.Drawing.Point(210, 21);
+            this.LabelServiceInstall.Name = "LabelServiceInstall";
+            this.LabelServiceInstall.Size = new System.Drawing.Size(22, 13);
+            this.LabelServiceInstall.TabIndex = 0;
+            this.LabelServiceInstall.Text = "***";
+            // 
+            // ButServiceInstall
+            // 
+            this.ButServiceInstall.Location = new System.Drawing.Point(7, 18);
+            this.ButServiceInstall.Name = "ButServiceInstall";
+            this.ButServiceInstall.Size = new System.Drawing.Size(94, 26);
+            this.ButServiceInstall.TabIndex = 21;
+            this.ButServiceInstall.Text = "Установить";
+            this.ButServiceInstall.UseVisualStyleBackColor = true;
+            // 
+            // ButServiceChange
+            // 
+            this.ButServiceChange.Location = new System.Drawing.Point(107, 18);
+            this.ButServiceChange.Name = "ButServiceChange";
+            this.ButServiceChange.Size = new System.Drawing.Size(26, 26);
+            this.ButServiceChange.TabIndex = 22;
+            this.ButServiceChange.Text = "...";
+            this.ButServiceChange.UseVisualStyleBackColor = true;
+            // 
             // FormOptions
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(485, 232);
+            this.ClientSize = new System.Drawing.Size(485, 289);
             this.ControlBox = false;
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.CheckRoleSecurity);
             this.Controls.Add(this.CheckRoleMessager);
             this.Controls.Add(this.CheckRoleOperate);
@@ -262,6 +322,8 @@
             this.Text = "Настройки программы";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -288,5 +350,10 @@
         private System.Windows.Forms.CheckBox CheckRoleOperate;
         private System.Windows.Forms.CheckBox CheckRoleMessager;
         private System.Windows.Forms.CheckBox CheckRoleSecurity;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Label LabelServiceStart;
+        private System.Windows.Forms.Label LabelServiceInstall;
+        private System.Windows.Forms.Button ButServiceChange;
+        private System.Windows.Forms.Button ButServiceInstall;
     }
 }

@@ -14,6 +14,8 @@ namespace NaNiT
     static class Globals
     {
         public static string appVersion = "1.2.2";
+        public static string version = Application.ProductVersion; /// Изменять в AssemblyInfo.cs версию, чтобы была такой же как ^^ app.Version
+        public static string pathUpdate = null;
         public static string nameFile = "";
         public static string optionsPasswordDefault = "478632";
         public static string optionsPasswordReg = "";
@@ -29,7 +31,6 @@ namespace NaNiT
         public static bool RoleAgent = true;
         public static string md5Clients = Program.MD5Code(RoleSecurity.ToString().ToLower() + RoleMessager.ToString().ToLower() + RoleOperate.ToString().ToLower() + RoleAdmin.ToString().ToLower() + RoleAgent.ToString().ToLower());
         public static bool isAboutLoaded = false;
-        public static string version = Application.ProductVersion;
         public static short errCatch = 0;
         public static string exMessage = null;
     }
@@ -79,6 +80,9 @@ namespace NaNiT
                 Globals.RoleOperate = regNanit.GetValue("RoleOperate").Equals("true");
                 Globals.RoleAdmin = regNanit.GetValue("RoleAdmin").Equals("true");
                 Globals.RoleAgent = regNanit.GetValue("RoleAgent").Equals("true");
+                if (regNanit.GetValue("path_update") != null)
+                    Globals.pathUpdate = regNanit.GetValue("path_update").ToString();
+
                 if (Globals.md5PortIp != Program.MD5Code(Globals.servPort + Globals.servIP))
                 {
                     const string message = "Указаны неверные настройки. Отправлено сообщение администратору.";

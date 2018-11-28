@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using System.Diagnostics;
+using System.Threading;
+using System.ServiceProcess;
 
 
 namespace NaNiT
@@ -10,7 +13,7 @@ namespace NaNiT
         public FormOptions()
         {
             InitializeComponent();
-            
+
             ControlBoxIpServ.Text = Globals.servIP;
             ControlBoxPortServ.Text = Globals.servPort;
             CheckRoleAdmin.Checked = Globals.RoleAdmin;
@@ -18,15 +21,13 @@ namespace NaNiT
             CheckRoleMessager.Checked = Globals.RoleMessager;
             CheckRoleSecurity.Checked = Globals.RoleSecurity;
             CheckRoleAgent.Checked = Globals.RoleAgent;
-        }
+            LabelServiceInstall.Text = "Загрузка...";
+            LabelServiceInstall.ForeColor = System.Drawing.Color.Black;
+            LabelServiceStart.Text = "Загрузка...";
+            LabelServiceStart.ForeColor = System.Drawing.Color.Black;
 
-        private void FormOptions_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            Globals.isAboutLoaded = false;
-            if (e.CloseReason == CloseReason.UserClosing)
-                Globals.isAboutLoaded = false;
-        }
-
+            ServiceInit();
+        }        
         private void ButOptSave_Click(object sender, EventArgs e)
         {
             Globals.servIP = ControlBoxIpServ.Text;
@@ -117,6 +118,44 @@ namespace NaNiT
                 BoxPassNew2.Text = "";
                 BoxPassOld.Text = "";
             }
+        }
+
+        private void ServiceInit()
+        {
+            ServiceController[] scServices;
+            scServices = ServiceController.GetServices();
+            foreach (ServiceController scTemp in scServices)
+            {
+
+                if (scTemp.ServiceName == "Nanit Updater")
+                {
+                    ServiceController sc = new ServiceController("Nanit Updater");
+                    LabelServiceInstall.Text = "Установлена";
+                    LabelServiceInstall.ForeColor = System.Drawing.Color.Green;
+                    if (sc.Status == ServiceControllerStatus.Running)
+                    {
+                        LabelServiceStart.Text = "Запущена";
+                        LabelServiceStart.ForeColor = System.Drawing.Color.Green;
+                    }
+                    else
+                    {
+                        LabelServiceStart.Text = "Не запущена";
+                        LabelServiceStart.ForeColor = System.Drawing.Color.Red;
+                    }
+                }
+                else
+                {
+                    LabelServiceInstall.Text = "Не установлена";
+                    LabelServiceInstall.ForeColor = System.Drawing.Color.Red;
+                    LabelServiceStart.Text = "Не запущена";
+                    LabelServiceStart.ForeColor = System.Drawing.Color.Red;
+                }
+            }
+
+            if (Globals.pathUpdate == null)
+                ButServiceInstall.Enabled = false;
+            else
+                ButServiceInstall.Enabled = true;
         }
     }
 }

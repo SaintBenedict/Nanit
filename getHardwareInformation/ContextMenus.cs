@@ -48,8 +48,8 @@ namespace NaNiT
 			{
                 Globals.isAboutLoaded = true;
                 Globals.form1 = new FormLogin();
-                Globals.form1.Show();
-			}
+                Globals.form1.Show();                
+            }
 		}
 
 		void Exit_Click(object sender, EventArgs e)

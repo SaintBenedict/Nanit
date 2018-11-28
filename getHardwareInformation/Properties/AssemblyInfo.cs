@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
-using NaNiT;
 
 [assembly: AssemblyTitle("Network agent Nii Television")]
 [assembly: AssemblyDescription("")]
