@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 namespace NaNiT
 {
@@ -19,6 +20,15 @@ namespace NaNiT
             delB.SetToolTip(ButDel, "Удалить");
             ToolTip chgB = new ToolTip();
             chgB.SetToolTip(ButDel, "Редактировать");
+            ChList.Items.Clear();
+
+            for (int j = 0; j < 11; j++)
+            {
+                if (Globals.pathUpdate[j] != null)
+                {
+                    ChList.Items.Add(Globals.pathUpdate[j]);
+                }
+            }            
             Enables();
         }
 
@@ -84,8 +94,8 @@ namespace NaNiT
         {
             if (chInd == -1)
             {
-                ChList.Items.Add(textBox1.Text);
-                textBox1.Text = "";
+                    ChList.Items.Add(textBox1.Text);
+                    textBox1.Text = "";
             }
             else
             {
@@ -100,26 +110,23 @@ namespace NaNiT
 
         private void FormUpdater_Close(object sender, EventArgs e)
         {
+            RegistryKey localMachineKey = Registry.LocalMachine;
+            RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
+            RegistryKey regNanit = localMachineSoftKey.CreateSubKey(@"N.A.N.I.T");
+            RegistryKey updateKey = regNanit.CreateSubKey("Update");
+            for (int j = 0; j < ChList.Items.Count; j++)
+            {
+                Globals.pathUpdate[j] = ChList.Items[j].ToString();
+                updateKey.SetValue("path_update_" + j.ToString(), Globals.pathUpdate[j]);
+            }
+            for (int j = ChList.Items.Count; j < 11; j++)
+            {
+                Globals.pathUpdate[j] = null;
+                updateKey.SetValue("path_update_" + j.ToString(), "NULL");
+            }
+            regNanit.Close();
             Globals.isUpdOpen = false;
             Globals.form2.ButServiceChange.Enabled = true;
         }       
-
-        /*public int IndOf(object value)
-        {
-            // получение индексов отмеченных элементов
-            foreach (int indexChecked in ChList.CheckedIndices)
-            {
-                MessageBox.Show("Index#: " + indexChecked.ToString() + ", is checked. Checked state is:" +
-                                ChList.GetItemCheckState(indexChecked).ToString() + ".");
-            }
-            // получение подписей (title) отмеченных элементов
-            foreach (object itemChecked in ChList.CheckedItems)
-            {
-                MessageBox.Show("Item with title: \"" + itemChecked.ToString() +
-                                "\", is checked. Checked state is: " +
-                          ChList.GetItemCheckState(ChList.Items.IndexOf(itemChecked)).ToString() + ".");
-
-            }
-        }*/
     }
 }

@@ -15,7 +15,7 @@ namespace NaNiT
     {
         public static string appVersion = "1.2.3";
         public static string version = Application.ProductVersion; /// Изменять в AssemblyInfo.cs версию, чтобы была такой же как ^^ app.Version
-        public static string pathUpdate = null;
+        public static string[] pathUpdate = new string[11];
         public static string nameFile = "";
         public static string optionsPasswordDefault = "478632";
         public static string optionsPasswordReg = "";
@@ -55,9 +55,11 @@ namespace NaNiT
             RegistryKey localMachineKey = Registry.LocalMachine;
             RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
             RegistryKey regNanit = localMachineSoftKey.CreateSubKey(@"N.A.N.I.T");
+            RegistryKey updateKey = regNanit.CreateSubKey("Update");
             if (regNanit.GetValue("install") == null)
             {
                 regNanit.SetValue("install", "1");
+                updateKey.SetValue("install", Globals.appVersion);
                 regNanit.SetValue("ip_server", Globals.servIP);
                 regNanit.SetValue("port_server", Globals.servPort);
                 regNanit.SetValue("validate_ip_port", Globals.md5PortIp);
@@ -69,6 +71,10 @@ namespace NaNiT
                 regNanit.SetValue("RoleAdmin", Globals.RoleAdmin.ToString().ToLower());
                 regNanit.SetValue("RoleAgent", Globals.RoleAgent.ToString().ToLower());
                 regNanit.SetValue("validate_clients", Globals.md5Clients);
+                for (int j = 0; j < 11; j++)
+                {
+                    updateKey.SetValue("path_update_" + j.ToString(), "NULL");
+                }
                 regNanit.Close();
             }
             else
@@ -82,9 +88,14 @@ namespace NaNiT
                 Globals.RoleOperate = regNanit.GetValue("RoleOperate").Equals("true");
                 Globals.RoleAdmin = regNanit.GetValue("RoleAdmin").Equals("true");
                 Globals.RoleAgent = regNanit.GetValue("RoleAgent").Equals("true");
-                if (regNanit.GetValue("path_update") != null)
-                    Globals.pathUpdate = regNanit.GetValue("path_update").ToString();
-
+                for (int j = 0; j < 11; j++)
+                {
+                    if (updateKey.GetValue("path_update_" + j.ToString()).ToString() != "NULL")
+                        Globals.pathUpdate[j] = updateKey.GetValue("path_update_" + j.ToString()).ToString();
+                    else
+                        Globals.pathUpdate[j] = null;
+                }
+               
                 if (Globals.md5PortIp != Program.MD5Code(Globals.servPort + Globals.servIP))
                 {
                     const string message = "Указаны неверные настройки. Отправлено сообщение администратору.";

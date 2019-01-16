@@ -152,7 +152,7 @@ namespace NaNiT
                 }
             }
 
-            if (Globals.pathUpdate == null)
+            if (Globals.pathUpdate[0] == null)
                 ButServiceInstall.Enabled = false;
             else
                 ButServiceInstall.Enabled = true;
