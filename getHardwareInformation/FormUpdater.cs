@@ -108,7 +108,7 @@ namespace NaNiT
             Enables();
         }
 
-        private void FormUpdater_Close(object sender, EventArgs e)
+        public void FormUpdater_Close(object sender, EventArgs e)
         {
             RegistryKey localMachineKey = Registry.LocalMachine;
             RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
@@ -125,8 +125,10 @@ namespace NaNiT
                 updateKey.SetValue("path_update_" + j.ToString(), "NULL");
             }
             regNanit.Close();
+            Globals.form2.CheckUpdServer();
             Globals.isUpdOpen = false;
             Globals.form2.ButServiceChange.Enabled = true;
-        }       
+        }
     }
 }
+

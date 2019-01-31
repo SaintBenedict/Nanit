@@ -14,6 +14,7 @@ namespace NaNiT
     static class Globals
     {
         public static string appVersion = "1.2.3";
+        public static string nanitSvcVer = null;
         public static string version = Application.ProductVersion; /// Изменять в AssemblyInfo.cs версию, чтобы была такой же как ^^ app.Version
         public static string[] pathUpdate = new string[11];
         public static string nameFile = "";
@@ -35,6 +36,7 @@ namespace NaNiT
         public static bool isUpdOpen = false;
         public static short errCatch = 0;
         public static string exMessage = null;
+        public static int serviceStatus = 0; //Проверка службы обновлений. 0 не установлена и не запущена. 1 установлена и запущена. 2 установлена не запущена. 3 обновление.
     }
     class Program
     {

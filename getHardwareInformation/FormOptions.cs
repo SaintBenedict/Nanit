@@ -4,6 +4,8 @@ using Microsoft.Win32;
 using System.Diagnostics;
 using System.Threading;
 using System.ServiceProcess;
+using System.Net;
+using System.IO;
 
 
 namespace NaNiT
@@ -25,8 +27,10 @@ namespace NaNiT
             LabelServiceInstall.ForeColor = System.Drawing.Color.Black;
             LabelServiceStart.Text = "Загрузка...";
             LabelServiceStart.ForeColor = System.Drawing.Color.Black;
+            ButServiceInstall.Enabled = false;
 
             ServiceInit();
+            CheckUpdServer();
         }        
         private void ButOptSave_Click(object sender, EventArgs e)
         {
@@ -132,15 +136,24 @@ namespace NaNiT
                     ServiceController sc = new ServiceController("Nanit Updater");
                     LabelServiceInstall.Text = "Установлена";
                     LabelServiceInstall.ForeColor = System.Drawing.Color.Green;
+                    FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(Environment.SystemDirectory + @"\nanit-svc.exe");
+                    Globals.nanitSvcVer = myFileVersionInfo.FileVersion;
+                    groupBox2.Text = "Версия службы обновлений " + Globals.nanitSvcVer;
                     if (sc.Status == ServiceControllerStatus.Running)
                     {
                         LabelServiceStart.Text = "Запущена";
                         LabelServiceStart.ForeColor = System.Drawing.Color.Green;
+                        Globals.serviceStatus = 1;
+                        ButServiceInstall.Text = "Обновить";
+                        ButServiceInstall.Enabled = false;
                     }
                     else
                     {
                         LabelServiceStart.Text = "Не запущена";
                         LabelServiceStart.ForeColor = System.Drawing.Color.Red;
+                        Globals.serviceStatus = 2;
+                        ButServiceInstall.Text = "Запустить";
+                        ButServiceInstall.Enabled = false;
                     }
                 }
                 else
@@ -149,13 +162,12 @@ namespace NaNiT
                     LabelServiceInstall.ForeColor = System.Drawing.Color.Red;
                     LabelServiceStart.Text = "Не запущена";
                     LabelServiceStart.ForeColor = System.Drawing.Color.Red;
+                    Globals.serviceStatus = 0;
+                    ButServiceInstall.Text = "Установить";
+                    groupBox2.Text = "Служба Windows (для обновлений)";
                 }
             }
 
-            if (Globals.pathUpdate[0] == null)
-                ButServiceInstall.Enabled = false;
-            else
-                ButServiceInstall.Enabled = true;
         }
 
         private void ButServiceChange_Click(object sender, EventArgs e)
@@ -167,6 +179,76 @@ namespace NaNiT
                 Globals.isUpdOpen = true;
                 ButServiceChange.Enabled = false;
             }
+        }
+
+        public static bool FileExists(string url)
+        {
+            bool result = true;
+            try
+            {
+                string remoteUri = url;
+                string fileName = "version.txt", myStringWebResource = null;
+                WebClient myWebClient = new WebClient();
+                myStringWebResource = remoteUri + fileName;
+                myWebClient.DownloadFile(myStringWebResource, fileName);
+            }
+            catch (WebException)
+            { result = false;}
+            return result;
+        }
+
+        public void CheckUpdServer()
+        {
+            for (int j = 0; j < 11; j++)
+            {
+                groupBox2.Text = "Служба Windows (для обновлений)";
+                if (Globals.pathUpdate[j] == null)
+                    continue;
+                if (Globals.pathUpdate[j].Length < 10)
+                    continue;
+                if (FileExists(Globals.pathUpdate[j] + "/nanit/") == true)
+                {
+                    string[] Mass = File.ReadAllLines(@"version.txt", System.Text.Encoding.Default);
+                    if (Mass[0] == "version-nanit-service")
+                    {
+                        ButServiceInstall.Enabled = true;
+                        if (Globals.nanitSvcVer == Mass[1])
+                            ButServiceInstall.Text = "ОК";
+                        else
+                        {
+                            if (Globals.serviceStatus == 0)
+                            {
+                                ButServiceInstall.Text = "Установить";
+                                groupBox2.Text = "Служба Windows (для обновлений) " + Mass[1];
+                            }
+                            else
+                            {
+                                Globals.serviceStatus = 3;
+                                ButServiceInstall.Text = "Обновить";
+                                groupBox2.Text = "Обновить службу обновлений до версии" + Mass[1];
+                            }
+                        }
+                        j = 11;
+                    }
+                    else
+                    {
+                        ButServiceInstall.Enabled = false;
+                        groupBox2.Text = "Служба Windows (для обновлений)";
+                        continue;
+                    }
+                }
+                else
+                {
+                        ButServiceInstall.Enabled = false;
+                        groupBox2.Text = "Служба Windows (для обновлений)";
+                }
+            }
+                
+        }
+
+        private void ButServiceInstall_Click(object sender, EventArgs e)
+        {
+            
         }
     }
 }

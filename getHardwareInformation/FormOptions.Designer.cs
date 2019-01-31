@@ -272,6 +272,7 @@
             this.ButServiceInstall.TabIndex = 21;
             this.ButServiceInstall.Text = "Установить";
             this.ButServiceInstall.UseVisualStyleBackColor = true;
+            this.ButServiceInstall.Click += new System.EventHandler(this.ButServiceInstall_Click);
             // 
             // LabelServiceStart
             // 
@@ -355,6 +356,6 @@
         private System.Windows.Forms.Label LabelServiceStart;
         private System.Windows.Forms.Label LabelServiceInstall;
         public System.Windows.Forms.Button ButServiceChange;
-        private System.Windows.Forms.Button ButServiceInstall;
+        public System.Windows.Forms.Button ButServiceInstall;
     }
 }
