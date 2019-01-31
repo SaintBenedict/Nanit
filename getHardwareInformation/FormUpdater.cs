@@ -126,6 +126,7 @@ namespace NaNiT
             }
             regNanit.Close();
             Globals.form2.CheckUpdServer();
+            Globals.form2.ServiceInit();
             Globals.isUpdOpen = false;
             Globals.form2.ButServiceChange.Enabled = true;
         }

@@ -37,6 +37,7 @@ namespace NaNiT
         public static short errCatch = 0;
         public static string exMessage = null;
         public static int serviceStatus = 0; //Проверка службы обновлений. 0 не установлена и не запущена. 1 установлена и запущена. 2 установлена не запущена. 3 обновление.
+        public static int adrUpdNum = -1;
     }
     class Program
     {

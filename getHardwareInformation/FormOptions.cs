@@ -124,7 +124,7 @@ namespace NaNiT
             }
         }
 
-        private void ServiceInit()
+        public void ServiceInit()
         {
             ServiceController[] scServices;
             scServices = ServiceController.GetServices();
@@ -134,11 +134,13 @@ namespace NaNiT
                 if (scTemp.ServiceName == "Nanit Updater")
                 {
                     ServiceController sc = new ServiceController("Nanit Updater");
-                    LabelServiceInstall.Text = "Установлена";
+                    
                     LabelServiceInstall.ForeColor = System.Drawing.Color.Green;
                     FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(Environment.SystemDirectory + @"\nanit-svc.exe");
-                    Globals.nanitSvcVer = myFileVersionInfo.FileVersion;
+                    string str = myFileVersionInfo.FileVersion.Substring(0, 5);
+                    Globals.nanitSvcVer = str;
                     groupBox2.Text = "Версия службы обновлений " + Globals.nanitSvcVer;
+                    LabelServiceInstall.Text = "Установлена (" + Globals.nanitSvcVer + ")";
                     if (sc.Status == ServiceControllerStatus.Running)
                     {
                         LabelServiceStart.Text = "Запущена";
@@ -202,6 +204,7 @@ namespace NaNiT
             for (int j = 0; j < 11; j++)
             {
                 groupBox2.Text = "Служба Windows (для обновлений)";
+                Globals.adrUpdNum = -1;
                 if (Globals.pathUpdate[j] == null)
                     continue;
                 if (Globals.pathUpdate[j].Length < 10)
@@ -212,20 +215,35 @@ namespace NaNiT
                     if (Mass[0] == "version-nanit-service")
                     {
                         ButServiceInstall.Enabled = true;
-                        if (Globals.nanitSvcVer == Mass[1])
-                            ButServiceInstall.Text = "ОК";
+                        Globals.adrUpdNum = j;
+                        string str = Mass[1].Substring(0, 5);
+                        if (Globals.nanitSvcVer == str)
+                        {
+                            if (Globals.serviceStatus == 1)
+                            {
+                                ButServiceInstall.Text = "ОК";
+                                ButServiceInstall.Enabled = false;
+                            }
+                            if (Globals.serviceStatus == 2)
+                            {
+                                ButServiceInstall.Text = "Запустить";
+                                ButServiceInstall.Enabled = true;
+                            }
+                        }
                         else
                         {
                             if (Globals.serviceStatus == 0)
                             {
                                 ButServiceInstall.Text = "Установить";
-                                groupBox2.Text = "Служба Windows (для обновлений) " + Mass[1];
+                                ButServiceInstall.Enabled = true;
+                                groupBox2.Text = "Служба Windows (для обновлений) " + str;
                             }
                             else
                             {
                                 Globals.serviceStatus = 3;
                                 ButServiceInstall.Text = "Обновить";
-                                groupBox2.Text = "Обновить службу обновлений до версии" + Mass[1];
+                                ButServiceInstall.Enabled = true;
+                                groupBox2.Text = "Обновить службу обновлений до версии" + str;
                             }
                         }
                         j = 11;
@@ -233,6 +251,7 @@ namespace NaNiT
                     else
                     {
                         ButServiceInstall.Enabled = false;
+                        Globals.adrUpdNum = -1;
                         groupBox2.Text = "Служба Windows (для обновлений)";
                         continue;
                     }
@@ -248,7 +267,66 @@ namespace NaNiT
 
         private void ButServiceInstall_Click(object sender, EventArgs e)
         {
-            
+            string remoteUri = Globals.pathUpdate[Globals.adrUpdNum] + "/nanit/";
+            string fileName = "nanit-svc.exe", myStringWebResource = null;
+            WebClient myWebClient = new WebClient();
+            myStringWebResource = remoteUri + fileName;
+            string path = Path.GetPathRoot(Environment.SystemDirectory);
+            string sourcePath = Application.StartupPath;
+            string targetPath = path + @"Windows\services";
+            string sourceFile = Path.Combine(sourcePath, fileName);
+            string destFile = Path.Combine(targetPath, fileName);
+            string InstSvc = path + @"Windows\Microsoft.NET\Framework\v2.0.50727\InstallUtil.exe ";
+
+            switch (Globals.serviceStatus)
+            {
+                case 0:
+                    myWebClient.DownloadFile(myStringWebResource, fileName);
+                    File.Copy(sourceFile, destFile, true);
+                    File.Delete(sourceFile);
+                    Process.Start("cmd.exe", "/C " + InstSvc + targetPath + @"\nanit-svc.exe");
+                    Thread.Sleep(2000);
+                    CheckUpdServer();
+                    ServiceInit();
+                    break;
+
+                case 2:
+                    ServiceController[] scServices;
+                    scServices = ServiceController.GetServices();
+                    foreach (ServiceController scTemp in scServices)
+                    {
+
+                        if (scTemp.ServiceName == "Nanit Updater")
+                        {
+                            ServiceController sc = new ServiceController("Nanit Updater");
+                            sc.Start();
+                            Thread.Sleep(2000);
+                            CheckUpdServer();
+                            ServiceInit();
+                        }
+                    }
+                    break;
+
+                case 3:
+                    scServices = ServiceController.GetServices();
+                    foreach (ServiceController scTemp in scServices)
+                    {
+
+                        if (scTemp.ServiceName == "Nanit Updater")
+                        {
+                            ServiceController sc = new ServiceController("Nanit Updater");
+                            if (sc.Status == ServiceControllerStatus.Running)
+                                sc.Stop();
+                            Process.Start("cmd.exe", "/C " + InstSvc + @"-u " + targetPath + @"\nanit-svc.exe");
+                            myWebClient.DownloadFile(myStringWebResource, fileName);
+                            Globals.serviceStatus = 0;
+                            Thread.Sleep(2000);
+                            CheckUpdServer();
+                            ServiceInit();
+                        }
+                    }
+                    break;
+            }
         }
     }
 }
