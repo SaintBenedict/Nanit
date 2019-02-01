@@ -1,35 +1,143 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Management;
-using System.IO;
-using System.Windows.Forms;
 using System.Diagnostics;
+using System.IO;
+using System.Management;
 using System.Net;
+using System.Security.Cryptography;
+using System.Text;
+using System.Windows.Forms;
 
-namespace getHardwareInformation
+/*Форматировать фрагмент кода - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + F.
+Форматировать весь код - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + D*/
+
+namespace NaNiT
 {
+    static class Globals
+    {
+        public static string appVersion = "1.3.0";
+        public static string nanitSvcVer = "0";
+        public static string version = Application.ProductVersion; /// Изменять в AssemblyInfo.cs версию, чтобы была такой же как ^^ app.Version
+        public static string[] pathUpdate = new string[11];
+        public static string nameFile = "";
+        public static string optionsPasswordDefault = "478632";
+        public static string optionsPasswordReg = "";
+        public static string servIP = "127.0.0.1";
+        public static string servPort = "51782";
+        public static string md5PortIp = Program.MD5Code(servPort + servIP);
+        public static FormLogin form1 = null;
+        public static FormOptions form2 = null;
+        public static FormUpdater form3 = null;
+        public static bool RoleSecurity = false;
+        public static bool RoleMessager = false;
+        public static bool RoleOperate = false;
+        public static bool RoleAdmin = false;
+        public static bool RoleAgent = true;
+        public static string md5Clients = Program.MD5Code(RoleSecurity.ToString().ToLower() + RoleMessager.ToString().ToLower() + RoleOperate.ToString().ToLower() + RoleAdmin.ToString().ToLower() + RoleAgent.ToString().ToLower());
+        public static bool isAboutLoaded = false;
+        public static bool isUpdOpen = false;
+        public static short errCatch = 0;
+        public static string exMessage = null;
+        public static int serviceStatus = 0; // Проверка службы обновлений. 0 не установлена и не запущена. 1 установлена и запущена. 2 установлена не запущена. 3 обновление.
+        public static int adrUpdNum = -1;
+        public static string updVerAvi = "1.0.0"; // Стринг для версии файла доступного для обновления
+    }
     class Program
     {
-        private static Form1 form1 = null;
         public static NotifyIcon notifyIcon = null;
-        public static string nameFile = "";
         public static string[,,] dataResult = new string[50, 10, 2];
 
         static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            notifyIcon = new NotifyIcon
-            {
-                Icon = Properties.Resources.net2
-            };
+            notifyIcon = new NotifyIcon();
+            notifyIcon.Icon = Properties.Resources.net2;
             notifyIcon.Visible = true;
             notifyIcon.ContextMenuStrip = new ContextMenus().Create();
             notifyIcon.Text = "Сетевой агент НИИ Телевидения";
 
+            ///Проверка наличия настроек в реестре
+            RegistryKey localMachineKey = Registry.LocalMachine;
+            RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
+            RegistryKey regNanit = localMachineSoftKey.CreateSubKey(@"N.A.N.I.T");
+            RegistryKey updateKey = regNanit.CreateSubKey("Update");
+            if (regNanit.GetValue("install") == null)
+            {
+                regNanit.SetValue("install", "1");
+                updateKey.SetValue("install", Globals.appVersion);
+                regNanit.SetValue("ip_server", Globals.servIP);
+                regNanit.SetValue("port_server", Globals.servPort);
+                regNanit.SetValue("validate_ip_port", Globals.md5PortIp);
+                regNanit.SetValue("password", MD5Code(Globals.optionsPasswordDefault));
+                Globals.optionsPasswordReg = MD5Code(Globals.optionsPasswordDefault);
+                regNanit.SetValue("RoleSecurity", Globals.RoleSecurity.ToString().ToLower());
+                regNanit.SetValue("RoleMessager", Globals.RoleMessager.ToString().ToLower());
+                regNanit.SetValue("RoleOperate", Globals.RoleOperate.ToString().ToLower());
+                regNanit.SetValue("RoleAdmin", Globals.RoleAdmin.ToString().ToLower());
+                regNanit.SetValue("RoleAgent", Globals.RoleAgent.ToString().ToLower());
+                regNanit.SetValue("validate_clients", Globals.md5Clients);
+                updateKey.SetValue("nanitSvcVer", Globals.nanitSvcVer);
+                for (int j = 0; j < 11; j++)
+                {
+                    updateKey.SetValue("path_update_" + j.ToString(), "NULL");
+                }
+                regNanit.Close();
+            }
+            else
+            {
+                Globals.servIP = regNanit.GetValue("ip_server").ToString();
+                Globals.servPort = regNanit.GetValue("port_server").ToString();
+                Globals.md5PortIp = regNanit.GetValue("validate_ip_port").ToString();
+                Globals.md5Clients = regNanit.GetValue("validate_clients").ToString();
+                Globals.RoleSecurity = regNanit.GetValue("RoleSecurity").Equals("true");
+                Globals.RoleMessager = regNanit.GetValue("RoleMessager").Equals("true");
+                Globals.RoleOperate = regNanit.GetValue("RoleOperate").Equals("true");
+                Globals.RoleAdmin = regNanit.GetValue("RoleAdmin").Equals("true");
+                Globals.RoleAgent = regNanit.GetValue("RoleAgent").Equals("true");
+                if (updateKey.GetValue("nanitSvcVer") != null)
+                    Globals.nanitSvcVer = updateKey.GetValue("nanitSvcVer").ToString();
+                else
+                    updateKey.SetValue("nanitSvcVer", Globals.nanitSvcVer);
+                for (int j = 0; j < 11; j++)
+                {
+                    if (updateKey.GetValue("path_update_" + j.ToString()).ToString() != "NULL")
+                        Globals.pathUpdate[j] = updateKey.GetValue("path_update_" + j.ToString()).ToString();
+                    else
+                        Globals.pathUpdate[j] = null;
+                }
+
+                if (Globals.md5PortIp != Program.MD5Code(Globals.servPort + Globals.servIP))
+                {
+                    const string message = "Указаны неверные настройки. Отправлено сообщение администратору.";
+                    const string caption = "";
+                    var result = MessageBox.Show(message, caption, MessageBoxButtons.OK);
+                    if (result == DialogResult.OK)
+                    {
+                        Program.notifyIcon.Dispose();
+                        Application.Exit();
+                        Process.GetCurrentProcess().Kill();
+                    }
+                }
+                if (Globals.md5Clients != Program.MD5Code(Globals.RoleSecurity.ToString().ToLower() + Globals.RoleMessager.ToString().ToLower() + Globals.RoleOperate.ToString().ToLower() + Globals.RoleAdmin.ToString().ToLower() + Globals.RoleAgent.ToString().ToLower()))
+                {
+                    const string message = "Указаны неверные политики. Отправлено сообщение администратору.";
+                    const string caption = "";
+                    var result = MessageBox.Show(message, caption, MessageBoxButtons.OK);
+                    if (result == DialogResult.OK)
+                    {
+                        Program.notifyIcon.Dispose();
+                        Application.Exit();
+                        Process.GetCurrentProcess().Kill();
+                    }
+                }
+
+                Globals.optionsPasswordReg = regNanit.GetValue("password").ToString();
+
+                regNanit.Close();
+            }
+            ///InfoGet(); /* Кусок кода для версии со сбором данных и не более того */
             Application.Run();
         }
 
@@ -43,7 +151,7 @@ namespace getHardwareInformation
             OutputSimple("Данные об Автоматизированном Рабочем Месте");
 
             OutputIniBlock("Данные о сетях");
-            OutputSimple("• Имя компьютера: "+myHost);
+            OutputSimple("• Имя компьютера: " + myHost);
 
             for (int i = 0; i <= Dns.GetHostEntry(myHost).AddressList.Length - 1; i++)
             {
@@ -96,10 +204,12 @@ namespace getHardwareInformation
             OutputSimple("");
             OutputResult("• Монитор:", GetHardwareInfo("Win32_DesktopMonitor", "DeviceID"), 28);
 
-            ///OutputIniBlock("Soft");
-            ///OutputResult("OS:", GetHardwareInfo("Win32_OperatingSystem", "Name"));
+            Process.Start(Globals.nameFile);
 
-            Process.Start(nameFile);
+            ///Application.Exit(); /* Кусок кода для версии со сбором данных и не более того */
+            ///Process.GetCurrentProcess().Kill(); /*Кусок кода для версии со сбором данных и не более того */
+
+
             /*
             ManagementObjectSearcher searcher_soft =
             new ManagementObjectSearcher("root\\CIMV2",
@@ -117,24 +227,21 @@ namespace getHardwareInformation
         {
             List<string> result = new List<string>();
             ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM " + WIN32_Class);
-            try
             {
                 foreach (ManagementObject obj in searcher.Get())
                 {
-                    result.Add(obj[ClassItemField].ToString().Trim());
+                    if (obj[ClassItemField] != null)
+                        result.Add(obj[ClassItemField].ToString().Trim());
+                    else
+                        result.Add("Ошибка при получении параметра (NULL)");
                 }
             }
-            catch (Exception ex)
-            {
-                ///Console.WriteLine(ex.Message);
-            }
-
             return result;
         }
 
         private static void OutputResult(string info, List<string> result, int pNumber)
         {
-            using (StreamWriter file = new StreamWriter(nameFile, true))
+            using (StreamWriter file = new StreamWriter(Globals.nameFile, true))
             {
                 if (info.Length > 0)
                     file.WriteLine(info);
@@ -146,7 +253,7 @@ namespace getHardwareInformation
                         file.WriteLine(result[i]);
                         dataResult[pNumber, i, 0] = result[i];
                         dataResult[pNumber, i, 1] = result.Count.ToString();
-                        file.WriteLine("DEBUG *номер запроса*"+ pNumber + "DEBUG *значение*" + dataResult[pNumber, i, 0] + "DEBUG *номер значения в листе*" + (i + 1) + "DEBUG *число значений в листе*" + dataResult[pNumber, i, 1]);
+                        ///file.WriteLine(" DEBUG *номер запроса* "+ pNumber + " DEBUG *значение* " + dataResult[pNumber, i, 0] + " DEBUG *номер значения в листе* " + (i + 1) + " DEBUG *число значений в листе* " + dataResult[pNumber, i, 1]);
                     }
                 }
             }
@@ -154,7 +261,7 @@ namespace getHardwareInformation
 
         private static void OutputSimple(string name)
         {
-            using (StreamWriter file = new StreamWriter(nameFile, true))
+            using (StreamWriter file = new StreamWriter(Globals.nameFile, true))
             {
                 file.WriteLine(name);
             }
@@ -162,7 +269,7 @@ namespace getHardwareInformation
 
         private static void OutputIniBlock(string name)
         {
-            using (StreamWriter file = new StreamWriter(nameFile, true))
+            using (StreamWriter file = new StreamWriter(Globals.nameFile, true))
             {
                 file.WriteLine("");
                 file.WriteLine("*****[" + name + "]*****");
@@ -174,13 +281,25 @@ namespace getHardwareInformation
         {
             string date2 = DateTime.Now.ToString();
             date2 = date2.Replace(":", "-");
-            nameFile = @date2 + @".txt";
-            nameFile = @".\" + nameFile;
-            if (File.Exists(nameFile))
+            Globals.nameFile = @date2 + @".txt";
+            Globals.nameFile = @".\" + Globals.nameFile;
+            if (File.Exists(Globals.nameFile))
             {
-                File.Delete(nameFile);
+                File.Delete(Globals.nameFile);
             }
         }
 
+        public static string MD5Code(string getCode)
+        {
+            byte[] hash = Encoding.ASCII.GetBytes(getCode);
+            MD5 md5 = new MD5CryptoServiceProvider();
+            byte[] hashenc = md5.ComputeHash(hash);
+            string result = "";
+            foreach (var b in hashenc)
+            {
+                result += b.ToString("x2");
+            }
+            return result;
+        }
     }
 }
