@@ -37,11 +37,12 @@
             this.CheckRoleMessager = new System.Windows.Forms.CheckBox();
             this.CheckRoleSecurity = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.ButServiceDel = new System.Windows.Forms.Button();
             this.ButServiceChange = new System.Windows.Forms.Button();
             this.ButServiceInstall = new System.Windows.Forms.Button();
             this.LabelServiceStart = new System.Windows.Forms.Label();
             this.LabelServiceInstall = new System.Windows.Forms.Label();
-            this.ButServiceDel = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -256,6 +257,16 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Служба Windows (для обновлений)";
             // 
+            // ButServiceDel
+            // 
+            this.ButServiceDel.Location = new System.Drawing.Point(107, 18);
+            this.ButServiceDel.Name = "ButServiceDel";
+            this.ButServiceDel.Size = new System.Drawing.Size(26, 26);
+            this.ButServiceDel.TabIndex = 23;
+            this.ButServiceDel.Text = "X";
+            this.ButServiceDel.UseVisualStyleBackColor = true;
+            this.ButServiceDel.Click += new System.EventHandler(this.ButServiceDel_Click);
+            // 
             // ButServiceChange
             // 
             this.ButServiceChange.Location = new System.Drawing.Point(107, 18);
@@ -298,15 +309,15 @@
             this.LabelServiceInstall.TabIndex = 0;
             this.LabelServiceInstall.Text = "***";
             // 
-            // ButServiceDel
+            // button1
             // 
-            this.ButServiceDel.Location = new System.Drawing.Point(107, 18);
-            this.ButServiceDel.Name = "ButServiceDel";
-            this.ButServiceDel.Size = new System.Drawing.Size(26, 26);
-            this.ButServiceDel.TabIndex = 23;
-            this.ButServiceDel.Text = "X";
-            this.ButServiceDel.UseVisualStyleBackColor = true;
-            this.ButServiceDel.Click += new System.EventHandler(this.ButServiceDel_Click);
+            this.button1.Location = new System.Drawing.Point(402, 120);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(30, 26);
+            this.button1.TabIndex = 21;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // FormOptions
             // 
@@ -314,6 +325,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(485, 289);
             this.ControlBox = false;
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.CheckRoleSecurity);
             this.Controls.Add(this.CheckRoleMessager);
@@ -370,5 +382,6 @@
         public System.Windows.Forms.Button ButServiceChange;
         public System.Windows.Forms.Button ButServiceInstall;
         private System.Windows.Forms.Button ButServiceDel;
+        private System.Windows.Forms.Button button1;
     }
 }
