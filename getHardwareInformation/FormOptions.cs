@@ -324,11 +324,10 @@ namespace NaNiT
                     Process cmdInstall = new Process();
                     cmdInstall.StartInfo.FileName = "cmd.exe";
                     cmdInstall.StartInfo.Arguments = "/C " + InstSvc + targetPath + @"\" + fileName2;
-                    cmdInstall.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+                    cmdInstall.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                     cmdInstall.Start();
                     cmdInstall.WaitForExit();
                     cmdInstall.Dispose();
-                    //Process.Start("cmd.exe", "/C " + InstSvc + targetPath + @"\" + fileName2);
                     ServiceController[] scServices;
                     // Кусок необходимый для проверки корректной установки, чтобы выйти из цикла 
                     // и не прибегать к функции thread.sleep потому как на разных компах скорость разная будет
@@ -345,13 +344,11 @@ namespace NaNiT
                                 goto case 2;
                             }
                         }
-                        Thread.Sleep(100);
                     }
                     goto case 2;
                 //Конец куска
 
                 case 2:
-                    ServiceInit();
                     scServices = ServiceController.GetServices();
                     foreach (ServiceController scTemp in scServices)
                     {
@@ -359,22 +356,20 @@ namespace NaNiT
                         {
                             ServiceController sc = new ServiceController("Nanit Updater");
                             sc.Start();
-                            // Кусок необходимый для проверки корректного запуска
-                            int run = 1;
-                            while (run > 0)
+                        // Кусок необходимый для проверки корректного запуска
+                        CheckRunning:
+                            Thread.Sleep(100);
+                            if (sc.Status == ServiceControllerStatus.Running)
                             {
-                                run++;
-                                if (sc.Status == ServiceControllerStatus.Running)
-                                {
-                                    run = 0;
-                                    sc.Dispose();
-                                    ServiceInit();
-                                    break;
-                                }
-                                Thread.Sleep(100);
+                                sc.Dispose();
+                                goto StopStarting;
                             }
+                            goto CheckRunning;
                         }
                     }
+                StopStarting:
+                    Thread.Sleep(200);
+                    ServiceInit();
                     break;
 
                 case 3:
@@ -382,6 +377,7 @@ namespace NaNiT
                     break;
             }
         }
+
 
         private void ButServiceDel_Click(object sender, EventArgs e)
         {
@@ -432,11 +428,10 @@ namespace NaNiT
             Process cmdInstall = new Process();
             cmdInstall.StartInfo.FileName = "cmd.exe";
             cmdInstall.StartInfo.Arguments = "/C " + InstSvc + @"-u " + targetPath + @"\" + fileName3;
-            cmdInstall.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+            cmdInstall.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             cmdInstall.Start();
             cmdInstall.WaitForExit();
             cmdInstall.Dispose();
-        //Process.Start("cmd.exe", "/C " + InstSvc + @"-u " + targetPath + @"\" + fileName3);
         // Кусок необходимый для проверки корректного удаления
         Testc:
             scServices = ServiceController.GetServices();
@@ -454,7 +449,6 @@ namespace NaNiT
             if (Globals.updVerAvi == "1.0.0")
                 Globals.nanitSvcVer = "0";
             ServiceInit();
-        //Thread.Sleep(600);
         DelFuckDel:
             try
             {
@@ -472,7 +466,7 @@ namespace NaNiT
         public void UpdateService()
         {
             DeleteService();
-            string remoteUri = Globals.pathUpdate[Globals.adrUpdNum] + " / nanit/";
+            string remoteUri = Globals.pathUpdate[Globals.adrUpdNum] + "/nanit/";
             string fileName = "nanit-svc.exe", myStringWebResource = null;
             string fileName2 = "nanit-svc" + "_" + Globals.updVerAvi + @".exe";
             string fileName3 = "nanit-svc" + "_" + Globals.nanitSvcVer + @".exe";
@@ -497,14 +491,13 @@ namespace NaNiT
             Process cmdInstall = new Process();
             cmdInstall.StartInfo.FileName = "cmd.exe";
             cmdInstall.StartInfo.Arguments = "/C " + InstSvc + targetPath + @"\" + fileName2;
-            cmdInstall.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+            cmdInstall.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             cmdInstall.Start();
             cmdInstall.WaitForExit();
             cmdInstall.Dispose();
-            //Process.Start("cmd.exe", "/C " + InstSvc + targetPath + @"\" + fileName2);
             // Кусок необходимый для проверки корректной повторной установки
-            int update2 = 1;
             ServiceController[] scServices;
+            int update2 = 1;
             while (update2 > 0)
             {
                 scServices = ServiceController.GetServices();
@@ -517,29 +510,23 @@ namespace NaNiT
                         goto UpdateEnd;
                     }
                 }
-                Thread.Sleep(100);
             }
         UpdateEnd:
-            //Конец куска
             Globals.nanitSvcVer = Globals.updVerAvi;
-            ServiceInit();
             ServiceController sc = new ServiceController("Nanit Updater");
             sc.Start();
-            // Кусок необходимый для проверки корректного запуска
-            int run2 = 1;
-            while (run2 > 0)
+        // Кусок необходимый для проверки корректного запуска
+        CheckRunning2:
+            Thread.Sleep(100);
+            if (sc.Status == ServiceControllerStatus.Running)
             {
-                run2++;
-                if (sc.Status == ServiceControllerStatus.Running)
-                {
-                    run2 = 0;
-                    goto Start2End;
-                }
-                Thread.Sleep(100);
+                sc.Dispose();
+                goto StopStarting2;
             }
-        Start2End:
-            sc.Dispose();
-            //Конец куска
+            goto CheckRunning2;
+
+        StopStarting2:
+            Thread.Sleep(200);
             ServiceInit();
         }
 
