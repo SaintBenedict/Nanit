@@ -1,20 +1,23 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Management;
-using System.IO;
-using System.Windows.Forms;
 using System.Diagnostics;
+using System.IO;
+using System.Management;
 using System.Net;
 using System.Security.Cryptography;
-using Microsoft.Win32;
+using System.Text;
+using System.Windows.Forms;
+
+/*Форматировать фрагмент кода - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + F.
+Форматировать весь код - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + D*/
 
 namespace NaNiT
 {
     static class Globals
     {
-        public static string appVersion = "1.2.3";
-        public static string nanitSvcVer = null;
+        public static string appVersion = "1.3.0";
+        public static string nanitSvcVer = "0";
         public static string version = Application.ProductVersion; /// Изменять в AssemblyInfo.cs версию, чтобы была такой же как ^^ app.Version
         public static string[] pathUpdate = new string[11];
         public static string nameFile = "";
@@ -36,14 +39,15 @@ namespace NaNiT
         public static bool isUpdOpen = false;
         public static short errCatch = 0;
         public static string exMessage = null;
-        public static int serviceStatus = 0; //Проверка службы обновлений. 0 не установлена и не запущена. 1 установлена и запущена. 2 установлена не запущена. 3 обновление.
+        public static int serviceStatus = 0; // Проверка службы обновлений. 0 не установлена и не запущена. 1 установлена и запущена. 2 установлена не запущена. 3 обновление.
         public static int adrUpdNum = -1;
+        public static string updVerAvi = "1.0.0"; // Стринг для версии файла доступного для обновления
     }
     class Program
     {
-        public static NotifyIcon notifyIcon = null;        
+        public static NotifyIcon notifyIcon = null;
         public static string[,,] dataResult = new string[50, 10, 2];
-        
+
         static void Main()
         {
             Application.EnableVisualStyles();
@@ -74,6 +78,7 @@ namespace NaNiT
                 regNanit.SetValue("RoleAdmin", Globals.RoleAdmin.ToString().ToLower());
                 regNanit.SetValue("RoleAgent", Globals.RoleAgent.ToString().ToLower());
                 regNanit.SetValue("validate_clients", Globals.md5Clients);
+                updateKey.SetValue("nanitSvcVer", Globals.nanitSvcVer);
                 for (int j = 0; j < 11; j++)
                 {
                     updateKey.SetValue("path_update_" + j.ToString(), "NULL");
@@ -91,6 +96,10 @@ namespace NaNiT
                 Globals.RoleOperate = regNanit.GetValue("RoleOperate").Equals("true");
                 Globals.RoleAdmin = regNanit.GetValue("RoleAdmin").Equals("true");
                 Globals.RoleAgent = regNanit.GetValue("RoleAgent").Equals("true");
+                if (updateKey.GetValue("nanitSvcVer") != null)
+                    Globals.nanitSvcVer = updateKey.GetValue("nanitSvcVer").ToString();
+                else
+                    updateKey.SetValue("nanitSvcVer", Globals.nanitSvcVer);
                 for (int j = 0; j < 11; j++)
                 {
                     if (updateKey.GetValue("path_update_" + j.ToString()).ToString() != "NULL")
@@ -98,7 +107,7 @@ namespace NaNiT
                     else
                         Globals.pathUpdate[j] = null;
                 }
-               
+
                 if (Globals.md5PortIp != Program.MD5Code(Globals.servPort + Globals.servIP))
                 {
                     const string message = "Указаны неверные настройки. Отправлено сообщение администратору.";
@@ -124,12 +133,12 @@ namespace NaNiT
                     }
                 }
 
-                Globals.optionsPasswordReg = regNanit.GetValue("password").ToString();               
+                Globals.optionsPasswordReg = regNanit.GetValue("password").ToString();
 
                 regNanit.Close();
             }
             ///InfoGet(); /* Кусок кода для версии со сбором данных и не более того */
-            Application.Run();           
+            Application.Run();
         }
 
         public static void InfoGet()
@@ -142,7 +151,7 @@ namespace NaNiT
             OutputSimple("Данные об Автоматизированном Рабочем Месте");
 
             OutputIniBlock("Данные о сетях");
-            OutputSimple("• Имя компьютера: "+myHost);
+            OutputSimple("• Имя компьютера: " + myHost);
 
             for (int i = 0; i <= Dns.GetHostEntry(myHost).AddressList.Length - 1; i++)
             {
@@ -225,8 +234,8 @@ namespace NaNiT
                         result.Add(obj[ClassItemField].ToString().Trim());
                     else
                         result.Add("Ошибка при получении параметра (NULL)");
-                }                
-            }              
+                }
+            }
             return result;
         }
 
@@ -277,7 +286,7 @@ namespace NaNiT
             if (File.Exists(Globals.nameFile))
             {
                 File.Delete(Globals.nameFile);
-            }            
+            }
         }
 
         public static string MD5Code(string getCode)

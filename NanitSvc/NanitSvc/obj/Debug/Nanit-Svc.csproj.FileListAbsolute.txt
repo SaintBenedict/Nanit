@@ -1,0 +1,6 @@
+D:\Repositories\N.A.N.I.T\NanitSvc\NanitSvc\obj\Debug\Nanit-Svc.csprojAssemblyReference.cache
+D:\Repositories\N.A.N.I.T\NanitSvc\NanitSvc\obj\Debug\Nanit-Svc.csproj.CoreCompileInputs.cache
+D:\Repositories\N.A.N.I.T\NanitSvc\NanitSvc\bin\Debug\nanit-svc.exe
+D:\Repositories\N.A.N.I.T\NanitSvc\NanitSvc\bin\Debug\nanit-svc.pdb
+D:\Repositories\N.A.N.I.T\NanitSvc\NanitSvc\obj\Debug\nanit-svc.exe
+D:\Repositories\N.A.N.I.T\NanitSvc\NanitSvc\obj\Debug\nanit-svc.pdb

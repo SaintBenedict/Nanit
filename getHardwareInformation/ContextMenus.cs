@@ -15,7 +15,7 @@ namespace NaNiT
 
             item = new ToolStripMenuItem();
 			item.Text = "Сбор данных в файл";
-			item.Click += new EventHandler(DataHover_Click);
+            item.Click += new EventHandler(DataHover_Click);
 			menu.Items.Add(item);
 
 			item = new ToolStripMenuItem();

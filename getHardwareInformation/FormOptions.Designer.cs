@@ -41,6 +41,7 @@
             this.ButServiceInstall = new System.Windows.Forms.Button();
             this.LabelServiceStart = new System.Windows.Forms.Label();
             this.LabelServiceInstall = new System.Windows.Forms.Label();
+            this.ButServiceDel = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -243,6 +244,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.ButServiceDel);
             this.groupBox2.Controls.Add(this.ButServiceChange);
             this.groupBox2.Controls.Add(this.ButServiceInstall);
             this.groupBox2.Controls.Add(this.LabelServiceStart);
@@ -290,11 +292,21 @@
             this.LabelServiceInstall.AutoSize = true;
             this.LabelServiceInstall.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.LabelServiceInstall.ForeColor = System.Drawing.Color.Red;
-            this.LabelServiceInstall.Location = new System.Drawing.Point(210, 21);
+            this.LabelServiceInstall.Location = new System.Drawing.Point(172, 21);
             this.LabelServiceInstall.Name = "LabelServiceInstall";
             this.LabelServiceInstall.Size = new System.Drawing.Size(22, 13);
             this.LabelServiceInstall.TabIndex = 0;
             this.LabelServiceInstall.Text = "***";
+            // 
+            // ButServiceDel
+            // 
+            this.ButServiceDel.Location = new System.Drawing.Point(107, 18);
+            this.ButServiceDel.Name = "ButServiceDel";
+            this.ButServiceDel.Size = new System.Drawing.Size(26, 26);
+            this.ButServiceDel.TabIndex = 23;
+            this.ButServiceDel.Text = "X";
+            this.ButServiceDel.UseVisualStyleBackColor = true;
+            this.ButServiceDel.Click += new System.EventHandler(this.ButServiceDel_Click);
             // 
             // FormOptions
             // 
@@ -357,5 +369,6 @@
         private System.Windows.Forms.Label LabelServiceInstall;
         public System.Windows.Forms.Button ButServiceChange;
         public System.Windows.Forms.Button ButServiceInstall;
+        private System.Windows.Forms.Button ButServiceDel;
     }
 }

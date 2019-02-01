@@ -5,7 +5,7 @@ using System.Configuration.Install;
 namespace NanitSvc
 {
     [RunInstaller(true)]
-    public partial class Installer1 : System.Configuration.Install.Installer
+    public partial class Installer1 : Installer
     {
         ServiceInstaller serviceInstaller;
         ServiceProcessInstaller processInstaller;
