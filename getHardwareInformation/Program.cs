@@ -16,7 +16,7 @@ namespace NaNiT
 {
     static class Globals
     {
-        public static string appVersion = "1.3.0";
+        public static string appVersion = "1.3.3";
         public static string nanitSvcVer = "0";
         public static string version = Application.ProductVersion; /// Изменять в AssemblyInfo.cs версию, чтобы была такой же как ^^ app.Version
         public static string[] pathUpdate = new string[11];
@@ -138,6 +138,83 @@ namespace NaNiT
                 regNanit.Close();
             }
             ///InfoGet(); /* Кусок кода для версии со сбором данных и не более того */
+            string path = Path.GetPathRoot(Environment.SystemDirectory);
+            string targetPath = path + @"Windows\services";
+            string targetFileName = "nanit_" + Globals.appVersion + ".exe";
+            string sourceFile = Application.ExecutablePath;
+            string myName = Path.GetFileName(sourceFile);
+            string targetFile = Path.Combine(targetPath, targetFileName);
+            Process currentProcess = Process.GetCurrentProcess();
+            string[] dirs2 = Directory.GetFiles(targetPath, "nanit_*");
+            int fuck = 0;
+            if (sourceFile != targetFile)
+            {
+                foreach (string dir in dirs2)
+                {
+                    string tempDir = dir.Substring(0, dir.Length - 4);
+                    string processToKill = Path.GetFileName(tempDir);
+                    Process[] AllNanit = Process.GetProcessesByName(processToKill);
+                    foreach (Process tempProc in AllNanit)
+                    {
+                        if (tempProc.Id != currentProcess.Id)
+                            tempProc.Kill();
+                    }
+                    fuck = 0;
+                DelThisPlz:
+                    try
+                    {
+                        File.Delete(dir);
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        if (fuck == 100)
+                        {
+                            //MessageBox.Show("FUCK");
+                            continue;
+                        }
+                        fuck++;
+                        goto DelThisPlz;
+                    }
+                }
+                File.Copy(sourceFile, targetFile, true);
+                Process.Start(targetFile);
+                Application.Exit();
+                currentProcess.Kill();
+            }
+            else
+            {
+                foreach (string dir in dirs2)
+                {
+                    string tempDir = dir.Substring(0, dir.Length - 4);
+                    string processToKill = Path.GetFileName(tempDir);
+                    Process[] AllNanit = Process.GetProcessesByName(processToKill);
+                    foreach (Process tempProc in AllNanit)
+                    {
+                        if (tempProc.Id != currentProcess.Id)
+                            tempProc.Kill();
+                    }
+                    fuck = 0;
+                    if (dir != sourceFile)
+                    {
+                    DelThisPlz2:
+                        try
+                        {
+                            File.Delete(dir);
+                        }
+                        catch (UnauthorizedAccessException)
+                        {
+                            if (fuck == 100)
+                            {
+                                //MessageBox.Show("FUCK");
+                                continue;
+                            }
+                            fuck++;
+                            goto DelThisPlz2;
+                        }
+                    }
+                }
+            }
+
             Application.Run();
         }
 
