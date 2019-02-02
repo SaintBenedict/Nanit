@@ -11,7 +11,6 @@ namespace NaNiT
         public FormOptions()
         {
             InitializeComponent();
-
             ControlBoxIpServ.Text = Globals.servIP;
             ControlBoxPortServ.Text = Globals.servPort;
             CheckRoleAdmin.Checked = Globals.RoleAdmin;
@@ -27,8 +26,16 @@ namespace NaNiT
             button1.Visible = false;
             if (Globals.DEBUGMODE == true)
                 button1.Visible = true;
-            ServiceInit();
+            RefreshPliz();
+            Program.ServiceInit();
         }
+
+        public void FormOptions_Close(object sender, EventArgs e)
+        {
+            Globals.isOptOpen = false;
+            Globals.isAboutLoaded = false;
+        }
+
         private void ButOptSave_Click(object sender, EventArgs e)
         {
             Globals.servIP = ControlBoxIpServ.Text;
@@ -56,6 +63,7 @@ namespace NaNiT
             regNanit.Close();
 
             this.Close();
+            Globals.isOptOpen = false;
             Globals.isAboutLoaded = false;
         }
 
@@ -71,12 +79,14 @@ namespace NaNiT
                 {
                     this.Close();
                     Globals.isAboutLoaded = false;
+                    Globals.isOptOpen = false;
                 }
             }
             else
             {
                 this.Close();
                 Globals.isAboutLoaded = false;
+                Globals.isOptOpen = false;
             }
         }
 
@@ -135,20 +145,23 @@ namespace NaNiT
         private void ButServiceInstall_Click(object sender, EventArgs e)
         {
             Program.InstallService();
-            ServiceInit();
         }
 
 
         private void ButServiceDel_Click(object sender, EventArgs e)
         {
             Program.DeleteService();
-            ServiceInit();
         }
-        public void ServiceInit()
+
+        public void RefreshPliz()
         {
-            Program.ServiceInit();
+            ServiceInit(Globals.serviceStatus);
+        }
+
+        public void ServiceInit(byte status)
+        {
+            switch (status)
             //0 не установлена и не запущена. 1 установлена и запущена. 2 установлена не запущена. 3 обновление запущена 4 обновление не запущена
-            switch (Globals.serviceStatus)
             {
                 case 0:
                     ButServiceDel.Visible = false;
@@ -238,7 +251,7 @@ namespace NaNiT
                     break;
             }
         }
-        
+
         private void button1_Click(object sender, EventArgs e)
         {
             Process cmdInstall = new Process();

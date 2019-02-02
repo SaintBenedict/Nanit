@@ -21,6 +21,7 @@ namespace NaNiT
             if (Program.MD5Code(BoxPass.Text) == Globals.optionsPasswordReg)
             {
                 Globals.form2 = new FormOptions();
+                Globals.isOptOpen = true;
                 Globals.form2.Text = (@"N.A.N.I.T (((ver." + Globals.version + ")))");
                 Globals.form2.Show();
                 this.Close();

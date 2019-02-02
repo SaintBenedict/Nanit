@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
@@ -131,7 +126,9 @@ namespace NaNiT
             }
             regNanit.Close();
             updateKey.Close();
-            Globals.form2.ServiceInit();
+            //Globals.form2.ServiceInit(true);
+            Program.CheckUpdServer();
+            Program.ServiceInit();
             Globals.isUpdOpen = false;
             Globals.form2.ButServiceChange.Enabled = true;
         }

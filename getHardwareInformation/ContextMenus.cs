@@ -49,9 +49,13 @@ namespace NaNiT
                 Globals.isAboutLoaded = true;
                 if (Program.MD5Code("") == Globals.optionsPasswordReg)
                 {
-                    Globals.form2 = new FormOptions();
-                    Globals.form2.Text = (@"N.A.N.I.T (((ver." + Globals.version + ")))");
-                    Globals.form2.Show();
+                    if (!Globals.isOptOpen)
+                    {
+                        Globals.form2 = new FormOptions();
+                        Globals.isOptOpen = true;
+                        Globals.form2.Text = (@"N.A.N.I.T (((ver." + Globals.version + ")))");
+                        Globals.form2.Show();
+                    }
                 }
                 else
                 {

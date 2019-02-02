@@ -350,6 +350,7 @@
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.Closed += new System.EventHandler(this.FormOptions_Close);
             this.ResumeLayout(false);
             this.PerformLayout();
 

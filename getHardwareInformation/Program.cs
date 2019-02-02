@@ -41,10 +41,12 @@ namespace NaNiT
         public static string md5Clients = Program.MD5Code(RoleSecurity.ToString().ToLower() + RoleMessager.ToString().ToLower() + RoleOperate.ToString().ToLower() + RoleAdmin.ToString().ToLower() + RoleAgent.ToString().ToLower());
         public static bool isAboutLoaded = false;
         public static bool isUpdOpen = false;
+        public static bool isOptOpen = false;
         public static string exMessage = null;
-        public static byte serviceStatus = 0; // Проверка службы обновлений. 0 не установлена и не запущена. 1 установлена и запущена. 2 установлена не запущена. 3 обновление.
+        public static byte serviceStatus = 0; // Проверка службы обновлений. 0 не установлена и не запущена. 1 установлена и запущена. 2 установлена не запущена. 3 обновление. 4 обновление
         public static sbyte adrUpdNum = -1;
         public static string updVerAvi = "1.0.0"; // Стринг для версии файла доступного для обновления
+        public static bool ssuNaVas = false;
     }
     class Program
     {
@@ -71,7 +73,6 @@ namespace NaNiT
             if (regNanit.GetValue("install") == null)
             {
                 regNanit.SetValue("install", "1");
-                updateKey.SetValue("install", Globals.appVersion);
                 regNanit.SetValue("ip_server", Globals.servIP);
                 regNanit.SetValue("port_server", Globals.servPort);
                 regNanit.SetValue("validate_ip_port", Globals.md5PortIp);
@@ -103,10 +104,9 @@ namespace NaNiT
                 Globals.RoleOperate = regNanit.GetValue("RoleOperate").Equals("true");
                 Globals.RoleAdmin = regNanit.GetValue("RoleAdmin").Equals("true");
                 Globals.RoleAgent = regNanit.GetValue("RoleAgent").Equals("true");
-                if (updateKey.GetValue("nanitSvcVer") != null)
-                    Globals.nanitSvcVer = updateKey.GetValue("nanitSvcVer").ToString();
-                else
-                    updateKey.SetValue("nanitSvcVer", Globals.nanitSvcVer);
+                Globals.optionsPasswordReg = regNanit.GetValue("password").ToString();
+                Globals.nanitSvcVer = CheckRegString("nanitSvcVer", updateKey, Globals.nanitSvcVer);
+
                 updateKey.SetValue("path_update_0", Globals.pathUpdate[0]);
                 for (byte j = 1; j < 11; j++)
                 {
@@ -116,6 +116,18 @@ namespace NaNiT
                         Globals.pathUpdate[j] = null;
                 }
 
+                string CheckRegString(string toRegName, RegistryKey toDo, string variant)
+                {
+                    if (toDo.GetValue(toRegName) != null)
+                        variant = toDo.GetValue(toRegName).ToString();
+                    else
+                        toDo.SetValue(toRegName, variant);
+                    return variant;
+                }
+
+                regNanit.Close();
+                updateKey.Close();
+
                 if (Globals.md5PortIp != Program.MD5Code(Globals.servPort + Globals.servIP))
                 {
                     const string message = "Указаны неверные настройки. Отправлено сообщение администратору.";
@@ -123,7 +135,7 @@ namespace NaNiT
                     var result = MessageBox.Show(message, caption, MessageBoxButtons.OK);
                     if (result == DialogResult.OK)
                     {
-                        Program.notifyIcon.Dispose();
+                        notifyIcon.Dispose();
                         Application.Exit();
                         Process.GetCurrentProcess().Kill();
                     }
@@ -135,19 +147,14 @@ namespace NaNiT
                     var result = MessageBox.Show(message, caption, MessageBoxButtons.OK);
                     if (result == DialogResult.OK)
                     {
-                        Program.notifyIcon.Dispose();
+                        notifyIcon.Dispose();
                         Application.Exit();
                         Process.GetCurrentProcess().Kill();
                     }
                 }
-
-                Globals.optionsPasswordReg = regNanit.GetValue("password").ToString();
-
-                regNanit.Close();
-                updateKey.Close();
             }
             ///InfoGet(); /* Кусок кода для версии со сбором данных и не более того */
-
+            
             if (Globals.DEBUGMODE == false)
             {
                 string path = Path.GetPathRoot(Environment.SystemDirectory);
@@ -232,9 +239,13 @@ namespace NaNiT
                     dirs2 = null;
                 }
             }
+
             TimerCallback tm1 = new TimerCallback(CheckServiceUpdate);
             Timer timer1 = new Timer(tm1, 0, 10000, 20000);
+            CheckUpdServer();
+            ServiceInit();
             Application.Run();
+            
         }
 
         public static void InfoGet()
@@ -404,10 +415,10 @@ namespace NaNiT
             try
             {
                 string remoteUri = url;
-                string fileName = "version.txt", myStringWebResource = null;
+                string fileName = "version.txt", myStringWebResourceF = null;
                 WebClient myWebClient = new WebClient();
-                myStringWebResource = remoteUri + fileName;
-                myWebClient.DownloadFile(myStringWebResource, fileName);
+                myStringWebResourceF = remoteUri + fileName;
+                myWebClient.DownloadFile(myStringWebResourceF, fileName);
                 myWebClient.Dispose();
             }
             catch (WebException)
@@ -417,7 +428,6 @@ namespace NaNiT
 
         public static void ServiceInit()
         {
-            CheckUpdServer();
             byte k = 0;
             ServiceController[] scServices;
             scServices = ServiceController.GetServices();
@@ -430,6 +440,8 @@ namespace NaNiT
                     k = 1;
                     string path = Path.GetPathRoot(Environment.SystemDirectory);
                     string targetPath = path + @"Windows\services";
+                    if (Globals.nanitSvcVer == "0")
+                        GoToHackMyself(targetPath);
                     FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(targetPath + @"\nanit-svc" + "_" + Globals.nanitSvcVer + @".exe");
                     string str = myFileVersionInfo.FileVersion.Substring(0, 5);
                     Globals.nanitSvcVer = str;
@@ -461,6 +473,11 @@ namespace NaNiT
             updateKey.SetValue("nanitSvcVer", Globals.nanitSvcVer);
             regNanit.Close();
             updateKey.Close();
+            if (Globals.isOptOpen == true)
+            {
+                if(!Globals.ssuNaVas)
+                    Globals.form2.RefreshPliz();
+            }
         }
 
         public static void CheckUpdServer()
@@ -475,7 +492,6 @@ namespace NaNiT
                 if (FileExists(Globals.pathUpdate[j] + "/nanit/") == true)
                 {
                     string[] Mass = File.ReadAllLines(@"version.txt", Encoding.Default);
-                    File.Delete(@"version.txt");
                     if (Mass[0] == "version-nanit-service")
                     {
                         Globals.adrUpdNum = j;
@@ -488,12 +504,14 @@ namespace NaNiT
                         Globals.adrUpdNum = -1;
                         continue;
                     }
+                    File.Delete(@"version.txt");
                 }
             }
         }
 
         public static void InstallService()
         {
+            ServiceInit();
             string remoteUri = Globals.pathUpdate[Globals.adrUpdNum] + "/nanit/";
             string fileName = "nanit-svc.exe", myStringWebResource = null;
             string fileName2 = "nanit-svc" + "_" + Globals.updVerAvi + @".exe";
@@ -586,15 +604,12 @@ namespace NaNiT
 
         public static void DeleteService()
         {
-            string remoteUri = Globals.pathUpdate[Globals.adrUpdNum] + "/nanit/";
-            string fileName = "nanit-svc.exe", myStringWebResource = null;
+            ServiceInit();
             string fileName2 = "nanit-svc" + "_" + Globals.updVerAvi + @".exe";
             string fileName3 = "nanit-svc" + "_" + Globals.nanitSvcVer + @".exe";
             string fileName4 = "nanit-svc" + "_" + Globals.nanitSvcVer + @".InstallLog";
-            myStringWebResource = remoteUri + fileName;
             string path = Path.GetPathRoot(Environment.SystemDirectory);
             string targetPath = path + @"Windows\services";
-            string targetFile = Path.Combine(targetPath, fileName);
             string destFile = Path.Combine(targetPath, fileName2);
             string oldFile = Path.Combine(targetPath, fileName3);
             string logFile = Path.Combine(targetPath, fileName4);
@@ -621,7 +636,6 @@ namespace NaNiT
                     }
                     //Конец куска
                     sc5.Dispose();
-                    ServiceInit();
                     goto Deleting;
                 }
             }
@@ -646,11 +660,9 @@ namespace NaNiT
                 }
             }
             //Конец куска
-            ServiceInit();
         End:
             if (Globals.updVerAvi == "1.0.0")
                 Globals.nanitSvcVer = "0";
-            ServiceInit();
         DelFuckDel:
             try
             {
@@ -663,17 +675,19 @@ namespace NaNiT
             }
             File.Delete(logFile);
             File.Delete(@"InstallUtil.InstallLog");
+            ServiceInit();
         }
 
         public static void UpdateService()
         {
+            CheckUpdServer();
             DeleteService();
             string remoteUri = Globals.pathUpdate[Globals.adrUpdNum] + "/nanit/";
-            string fileName = "nanit-svc.exe", myStringWebResource = null;
+            string fileName = "nanit-svc.exe", myStringWebResourceU = null;
             string fileName2 = "nanit-svc" + "_" + Globals.updVerAvi + @".exe";
             string fileName3 = "nanit-svc" + "_" + Globals.nanitSvcVer + @".exe";
             WebClient myWebClient = new WebClient();
-            myStringWebResource = remoteUri + fileName;
+            myStringWebResourceU = remoteUri + fileName;
             string path = Path.GetPathRoot(Environment.SystemDirectory);
             string targetPath = path + @"Windows\services";
             string sourcePath = Application.StartupPath;
@@ -683,7 +697,7 @@ namespace NaNiT
             string oldFile = Path.Combine(targetPath, fileName3);
             Directory.CreateDirectory(targetPath);
             string InstSvc = path + @"Windows\Microsoft.NET\Framework\v2.0.50727\InstallUtil.exe ";
-            myWebClient.DownloadFile(myStringWebResource, fileName);
+            myWebClient.DownloadFile(myStringWebResourceU, fileName);
             myWebClient.Dispose();
             File.Delete(sourceFile);
             File.Move(downlFile, sourceFile);
@@ -732,12 +746,33 @@ namespace NaNiT
             ServiceInit();
         }
 
+        public static void GoToHackMyself(string targetPath)
+        {
+            string[] tempDir2 = Directory.GetFiles(targetPath, "nanit-svc*");
+            foreach (string notEvenPretty in tempDir2)
+            {
+                string myPrettyFile = Path.GetFileName(notEvenPretty);
+                int notEvenPrettyLong = myPrettyFile.Length;
+                if (notEvenPrettyLong > 20)
+                    continue;
+                int PrettyLong = myPrettyFile.Length - 14;
+                string myPrettyVersion = myPrettyFile.Substring(10, PrettyLong);
+                Globals.nanitSvcVer = myPrettyVersion;
+            }
+            tempDir2 = null;
+        }
+
         public static void CheckServiceUpdate(object obj)
         {
-            ServiceInit();
+            CheckUpdServer();
+            //ServiceInit();
             if (Globals.adrUpdNum != -1)
                 if (Globals.nanitSvcVer != Globals.updVerAvi)
+                {
+                    Globals.ssuNaVas = true;
                     UpdateService();
+                    Globals.ssuNaVas = false;
+                }     
         }
     }
 }
