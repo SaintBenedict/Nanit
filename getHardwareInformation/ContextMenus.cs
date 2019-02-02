@@ -39,7 +39,7 @@ namespace NaNiT
 
 		void DataHover_Click(object sender, EventArgs e)
 		{
-            Program.InfoGet();
+            CatchInfo.InfoGet();
         }
 
 		void Options_Click(object sender, EventArgs e)
@@ -47,14 +47,14 @@ namespace NaNiT
             if (!Globals.isAboutLoaded)
 			{
                 Globals.isAboutLoaded = true;
-                if (Program.MD5Code("") == Globals.optionsPasswordReg)
+                if (Functions.MD5Code("") == Globals.optionsPasswordReg)
                 {
                     if (!Globals.isOptOpen)
                     {
                         Globals.form2 = new FormOptions();
-                        Globals.isOptOpen = true;
                         Globals.form2.Text = (@"N.A.N.I.T (((ver." + Globals.version + ")))");
                         Globals.form2.Show();
+                        Globals.isOptOpen = true;
                     }
                 }
                 else

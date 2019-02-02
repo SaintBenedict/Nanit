@@ -1,6 +1,8 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Threading;
 using System.Windows.Forms;
 
 
@@ -8,9 +10,12 @@ namespace NaNiT
 {
     public partial class FormOptions : Form
     {
+        static object locker = new object();
+
         public FormOptions()
         {
             InitializeComponent();
+            Globals.form2 = this;
             ControlBoxIpServ.Text = Globals.servIP;
             ControlBoxPortServ.Text = Globals.servPort;
             CheckRoleAdmin.Checked = Globals.RoleAdmin;
@@ -24,10 +29,12 @@ namespace NaNiT
             LabelServiceStart.ForeColor = System.Drawing.Color.Black;
             ButServiceInstall.Enabled = false;
             button1.Visible = false;
+            backgroundWorker1.WorkerReportsProgress = true;
+            backgroundWorker1.RunWorkerAsync();
+            backgroundWorker1.ReportProgress(30);
             if (Globals.DEBUGMODE == true)
                 button1.Visible = true;
-            RefreshPliz();
-            Program.ServiceInit();
+            ServiceInit();
         }
 
         public void FormOptions_Close(object sender, EventArgs e)
@@ -45,8 +52,8 @@ namespace NaNiT
             Globals.RoleMessager = CheckRoleMessager.Checked;
             Globals.RoleSecurity = CheckRoleSecurity.Checked;
             Globals.RoleAgent = CheckRoleAgent.Checked;
-            Globals.md5PortIp = Program.MD5Code(Globals.servPort + Globals.servIP);
-            Globals.md5Clients = Program.MD5Code(Globals.RoleSecurity.ToString().ToLower() + Globals.RoleMessager.ToString().ToLower() + Globals.RoleOperate.ToString().ToLower() + Globals.RoleAdmin.ToString().ToLower() + Globals.RoleAgent.ToString().ToLower());
+            Globals.md5PortIp = Functions.MD5Code(Globals.servPort + Globals.servIP);
+            Globals.md5Clients = Functions.MD5Code(Globals.RoleSecurity.ToString().ToLower() + Globals.RoleMessager.ToString().ToLower() + Globals.RoleOperate.ToString().ToLower() + Globals.RoleAdmin.ToString().ToLower() + Globals.RoleAgent.ToString().ToLower());
 
             RegistryKey localMachineKey = Registry.LocalMachine;
             RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
@@ -92,12 +99,12 @@ namespace NaNiT
 
         private void ButChangePass_Click(object sender, EventArgs e)
         {
-            string tryPass = Program.MD5Code(BoxPassOld.Text);
+            string tryPass = Functions.MD5Code(BoxPassOld.Text);
             if (tryPass == Globals.optionsPasswordReg)
             {
                 if (BoxPassNew.Text == BoxPassNew2.Text)
                 {
-                    Globals.optionsPasswordReg = Program.MD5Code(BoxPassNew.Text);
+                    Globals.optionsPasswordReg = Functions.MD5Code(BoxPassNew.Text);
                     RegistryKey localMachineKey = Registry.LocalMachine;
                     RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
                     RegistryKey regNanit = localMachineSoftKey.CreateSubKey(@"N.A.N.I.T");
@@ -144,111 +151,116 @@ namespace NaNiT
 
         private void ButServiceInstall_Click(object sender, EventArgs e)
         {
-            Program.InstallService();
+            Thread InstallService = new Thread(new ThreadStart(ServiceWork.InstallService));
+            InstallService.Name = "Install or Update on click";
+            InstallService.Start();
         }
 
 
         private void ButServiceDel_Click(object sender, EventArgs e)
         {
-            Program.DeleteService();
+            Thread DeleteService = new Thread(new ThreadStart(ServiceWork.DeleteService));
+            DeleteService.Name = "Delete on click";
+            DeleteService.Start();
         }
 
-        public void RefreshPliz()
+        public void ServiceInit()
         {
-            ServiceInit(Globals.serviceStatus);
-        }
-
-        public void ServiceInit(byte status)
-        {
-            switch (status)
-            //0 не установлена и не запущена. 1 установлена и запущена. 2 установлена не запущена. 3 обновление запущена 4 обновление не запущена
+            /*Globals.isOptOpen = false;
+            ServiceWork.ServiceInit();
+            Globals.isOptOpen = true;*/
+            lock (locker)
             {
-                case 0:
-                    ButServiceDel.Visible = false;
-                    ButServiceChange.Visible = true;
-                    ButServiceInstall.Text = "Установить";
-                    LabelServiceStart.Text = "Не запущена";
-                    LabelServiceStart.ForeColor = System.Drawing.Color.Red;
-                    LabelServiceInstall.Text = "Не установлена";
-                    LabelServiceInstall.ForeColor = System.Drawing.Color.Red;
-                    if (Globals.adrUpdNum == -1)
-                    {
-                        groupBox2.Text = "Служба Windows (для обновлений)";
-                        ButServiceInstall.Enabled = false;
-                    }
-                    else
-                    {
-                        groupBox2.Text = "Установить службу обновлений версии " + Globals.updVerAvi;
-                        ButServiceInstall.Enabled = true;
-                    }
-                    break;
-                case 1:
-                    ButServiceDel.Visible = true;
-                    ButServiceChange.Visible = false;
-                    ButServiceInstall.Text = "ОК";
-                    ButServiceInstall.Enabled = false;
-                    LabelServiceStart.Text = "Запущена";
-                    LabelServiceStart.ForeColor = System.Drawing.Color.Green;
-                    LabelServiceInstall.Text = "Установлена (" + Globals.nanitSvcVer + ")";
-                    LabelServiceInstall.ForeColor = System.Drawing.Color.Green;
-                    if (Globals.adrUpdNum == -1)
-                        groupBox2.Text = "Служба Windows (для обновлений)";
-                    else
-                        groupBox2.Text = "Доступная версия службы обновлений " + Globals.nanitSvcVer;
-                    break;
-                case 2:
-                    ButServiceDel.Visible = false;
-                    ButServiceChange.Visible = true;
-                    ButServiceInstall.Text = "Запустить";
-                    ButServiceInstall.Enabled = true;
-                    LabelServiceStart.Text = "Не запущена";
-                    LabelServiceStart.ForeColor = System.Drawing.Color.Red;
-                    LabelServiceInstall.Text = "Установлена (" + Globals.nanitSvcVer + ")";
-                    LabelServiceInstall.ForeColor = System.Drawing.Color.Green;
-                    if (Globals.adrUpdNum == -1)
-                        groupBox2.Text = "Служба Windows (для обновлений)";
-                    else
-                        groupBox2.Text = "Доступная версия службы обновлений " + Globals.nanitSvcVer;
-                    break;
-                case 3:
-                    ButServiceDel.Visible = false;
-                    ButServiceChange.Visible = true;
-                    ButServiceInstall.Text = "Обновить";
-                    LabelServiceStart.Text = "Запущена";
-                    LabelServiceStart.ForeColor = System.Drawing.Color.Green;
-                    LabelServiceInstall.Text = "Установлена (" + Globals.nanitSvcVer + ")";
-                    LabelServiceInstall.ForeColor = System.Drawing.Color.Green;
-                    if (Globals.adrUpdNum == -1)
-                    {
-                        groupBox2.Text = "Служба Windows (для обновлений)";
-                        ButServiceInstall.Enabled = false;
-                    }
-                    else
-                    {
-                        groupBox2.Text = "Обновить службу обновлений до версии " + Globals.updVerAvi;
-                        ButServiceInstall.Enabled = true;
-                    }
-                    break;
-                case 4:
-                    ButServiceDel.Visible = false;
-                    ButServiceChange.Visible = true;
-                    LabelServiceStart.Text = "Не запущена";
-                    LabelServiceStart.ForeColor = System.Drawing.Color.Red;
-                    LabelServiceInstall.Text = "Установлена (" + Globals.nanitSvcVer + ")";
-                    LabelServiceInstall.ForeColor = System.Drawing.Color.Green;
-                    if (Globals.adrUpdNum == -1)
-                    {
-                        ButServiceInstall.Text = "Запустить";
-                        groupBox2.Text = "Служба Windows (для обновлений)";
-                        ButServiceInstall.Enabled = true;
-                    }
-                    else
-                    {
-                        ButServiceInstall.Text = "Обновить";
-                        groupBox2.Text = "Обновить службу обновлений до версии " + Globals.updVerAvi;
-                        ButServiceInstall.Enabled = true;
-                    }
-                    break;
+                switch (Globals.serviceStatus)
+                //0 не установлена и не запущена. 1 установлена и запущена. 2 установлена не запущена. 3 обновление запущена 4 обновление не запущена
+                {
+                    case 0:
+                        Globals.form2.ButServiceDel.Visible = false;
+                        Globals.form2.ButServiceChange.Visible = true;
+                        Globals.form2.ButServiceInstall.Text = "Установить";
+                        Globals.form2.LabelServiceStart.Text = "Не запущена";
+                        Globals.form2.LabelServiceStart.ForeColor = System.Drawing.Color.Red;
+                        Globals.form2.LabelServiceInstall.Text = "Не установлена";
+                        Globals.form2.LabelServiceInstall.ForeColor = System.Drawing.Color.Red;
+                        if (Globals.adrUpdNum == -1)
+                        {
+                            Globals.form2.groupBox2.Text = "Служба Windows (для обновлений)";
+                            Globals.form2.ButServiceInstall.Enabled = false;
+                        }
+                        else
+                        {
+                            Globals.form2.groupBox2.Text = "Установить службу обновлений версии " + Globals.updVerAvi;
+                            Globals.form2.ButServiceInstall.Enabled = true;
+                        }
+                        break;
+                    case 1:
+                        Globals.form2.ButServiceDel.Visible = true;
+                        Globals.form2.ButServiceChange.Visible = false;
+                        Globals.form2.ButServiceInstall.Text = "ОК";
+                        Globals.form2.ButServiceInstall.Enabled = false;
+                        Globals.form2.LabelServiceStart.Text = "Запущена";
+                        Globals.form2.LabelServiceStart.ForeColor = System.Drawing.Color.Green;
+                        Globals.form2.LabelServiceInstall.Text = "Установлена (" + Globals.nanitSvcVer + ")";
+                        Globals.form2.LabelServiceInstall.ForeColor = System.Drawing.Color.Green;
+                        if (Globals.adrUpdNum == -1)
+                            Globals.form2.groupBox2.Text = "Служба Windows (для обновлений)";
+                        else
+                            Globals.form2.groupBox2.Text = "Доступная версия службы обновлений " + Globals.nanitSvcVer;
+                        break;
+                    case 2:
+                        Globals.form2.ButServiceDel.Visible = false;
+                        Globals.form2.ButServiceChange.Visible = true;
+                        Globals.form2.ButServiceInstall.Text = "Запустить";
+                        Globals.form2.ButServiceInstall.Enabled = true;
+                        Globals.form2.LabelServiceStart.Text = "Не запущена";
+                        Globals.form2.LabelServiceStart.ForeColor = System.Drawing.Color.Red;
+                        Globals.form2.LabelServiceInstall.Text = "Установлена (" + Globals.nanitSvcVer + ")";
+                        Globals.form2.LabelServiceInstall.ForeColor = System.Drawing.Color.Green;
+                        if (Globals.adrUpdNum == -1)
+                            Globals.form2.groupBox2.Text = "Служба Windows (для обновлений)";
+                        else
+                            Globals.form2.groupBox2.Text = "Доступная версия службы обновлений " + Globals.nanitSvcVer;
+                        break;
+                    case 3:
+                        Globals.form2.ButServiceDel.Visible = false;
+                        Globals.form2.ButServiceChange.Visible = true;
+                        Globals.form2.ButServiceInstall.Text = "Обновить";
+                        Globals.form2.LabelServiceStart.Text = "Запущена";
+                        Globals.form2.LabelServiceStart.ForeColor = System.Drawing.Color.Green;
+                        Globals.form2.LabelServiceInstall.Text = "Установлена (" + Globals.nanitSvcVer + ")";
+                        Globals.form2.LabelServiceInstall.ForeColor = System.Drawing.Color.Green;
+                        if (Globals.adrUpdNum == -1)
+                        {
+                            Globals.form2.groupBox2.Text = "Служба Windows (для обновлений)";
+                            Globals.form2.ButServiceInstall.Enabled = false;
+                        }
+                        else
+                        {
+                            Globals.form2.groupBox2.Text = "Обновить службу обновлений до версии " + Globals.updVerAvi;
+                            Globals.form2.ButServiceInstall.Enabled = true;
+                        }
+                        break;
+                    case 4:
+                        Globals.form2.ButServiceDel.Visible = false;
+                        Globals.form2.ButServiceChange.Visible = true;
+                        Globals.form2.LabelServiceStart.Text = "Не запущена";
+                        Globals.form2.LabelServiceStart.ForeColor = System.Drawing.Color.Red;
+                        Globals.form2.LabelServiceInstall.Text = "Установлена (" + Globals.nanitSvcVer + ")";
+                        Globals.form2.LabelServiceInstall.ForeColor = System.Drawing.Color.Green;
+                        if (Globals.adrUpdNum == -1)
+                        {
+                            Globals.form2.ButServiceInstall.Text = "Запустить";
+                            Globals.form2.groupBox2.Text = "Служба Windows (для обновлений)";
+                            Globals.form2.ButServiceInstall.Enabled = true;
+                        }
+                        else
+                        {
+                            Globals.form2.ButServiceInstall.Text = "Обновить";
+                            Globals.form2.groupBox2.Text = "Обновить службу обновлений до версии " + Globals.updVerAvi;
+                            Globals.form2.ButServiceInstall.Enabled = true;
+                        }
+                        break;
+                }
             }
         }
 
@@ -259,6 +271,38 @@ namespace NaNiT
             cmdInstall.StartInfo.Arguments = "/C " + @"ping google.com";
             cmdInstall.Start();
             cmdInstall.WaitForExit();
+        }
+
+        private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            MessageBox.Show(e.ProgressPercentage.ToString());
+            ServiceInit();
+        }
+        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = sender as BackgroundWorker;
+            if (Globals.work != Globals.workTmp)
+            {
+                Globals.workTmp = Globals.work;
+                worker.ReportProgress(Globals.work);
+                MessageBox.Show(Globals.work.ToString() + "fsdfs");
+            }
+            Thread.Sleep(2000);
+        }
+        private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Cancelled == true)
+            {
+                MessageBox.Show("Canceled!");
+            }
+            else if (e.Error != null)
+            {
+                MessageBox.Show("Error: " + e.Error.Message);
+            }
+            else
+            {
+                MessageBox.Show("Что-то пошло не так. Я закончил работать");
+            }
         }
     }
 }

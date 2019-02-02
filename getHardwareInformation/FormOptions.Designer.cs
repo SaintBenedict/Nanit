@@ -9,13 +9,14 @@
             {
                 components.Dispose();
                 Globals.isAboutLoaded = false;
+                Globals.isOptOpen = false;
             }
             base.Dispose(disposing);
         }
 
         #region Windows Form Designer generated code
 
-        private void InitializeComponent()
+        public void InitializeComponent()
         {
             this.ButOptSave = new System.Windows.Forms.Button();
             this.ButOptClose = new System.Windows.Forms.Button();
@@ -43,6 +44,7 @@
             this.LabelServiceStart = new System.Windows.Forms.Label();
             this.LabelServiceInstall = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -346,14 +348,16 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Настройки программы";
+            this.Closed += new System.EventHandler(this.FormOptions_Close);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            this.Closed += new System.EventHandler(this.FormOptions_Close);
             this.ResumeLayout(false);
             this.PerformLayout();
-
+            this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
+            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
+            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
         }
 
         #endregion
@@ -384,5 +388,6 @@
         public System.Windows.Forms.Button ButServiceInstall;
         public System.Windows.Forms.Button ButServiceDel;
         private System.Windows.Forms.Button button1;
+        public System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
 }

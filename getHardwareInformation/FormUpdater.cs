@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
+using System.Threading;
 using System.Windows.Forms;
-using Microsoft.Win32;
 
 namespace NaNiT
 {
@@ -10,7 +11,7 @@ namespace NaNiT
         sbyte numInd = -1;
         public FormUpdater()
         {
-            InitializeComponent();            
+            InitializeComponent();
             ToolTip delB = new ToolTip();
             delB.SetToolTip(ButDel, "Удалить");
             ToolTip chgB = new ToolTip();
@@ -23,7 +24,7 @@ namespace NaNiT
                 {
                     ChList.Items.Add(Globals.pathUpdate[j]);
                 }
-            }            
+            }
             Enables();
         }
 
@@ -53,11 +54,11 @@ namespace NaNiT
 
         private void ChList_ItemCheck(Object sender, EventArgs e)
         {
-            foreach (sbyte indexChecked in ChList.CheckedIndices)
+            /*foreach (sbyte indexChecked in ChList.CheckedIndices)
             {
                 if (indexChecked == 0)
                     ChList.SetItemCheckState(0, CheckState.Unchecked);
-            }
+            }*/
             Enables();
         }
 
@@ -65,7 +66,7 @@ namespace NaNiT
         {
             chInd = 1;
             foreach (sbyte indexChecked in ChList.CheckedIndices)
-                numInd =  indexChecked;
+                numInd = indexChecked;
             foreach (object itemChecked in ChList.CheckedItems)
                 textBox1.Text = itemChecked.ToString();
             ButDel.Enabled = false;
@@ -84,7 +85,7 @@ namespace NaNiT
             }
             for (byte j = 0; j < i; j++)
             {
-                ChList.Items.RemoveAt(k[j]-j);
+                ChList.Items.RemoveAt(k[j] - j);
             }
             i = -1; k = null;
             Enables();
@@ -94,8 +95,8 @@ namespace NaNiT
         {
             if (chInd == -1)
             {
-                    ChList.Items.Add(textBox1.Text);
-                    textBox1.Text = "";
+                ChList.Items.Add(textBox1.Text);
+                textBox1.Text = "";
             }
             else
             {
@@ -126,9 +127,12 @@ namespace NaNiT
             }
             regNanit.Close();
             updateKey.Close();
-            //Globals.form2.ServiceInit(true);
-            Program.CheckUpdServer();
-            Program.ServiceInit();
+
+            //ServiceWork.CheckUpdServer();
+            if (Globals.work == 30)
+                Globals.work = 40;
+            else
+                Globals.work = 30;
             Globals.isUpdOpen = false;
             Globals.form2.ButServiceChange.Enabled = true;
         }
