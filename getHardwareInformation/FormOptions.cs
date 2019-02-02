@@ -1,10 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Diagnostics;
-using System.IO;
-using System.Net;
-using System.ServiceProcess;
-using System.Threading;
 using System.Windows.Forms;
 
 
@@ -28,9 +24,10 @@ namespace NaNiT
             LabelServiceStart.Text = "Загрузка...";
             LabelServiceStart.ForeColor = System.Drawing.Color.Black;
             ButServiceInstall.Enabled = false;
-
+            button1.Visible = false;
+            if (Globals.DEBUGMODE == true)
+                button1.Visible = true;
             ServiceInit();
-            CheckUpdServer();
         }
         private void ButOptSave_Click(object sender, EventArgs e)
         {
@@ -124,85 +121,6 @@ namespace NaNiT
             }
         }
 
-        public void ServiceInit()
-        {
-            int k = 0;
-            ServiceController[] scServices;
-            scServices = ServiceController.GetServices();
-            foreach (ServiceController scTemp in scServices)
-            {
-
-                if (scTemp.ServiceName == "Nanit Updater")
-                {
-                    ServiceController sc = new ServiceController("Nanit Updater");
-                    k = 1;
-                    LabelServiceInstall.ForeColor = System.Drawing.Color.Green;
-                    string path = Path.GetPathRoot(Environment.SystemDirectory);
-                    string targetPath = path + @"Windows\services";
-                    FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(targetPath + @"\nanit-svc" + "_" + Globals.nanitSvcVer + @".exe");
-                    string str = myFileVersionInfo.FileVersion.Substring(0, 5);
-                    Globals.nanitSvcVer = str;
-                    groupBox2.Text = "Версия службы обновлений " + Globals.nanitSvcVer;
-                    LabelServiceInstall.Text = "Установлена (" + Globals.nanitSvcVer + ")";
-                    if (sc.Status == ServiceControllerStatus.Running)
-                    {
-                        LabelServiceStart.Text = "Запущена";
-                        LabelServiceStart.ForeColor = System.Drawing.Color.Green;
-                        Globals.serviceStatus = 1;
-                        ButServiceInstall.Text = "Обновить";
-                        ButServiceInstall.Enabled = false;
-                    }
-                    else
-                    {
-                        LabelServiceStart.Text = "Не запущена";
-                        LabelServiceStart.ForeColor = System.Drawing.Color.Red;
-                        Globals.serviceStatus = 2;
-                        ButServiceInstall.Text = "Запустить";
-                        ButServiceInstall.Enabled = true;
-                    }
-                    File.Delete(@"InstallUtil.InstallLog");
-                }
-                else
-                {
-                    LabelServiceInstall.Text = "Не установлена";
-                    LabelServiceInstall.ForeColor = System.Drawing.Color.Red;
-                    LabelServiceStart.Text = "Не запущена";
-                    LabelServiceStart.ForeColor = System.Drawing.Color.Red;
-                    Globals.serviceStatus = 0;
-                    ButServiceInstall.Text = "Установить";
-                    groupBox2.Text = "Служба Windows (для обновлений)";
-                }
-            }
-            if (k == 0)
-                Globals.nanitSvcVer = "0";
-            switch (Globals.serviceStatus)
-            {
-                case 0:
-                    ButServiceDel.Visible = false;
-                    ButServiceChange.Visible = true;
-                    break;
-                case 1:
-                    ButServiceDel.Visible = true;
-                    ButServiceChange.Visible = false;
-                    break;
-                case 2:
-                    ButServiceDel.Visible = false;
-                    ButServiceChange.Visible = true;
-                    break;
-                case 3:
-                    ButServiceDel.Visible = false;
-                    ButServiceChange.Visible = true;
-                    break;
-            }
-            CheckUpdServer();
-            RegistryKey localMachineKey = Registry.LocalMachine;
-            RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
-            RegistryKey regNanit = localMachineSoftKey.CreateSubKey(@"N.A.N.I.T");
-            RegistryKey updateKey = regNanit.CreateSubKey("Update");
-            updateKey.SetValue("nanitSvcVer", Globals.nanitSvcVer);
-            regNanit.Close();
-        }
-
         private void ButServiceChange_Click(object sender, EventArgs e)
         {
             if (!Globals.isUpdOpen)
@@ -214,322 +132,113 @@ namespace NaNiT
             }
         }
 
-        public static bool FileExists(string url)
-        {
-            bool result = true;
-            try
-            {
-                string remoteUri = url;
-                string fileName = "version.txt", myStringWebResource = null;
-                WebClient myWebClient = new WebClient();
-                myStringWebResource = remoteUri + fileName;
-                myWebClient.DownloadFile(myStringWebResource, fileName);
-                myWebClient.Dispose();
-            }
-            catch (WebException)
-            { result = false; }
-            return result;
-        }
-
-        public void CheckUpdServer()
-        {
-            for (int j = 0; j < 11; j++)
-            {
-                groupBox2.Text = "Служба Windows (для обновлений)";
-                Globals.adrUpdNum = -1;
-                if (Globals.pathUpdate[j] == null)
-                    continue;
-                if (Globals.pathUpdate[j].Length < 10)
-                    continue;
-                if (FileExists(Globals.pathUpdate[j] + "/nanit/") == true)
-                {
-                    string[] Mass = File.ReadAllLines(@"version.txt", System.Text.Encoding.Default);
-                    File.Delete(@"version.txt");
-                    if (Mass[0] == "version-nanit-service")
-                    {
-                        ButServiceInstall.Enabled = true;
-                        Globals.adrUpdNum = j;
-                        Globals.updVerAvi = Mass[1].Substring(0, 5);
-                        if (Globals.nanitSvcVer == Globals.updVerAvi)
-                        {
-                            if (Globals.serviceStatus == 1)
-                            {
-                                ButServiceInstall.Text = "ОК";
-                                ButServiceInstall.Enabled = false;
-                            }
-                            if (Globals.serviceStatus == 2)
-                            {
-                                ButServiceInstall.Text = "Запустить";
-                                ButServiceInstall.Enabled = true;
-                            }
-                        }
-                        else
-                        {
-                            if (Globals.serviceStatus == 0)
-                            {
-                                ButServiceInstall.Text = "Установить";
-                                ButServiceInstall.Enabled = true;
-                                groupBox2.Text = "Служба Windows (для обновлений) " + Globals.updVerAvi;
-                            }
-                            else
-                            {
-                                Globals.serviceStatus = 3;
-                                ButServiceInstall.Text = "Обновить";
-                                ButServiceInstall.Enabled = true;
-                                groupBox2.Text = "Обновить службу обновлений до версии" + Globals.updVerAvi;
-                            }
-                        }
-                        j = 11;
-                    }
-                    else
-                    {
-                        ButServiceInstall.Enabled = false;
-                        Globals.adrUpdNum = -1;
-                        groupBox2.Text = "Служба Windows (для обновлений)";
-                        continue;
-                    }
-                }
-            }
-        }
-
         private void ButServiceInstall_Click(object sender, EventArgs e)
         {
-            string remoteUri = Globals.pathUpdate[Globals.adrUpdNum] + "/nanit/";
-            string fileName = "nanit-svc.exe", myStringWebResource = null;
-            string fileName2 = "nanit-svc" + "_" + Globals.updVerAvi + @".exe";
-            string fileName3 = "nanit-svc" + "_" + Globals.nanitSvcVer + @".exe";
-            WebClient myWebClient = new WebClient();
-            myStringWebResource = remoteUri + fileName;
-            string path = Path.GetPathRoot(Environment.SystemDirectory);
-            string sourcePath = Application.StartupPath;
-            string targetPath = path + @"Windows\services";
-            string downlFile = Path.Combine(sourcePath, fileName);
-            string sourceFile = Path.Combine(sourcePath, fileName2);
-            string targetFile = Path.Combine(targetPath, fileName2);
-            string oldFile = Path.Combine(targetPath, fileName3);
-            Directory.CreateDirectory(targetPath);
-            string InstSvc = path + @"Windows\Microsoft.NET\Framework\v2.0.50727\InstallUtil.exe ";
-
-            switch (Globals.serviceStatus)
-            {
-                case 0:
-                    myWebClient.DownloadFile(myStringWebResource, fileName);
-                    myWebClient.Dispose();
-                    File.Delete(sourceFile);
-                    File.Move(downlFile, sourceFile);
-                    File.Copy(sourceFile, targetFile, true);
-                    Globals.nanitSvcVer = Globals.updVerAvi;
-                    File.Delete(sourceFile);
-                    File.Delete(downlFile);
-                    Process cmdInstall = new Process();
-                    cmdInstall.StartInfo.FileName = "cmd.exe";
-                    cmdInstall.StartInfo.Arguments = "/C " + InstSvc + targetPath + @"\" + fileName2;
-                    cmdInstall.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                    cmdInstall.Start();
-                    cmdInstall.WaitForExit();
-                    cmdInstall.Dispose();
-                    ServiceController[] scServices;
-                    // Кусок необходимый для проверки корректной установки, чтобы выйти из цикла 
-                    // и не прибегать к функции thread.sleep потому как на разных компах скорость разная будет
-                    int install = 1;
-                    while (install > 0)
-                    {
-                        scServices = ServiceController.GetServices();
-                        foreach (ServiceController scTemp in scServices)
-                        {
-                            install++;
-                            if (scTemp.ServiceName == "Nanit Updater")
-                            {
-                                install = 0;
-                                goto case 2;
-                            }
-                        }
-                    }
-                    goto case 2;
-                //Конец куска
-
-                case 2:
-                    scServices = ServiceController.GetServices();
-                    foreach (ServiceController scTemp in scServices)
-                    {
-                        if (scTemp.ServiceName == "Nanit Updater")
-                        {
-                            ServiceController sc = new ServiceController("Nanit Updater");
-                            sc.Start();
-                        // Кусок необходимый для проверки корректного запуска
-                        CheckRunning:
-                            Thread.Sleep(100);
-                            if (sc.Status == ServiceControllerStatus.Running)
-                            {
-                                sc.Dispose();
-                                goto StopStarting;
-                            }
-                            goto CheckRunning;
-                        }
-                    }
-                StopStarting:
-                    Thread.Sleep(200);
-                    ServiceInit();
-                    break;
-
-                case 3:
-                    UpdateService();
-                    break;
-            }
+            Program.InstallService();
+            ServiceInit();
         }
 
 
         private void ButServiceDel_Click(object sender, EventArgs e)
         {
-            DeleteService();
+            Program.DeleteService();
+            ServiceInit();
         }
-
-        public void DeleteService()
+        public void ServiceInit()
         {
-            string remoteUri = Globals.pathUpdate[Globals.adrUpdNum] + "/nanit/";
-            string fileName = "nanit-svc.exe", myStringWebResource = null;
-            string fileName2 = "nanit-svc" + "_" + Globals.updVerAvi + @".exe";
-            string fileName3 = "nanit-svc" + "_" + Globals.nanitSvcVer + @".exe";
-            string fileName4 = "nanit-svc" + "_" + Globals.nanitSvcVer + @".InstallLog";
-            myStringWebResource = remoteUri + fileName;
-            string path = Path.GetPathRoot(Environment.SystemDirectory);
-            string targetPath = path + @"Windows\services";
-            string targetFile = Path.Combine(targetPath, fileName);
-            string destFile = Path.Combine(targetPath, fileName2);
-            string oldFile = Path.Combine(targetPath, fileName3);
-            string logFile = Path.Combine(targetPath, fileName4);
-            string InstSvc = path + @"Windows\Microsoft.NET\Framework\v2.0.50727\InstallUtil.exe ";
-            ServiceController[] scServices;
-            scServices = ServiceController.GetServices();
-            foreach (ServiceController scTemp in scServices)
+            Program.ServiceInit();
+            //0 не установлена и не запущена. 1 установлена и запущена. 2 установлена не запущена. 3 обновление запущена 4 обновление не запущена
+            switch (Globals.serviceStatus)
             {
-
-                if (scTemp.ServiceName == "Nanit Updater")
-                {
-                    ServiceController sc = new ServiceController("Nanit Updater");
-                    if (sc.Status == ServiceControllerStatus.Running)
-                        sc.Stop();
-                    Thread.Sleep(100);
-                // Кусок необходимый для проверки корректной остановки
-                Running:
-                    if (sc.Status == ServiceControllerStatus.Running)
+                case 0:
+                    ButServiceDel.Visible = false;
+                    ButServiceChange.Visible = true;
+                    ButServiceInstall.Text = "Установить";
+                    LabelServiceStart.Text = "Не запущена";
+                    LabelServiceStart.ForeColor = System.Drawing.Color.Red;
+                    LabelServiceInstall.Text = "Не установлена";
+                    LabelServiceInstall.ForeColor = System.Drawing.Color.Red;
+                    if (Globals.adrUpdNum == -1)
                     {
-                        Thread.Sleep(100);
-                        goto Running;
+                        groupBox2.Text = "Служба Windows (для обновлений)";
+                        ButServiceInstall.Enabled = false;
                     }
-                    sc.Dispose();
-                }
-                //Конец куска
-                ServiceInit();
-                goto Deleting;
-            }
-            goto End;
-        Deleting:
-            Process cmdInstall = new Process();
-            cmdInstall.StartInfo.FileName = "cmd.exe";
-            cmdInstall.StartInfo.Arguments = "/C " + InstSvc + @"-u " + targetPath + @"\" + fileName3;
-            cmdInstall.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            cmdInstall.Start();
-            cmdInstall.WaitForExit();
-            cmdInstall.Dispose();
-        // Кусок необходимый для проверки корректного удаления
-        Testc:
-            scServices = ServiceController.GetServices();
-            foreach (ServiceController scTemp5 in scServices)
-            {
-                if (scTemp5.ServiceName == "Nanit Updater")
-                {
-                    Thread.Sleep(100);
-                    goto Testc;
-                }
-            }
-            //Конец куска
-            ServiceInit();
-        End:
-            if (Globals.updVerAvi == "1.0.0")
-                Globals.nanitSvcVer = "0";
-            ServiceInit();
-        DelFuckDel:
-            try
-            {
-                File.Delete(oldFile);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                Thread.Sleep(100);
-                goto DelFuckDel;
-            }
-            File.Delete(logFile);
-            File.Delete(@"InstallUtil.InstallLog");
-        }
-
-        public void UpdateService()
-        {
-            DeleteService();
-            string remoteUri = Globals.pathUpdate[Globals.adrUpdNum] + "/nanit/";
-            string fileName = "nanit-svc.exe", myStringWebResource = null;
-            string fileName2 = "nanit-svc" + "_" + Globals.updVerAvi + @".exe";
-            string fileName3 = "nanit-svc" + "_" + Globals.nanitSvcVer + @".exe";
-            WebClient myWebClient = new WebClient();
-            myStringWebResource = remoteUri + fileName;
-            string path = Path.GetPathRoot(Environment.SystemDirectory);
-            string targetPath = path + @"Windows\services";
-            string sourcePath = Application.StartupPath;
-            string downlFile = Path.Combine(sourcePath, fileName);
-            string sourceFile = Path.Combine(sourcePath, fileName2);
-            string targetFile = Path.Combine(targetPath, fileName2);
-            string oldFile = Path.Combine(targetPath, fileName3);
-            Directory.CreateDirectory(targetPath);
-            string InstSvc = path + @"Windows\Microsoft.NET\Framework\v2.0.50727\InstallUtil.exe ";
-            myWebClient.DownloadFile(myStringWebResource, fileName);
-            myWebClient.Dispose();
-            File.Delete(sourceFile);
-            File.Move(downlFile, sourceFile);
-            File.Copy(sourceFile, targetFile, true);
-            File.Delete(sourceFile);
-            File.Delete(downlFile);
-            Process cmdInstall = new Process();
-            cmdInstall.StartInfo.FileName = "cmd.exe";
-            cmdInstall.StartInfo.Arguments = "/C " + InstSvc + targetPath + @"\" + fileName2;
-            cmdInstall.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            cmdInstall.Start();
-            cmdInstall.WaitForExit();
-            cmdInstall.Dispose();
-            // Кусок необходимый для проверки корректной повторной установки
-            ServiceController[] scServices;
-            int update2 = 1;
-            while (update2 > 0)
-            {
-                scServices = ServiceController.GetServices();
-                foreach (ServiceController scTemp3 in scServices)
-                {
-                    update2++;
-                    if (scTemp3.ServiceName == "Nanit Updater")
+                    else
                     {
-                        update2 = 0;
-                        goto UpdateEnd;
+                        groupBox2.Text = "Установить службу обновлений версии " + Globals.updVerAvi;
+                        ButServiceInstall.Enabled = true;
                     }
-                }
+                    break;
+                case 1:
+                    ButServiceDel.Visible = true;
+                    ButServiceChange.Visible = false;
+                    ButServiceInstall.Text = "ОК";
+                    ButServiceInstall.Enabled = false;
+                    LabelServiceStart.Text = "Запущена";
+                    LabelServiceStart.ForeColor = System.Drawing.Color.Green;
+                    LabelServiceInstall.Text = "Установлена (" + Globals.nanitSvcVer + ")";
+                    LabelServiceInstall.ForeColor = System.Drawing.Color.Green;
+                    if (Globals.adrUpdNum == -1)
+                        groupBox2.Text = "Служба Windows (для обновлений)";
+                    else
+                        groupBox2.Text = "Доступная версия службы обновлений " + Globals.nanitSvcVer;
+                    break;
+                case 2:
+                    ButServiceDel.Visible = false;
+                    ButServiceChange.Visible = true;
+                    ButServiceInstall.Text = "Запустить";
+                    ButServiceInstall.Enabled = true;
+                    LabelServiceStart.Text = "Не запущена";
+                    LabelServiceStart.ForeColor = System.Drawing.Color.Red;
+                    LabelServiceInstall.Text = "Установлена (" + Globals.nanitSvcVer + ")";
+                    LabelServiceInstall.ForeColor = System.Drawing.Color.Green;
+                    if (Globals.adrUpdNum == -1)
+                        groupBox2.Text = "Служба Windows (для обновлений)";
+                    else
+                        groupBox2.Text = "Доступная версия службы обновлений " + Globals.nanitSvcVer;
+                    break;
+                case 3:
+                    ButServiceDel.Visible = false;
+                    ButServiceChange.Visible = true;
+                    ButServiceInstall.Text = "Обновить";
+                    LabelServiceStart.Text = "Запущена";
+                    LabelServiceStart.ForeColor = System.Drawing.Color.Green;
+                    LabelServiceInstall.Text = "Установлена (" + Globals.nanitSvcVer + ")";
+                    LabelServiceInstall.ForeColor = System.Drawing.Color.Green;
+                    if (Globals.adrUpdNum == -1)
+                    {
+                        groupBox2.Text = "Служба Windows (для обновлений)";
+                        ButServiceInstall.Enabled = false;
+                    }
+                    else
+                    {
+                        groupBox2.Text = "Обновить службу обновлений до версии " + Globals.updVerAvi;
+                        ButServiceInstall.Enabled = true;
+                    }
+                    break;
+                case 4:
+                    ButServiceDel.Visible = false;
+                    ButServiceChange.Visible = true;
+                    LabelServiceStart.Text = "Не запущена";
+                    LabelServiceStart.ForeColor = System.Drawing.Color.Red;
+                    LabelServiceInstall.Text = "Установлена (" + Globals.nanitSvcVer + ")";
+                    LabelServiceInstall.ForeColor = System.Drawing.Color.Green;
+                    if (Globals.adrUpdNum == -1)
+                    {
+                        ButServiceInstall.Text = "Запустить";
+                        groupBox2.Text = "Служба Windows (для обновлений)";
+                        ButServiceInstall.Enabled = true;
+                    }
+                    else
+                    {
+                        ButServiceInstall.Text = "Обновить";
+                        groupBox2.Text = "Обновить службу обновлений до версии " + Globals.updVerAvi;
+                        ButServiceInstall.Enabled = true;
+                    }
+                    break;
             }
-        UpdateEnd:
-            Globals.nanitSvcVer = Globals.updVerAvi;
-            ServiceController sc = new ServiceController("Nanit Updater");
-            sc.Start();
-        // Кусок необходимый для проверки корректного запуска
-        CheckRunning2:
-            Thread.Sleep(100);
-            if (sc.Status == ServiceControllerStatus.Running)
-            {
-                sc.Dispose();
-                goto StopStarting2;
-            }
-            goto CheckRunning2;
-
-        StopStarting2:
-            Thread.Sleep(200);
-            ServiceInit();
         }
-
+        
         private void button1_Click(object sender, EventArgs e)
         {
             Process cmdInstall = new Process();

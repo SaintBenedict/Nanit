@@ -44,11 +44,20 @@ namespace NaNiT
 
 		void Options_Click(object sender, EventArgs e)
 		{
-			if (!Globals.isAboutLoaded)
+            if (!Globals.isAboutLoaded)
 			{
                 Globals.isAboutLoaded = true;
-                Globals.form1 = new FormLogin();
-                Globals.form1.Show();                
+                if (Program.MD5Code("") == Globals.optionsPasswordReg)
+                {
+                    Globals.form2 = new FormOptions();
+                    Globals.form2.Text = (@"N.A.N.I.T (((ver." + Globals.version + ")))");
+                    Globals.form2.Show();
+                }
+                else
+                {
+                    Globals.form1 = new FormLogin();
+                    Globals.form1.Show();
+                }
             }
 		}
 

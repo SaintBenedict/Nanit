@@ -11,8 +11,8 @@ namespace NaNiT
 {
     public partial class FormUpdater : Form
     {
-        int chInd = -1;
-        int numInd = -1;
+        sbyte chInd = -1;
+        sbyte numInd = -1;
         public FormUpdater()
         {
             InitializeComponent();            
@@ -22,7 +22,7 @@ namespace NaNiT
             chgB.SetToolTip(ButDel, "Редактировать");
             ChList.Items.Clear();
 
-            for (int j = 0; j < 11; j++)
+            for (byte j = 0; j < 11; j++)
             {
                 if (Globals.pathUpdate[j] != null)
                 {
@@ -34,9 +34,9 @@ namespace NaNiT
 
         private void Enables()
         {
-            ///MessageBox.Show(ChList.CheckedIndices.Count.ToString());
             if (ChList.CheckedIndices.Count != 0)
             {
+                ChList.SetItemCheckState(0, CheckState.Indeterminate);
                 if (ChList.CheckedIndices.Count == 1)
                     ButChg.Enabled = true;
                 else
@@ -58,13 +58,18 @@ namespace NaNiT
 
         private void ChList_ItemCheck(Object sender, EventArgs e)
         {
+            foreach (sbyte indexChecked in ChList.CheckedIndices)
+            {
+                if (indexChecked == 0)
+                    ChList.SetItemCheckState(0, CheckState.Unchecked);
+            }
             Enables();
         }
 
         private void ButChg_Click(object sender, EventArgs e)
         {
             chInd = 1;
-            foreach (int indexChecked in ChList.CheckedIndices)
+            foreach (sbyte indexChecked in ChList.CheckedIndices)
                 numInd =  indexChecked;
             foreach (object itemChecked in ChList.CheckedItems)
                 textBox1.Text = itemChecked.ToString();
@@ -75,14 +80,14 @@ namespace NaNiT
 
         private void ButDel_Click(object sender, EventArgs e)
         {
-            var i = 0;
-            int[] k = new int [15];
-            foreach (int indexChecked in ChList.CheckedIndices)
+            sbyte i = 0;
+            short[] k = new short[15];
+            foreach (short indexChecked in ChList.CheckedIndices)
             {
                 k[i] = indexChecked;
                 i++;
             }
-            for (int j = 0; j < i; j++)
+            for (byte j = 0; j < i; j++)
             {
                 ChList.Items.RemoveAt(k[j]-j);
             }
@@ -114,18 +119,18 @@ namespace NaNiT
             RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
             RegistryKey regNanit = localMachineSoftKey.CreateSubKey(@"N.A.N.I.T");
             RegistryKey updateKey = regNanit.CreateSubKey("Update");
-            for (int j = 0; j < ChList.Items.Count; j++)
+            for (byte j = 0; j < ChList.Items.Count; j++)
             {
                 Globals.pathUpdate[j] = ChList.Items[j].ToString();
                 updateKey.SetValue("path_update_" + j.ToString(), Globals.pathUpdate[j]);
             }
-            for (int j = ChList.Items.Count; j < 11; j++)
+            for (byte j = Convert.ToByte(ChList.Items.Count); j < 11; j++)
             {
                 Globals.pathUpdate[j] = null;
                 updateKey.SetValue("path_update_" + j.ToString(), "NULL");
             }
             regNanit.Close();
-            Globals.form2.CheckUpdServer();
+            updateKey.Close();
             Globals.form2.ServiceInit();
             Globals.isUpdOpen = false;
             Globals.form2.ButServiceChange.Enabled = true;

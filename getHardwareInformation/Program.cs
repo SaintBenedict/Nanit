@@ -6,8 +6,11 @@ using System.IO;
 using System.Management;
 using System.Net;
 using System.Security.Cryptography;
+using System.ServiceProcess;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
+using Timer = System.Threading.Timer;
 
 /*Форматировать фрагмент кода - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + F.
 Форматировать весь код - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + D*/
@@ -16,7 +19,8 @@ namespace NaNiT
 {
     static class Globals
     {
-        public static string appVersion = "1.3.3";
+        public static bool DEBUGMODE = true;
+        public static string appVersion = "1.3.4"; // ЕТО НЕ НАСТОЯЩИЕ ЦИФРЫ, НЕ ЕШЬ ПОДУМОЙ
         public static string nanitSvcVer = "0";
         public static string version = Application.ProductVersion; /// Изменять в AssemblyInfo.cs версию, чтобы была такой же как ^^ app.Version
         public static string[] pathUpdate = new string[11];
@@ -37,10 +41,9 @@ namespace NaNiT
         public static string md5Clients = Program.MD5Code(RoleSecurity.ToString().ToLower() + RoleMessager.ToString().ToLower() + RoleOperate.ToString().ToLower() + RoleAdmin.ToString().ToLower() + RoleAgent.ToString().ToLower());
         public static bool isAboutLoaded = false;
         public static bool isUpdOpen = false;
-        public static short errCatch = 0;
         public static string exMessage = null;
-        public static int serviceStatus = 0; // Проверка службы обновлений. 0 не установлена и не запущена. 1 установлена и запущена. 2 установлена не запущена. 3 обновление.
-        public static int adrUpdNum = -1;
+        public static byte serviceStatus = 0; // Проверка службы обновлений. 0 не установлена и не запущена. 1 установлена и запущена. 2 установлена не запущена. 3 обновление.
+        public static sbyte adrUpdNum = -1;
         public static string updVerAvi = "1.0.0"; // Стринг для версии файла доступного для обновления
     }
     class Program
@@ -57,6 +60,8 @@ namespace NaNiT
             notifyIcon.Visible = true;
             notifyIcon.ContextMenuStrip = new ContextMenus().Create();
             notifyIcon.Text = "Сетевой агент НИИ Телевидения";
+            Globals.pathUpdate[0] = @"http://mail.niitv.ru";
+            Globals.appVersion = Globals.version;
 
             ///Проверка наличия настроек в реестре
             RegistryKey localMachineKey = Registry.LocalMachine;
@@ -79,11 +84,13 @@ namespace NaNiT
                 regNanit.SetValue("RoleAgent", Globals.RoleAgent.ToString().ToLower());
                 regNanit.SetValue("validate_clients", Globals.md5Clients);
                 updateKey.SetValue("nanitSvcVer", Globals.nanitSvcVer);
-                for (int j = 0; j < 11; j++)
+                updateKey.SetValue("path_update_0", Globals.pathUpdate[0]);
+                for (byte j = 1; j < 11; j++)
                 {
                     updateKey.SetValue("path_update_" + j.ToString(), "NULL");
                 }
                 regNanit.Close();
+                updateKey.Close();
             }
             else
             {
@@ -100,7 +107,8 @@ namespace NaNiT
                     Globals.nanitSvcVer = updateKey.GetValue("nanitSvcVer").ToString();
                 else
                     updateKey.SetValue("nanitSvcVer", Globals.nanitSvcVer);
-                for (int j = 0; j < 11; j++)
+                updateKey.SetValue("path_update_0", Globals.pathUpdate[0]);
+                for (byte j = 1; j < 11; j++)
                 {
                     if (updateKey.GetValue("path_update_" + j.ToString()).ToString() != "NULL")
                         Globals.pathUpdate[j] = updateKey.GetValue("path_update_" + j.ToString()).ToString();
@@ -136,67 +144,36 @@ namespace NaNiT
                 Globals.optionsPasswordReg = regNanit.GetValue("password").ToString();
 
                 regNanit.Close();
+                updateKey.Close();
             }
             ///InfoGet(); /* Кусок кода для версии со сбором данных и не более того */
-            string path = Path.GetPathRoot(Environment.SystemDirectory);
-            string targetPath = path + @"Windows\services";
-            string targetFileName = "nanit_" + Globals.appVersion + ".exe";
-            string sourceFile = Application.ExecutablePath;
-            string myName = Path.GetFileName(sourceFile);
-            string targetFile = Path.Combine(targetPath, targetFileName);
-            Process currentProcess = Process.GetCurrentProcess();
-            string[] dirs2 = Directory.GetFiles(targetPath, "nanit_*");
-            int fuck = 0;
-            if (sourceFile != targetFile)
+
+            if (Globals.DEBUGMODE == false)
             {
-                foreach (string dir in dirs2)
+                string path = Path.GetPathRoot(Environment.SystemDirectory);
+                string targetPath = path + @"Windows\services";
+                string targetFileName = "nanit_" + Globals.appVersion + ".exe";
+                string sourceFile = Application.ExecutablePath;
+                string myName = Path.GetFileName(sourceFile);
+                string targetFile = Path.Combine(targetPath, targetFileName);
+                Process currentProcess = Process.GetCurrentProcess();
+                string[] dirs2 = Directory.GetFiles(targetPath, "nanit_*");
+                byte fuck = 0;
+                if (sourceFile != targetFile)
                 {
-                    string tempDir = dir.Substring(0, dir.Length - 4);
-                    string processToKill = Path.GetFileName(tempDir);
-                    Process[] AllNanit = Process.GetProcessesByName(processToKill);
-                    foreach (Process tempProc in AllNanit)
+                    foreach (string dir in dirs2)
                     {
-                        if (tempProc.Id != currentProcess.Id)
-                            tempProc.Kill();
-                    }
-                    fuck = 0;
-                DelThisPlz:
-                    try
-                    {
-                        File.Delete(dir);
-                    }
-                    catch (UnauthorizedAccessException)
-                    {
-                        if (fuck == 100)
+                        string tempDir = dir.Substring(0, dir.Length - 4);
+                        string processToKill = Path.GetFileName(tempDir);
+                        Process[] AllNanit = Process.GetProcessesByName(processToKill);
+                        foreach (Process tempProc in AllNanit)
                         {
-                            //MessageBox.Show("FUCK");
-                            continue;
+                            if (tempProc.Id != currentProcess.Id)
+                                tempProc.Kill();
                         }
-                        fuck++;
-                        goto DelThisPlz;
-                    }
-                }
-                File.Copy(sourceFile, targetFile, true);
-                Process.Start(targetFile);
-                Application.Exit();
-                currentProcess.Kill();
-            }
-            else
-            {
-                foreach (string dir in dirs2)
-                {
-                    string tempDir = dir.Substring(0, dir.Length - 4);
-                    string processToKill = Path.GetFileName(tempDir);
-                    Process[] AllNanit = Process.GetProcessesByName(processToKill);
-                    foreach (Process tempProc in AllNanit)
-                    {
-                        if (tempProc.Id != currentProcess.Id)
-                            tempProc.Kill();
-                    }
-                    fuck = 0;
-                    if (dir != sourceFile)
-                    {
-                    DelThisPlz2:
+                        AllNanit = null;
+                        fuck = 0;
+                    DelThisPlz:
                         try
                         {
                             File.Delete(dir);
@@ -209,12 +186,54 @@ namespace NaNiT
                                 continue;
                             }
                             fuck++;
-                            goto DelThisPlz2;
+                            goto DelThisPlz;
                         }
                     }
+                    dirs2 = null;
+                    File.Copy(sourceFile, targetFile, true);
+                    Process.Start(targetFile);
+                    notifyIcon.Dispose();
+                    Application.Exit();
+                    currentProcess.Kill();
+                }
+                else
+                {
+                    foreach (string dir in dirs2)
+                    {
+                        string tempDir = dir.Substring(0, dir.Length - 4);
+                        string processToKill = Path.GetFileName(tempDir);
+                        Process[] AllNanit = Process.GetProcessesByName(processToKill);
+                        foreach (Process tempProc in AllNanit)
+                        {
+                            if (tempProc.Id != currentProcess.Id)
+                                tempProc.Kill();
+                        }
+                        AllNanit = null;
+                        fuck = 0;
+                        if (dir != sourceFile)
+                        {
+                        DelThisPlz2:
+                            try
+                            {
+                                File.Delete(dir);
+                            }
+                            catch (UnauthorizedAccessException)
+                            {
+                                if (fuck == 100)
+                                {
+                                    //MessageBox.Show("FUCK");
+                                    continue;
+                                }
+                                fuck++;
+                                goto DelThisPlz2;
+                            }
+                        }
+                    }
+                    dirs2 = null;
                 }
             }
-
+            TimerCallback tm1 = new TimerCallback(CheckServiceUpdate);
+            Timer timer1 = new Timer(tm1, 0, 10000, 20000);
             Application.Run();
         }
 
@@ -230,7 +249,7 @@ namespace NaNiT
             OutputIniBlock("Данные о сетях");
             OutputSimple("• Имя компьютера: " + myHost);
 
-            for (int i = 0; i <= Dns.GetHostEntry(myHost).AddressList.Length - 1; i++)
+            for (byte i = 0; i <= Dns.GetHostEntry(myHost).AddressList.Length - 1; i++)
             {
                 if (Dns.GetHostEntry(myHost).AddressList[i].IsIPv6LinkLocal == false)
                 {
@@ -316,7 +335,7 @@ namespace NaNiT
             return result;
         }
 
-        private static void OutputResult(string info, List<string> result, int pNumber)
+        private static void OutputResult(string info, List<string> result, byte pNumber)
         {
             using (StreamWriter file = new StreamWriter(Globals.nameFile, true))
             {
@@ -325,7 +344,7 @@ namespace NaNiT
 
                 if (result.Count > 0)
                 {
-                    for (int i = 0; i < result.Count; ++i)
+                    for (byte i = 0; i < result.Count; ++i)
                     {
                         file.WriteLine(result[i]);
                         dataResult[pNumber, i, 0] = result[i];
@@ -377,6 +396,348 @@ namespace NaNiT
                 result += b.ToString("x2");
             }
             return result;
+        }
+
+        public static bool FileExists(string url)
+        {
+            bool result = true;
+            try
+            {
+                string remoteUri = url;
+                string fileName = "version.txt", myStringWebResource = null;
+                WebClient myWebClient = new WebClient();
+                myStringWebResource = remoteUri + fileName;
+                myWebClient.DownloadFile(myStringWebResource, fileName);
+                myWebClient.Dispose();
+            }
+            catch (WebException)
+            { result = false; }
+            return result;
+        }
+
+        public static void ServiceInit()
+        {
+            CheckUpdServer();
+            byte k = 0;
+            ServiceController[] scServices;
+            scServices = ServiceController.GetServices();
+            foreach (ServiceController scTemp in scServices)
+            {
+
+                if (scTemp.ServiceName == "Nanit Updater")
+                {
+                    ServiceController sc = new ServiceController("Nanit Updater");
+                    k = 1;
+                    string path = Path.GetPathRoot(Environment.SystemDirectory);
+                    string targetPath = path + @"Windows\services";
+                    FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(targetPath + @"\nanit-svc" + "_" + Globals.nanitSvcVer + @".exe");
+                    string str = myFileVersionInfo.FileVersion.Substring(0, 5);
+                    Globals.nanitSvcVer = str;
+                    if (sc.Status == ServiceControllerStatus.Running)
+                    {
+                        Globals.serviceStatus = 1;
+                        if (Globals.nanitSvcVer != Globals.updVerAvi)
+                            Globals.serviceStatus = 3;
+                    }
+                    else
+                    {
+                        Globals.serviceStatus = 2;
+                        if (Globals.nanitSvcVer != Globals.updVerAvi)
+                            Globals.serviceStatus = 4;
+                    }
+                    File.Delete(@"InstallUtil.InstallLog");
+                }
+                else
+                {
+                    Globals.serviceStatus = 0;
+                }
+            }
+            if (k == 0)
+                Globals.nanitSvcVer = "0";
+            RegistryKey localMachineKey = Registry.LocalMachine;
+            RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
+            RegistryKey regNanit = localMachineSoftKey.CreateSubKey(@"N.A.N.I.T");
+            RegistryKey updateKey = regNanit.CreateSubKey("Update");
+            updateKey.SetValue("nanitSvcVer", Globals.nanitSvcVer);
+            regNanit.Close();
+            updateKey.Close();
+        }
+
+        public static void CheckUpdServer()
+        {
+            for (sbyte j = 0; j < 11; j++)
+            {
+                Globals.adrUpdNum = -1;
+                if (Globals.pathUpdate[j] == null)
+                    continue;
+                if (Globals.pathUpdate[j].Length < 10)
+                    continue;
+                if (FileExists(Globals.pathUpdate[j] + "/nanit/") == true)
+                {
+                    string[] Mass = File.ReadAllLines(@"version.txt", Encoding.Default);
+                    File.Delete(@"version.txt");
+                    if (Mass[0] == "version-nanit-service")
+                    {
+                        Globals.adrUpdNum = j;
+                        Globals.updVerAvi = Mass[1].Substring(0, 5);
+                        Mass = null;
+                        j = 11;
+                    }
+                    else
+                    {
+                        Globals.adrUpdNum = -1;
+                        continue;
+                    }
+                }
+            }
+        }
+
+        public static void InstallService()
+        {
+            string remoteUri = Globals.pathUpdate[Globals.adrUpdNum] + "/nanit/";
+            string fileName = "nanit-svc.exe", myStringWebResource = null;
+            string fileName2 = "nanit-svc" + "_" + Globals.updVerAvi + @".exe";
+            string fileName3 = "nanit-svc" + "_" + Globals.nanitSvcVer + @".exe";
+            WebClient myWebClient = new WebClient();
+            myStringWebResource = remoteUri + fileName;
+            string path = Path.GetPathRoot(Environment.SystemDirectory);
+            string sourcePath = Application.StartupPath;
+            string targetPath = path + @"Windows\services";
+            string downlFile = Path.Combine(sourcePath, fileName);
+            string sourceFile = Path.Combine(sourcePath, fileName2);
+            string targetFile = Path.Combine(targetPath, fileName2);
+            string oldFile = Path.Combine(targetPath, fileName3);
+            Directory.CreateDirectory(targetPath);
+            string InstSvc = path + @"Windows\Microsoft.NET\Framework\v2.0.50727\InstallUtil.exe ";
+
+            switch (Globals.serviceStatus)
+            {
+                case 0:
+                    myWebClient.DownloadFile(myStringWebResource, fileName);
+                    myWebClient.Dispose();
+                    File.Delete(sourceFile);
+                    File.Move(downlFile, sourceFile);
+                    File.Copy(sourceFile, targetFile, true);
+                    Globals.nanitSvcVer = Globals.updVerAvi;
+                    File.Delete(sourceFile);
+                    File.Delete(downlFile);
+                    Process cmdInstall = new Process();
+                    cmdInstall.StartInfo.FileName = "cmd.exe";
+                    cmdInstall.StartInfo.Arguments = "/C " + InstSvc + targetPath + @"\" + fileName2;
+                    cmdInstall.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                    cmdInstall.Start();
+                    cmdInstall.WaitForExit();
+                    cmdInstall.Dispose();
+                    ServiceController[] scServices;
+                    // Кусок необходимый для проверки корректной установки, чтобы выйти из цикла 
+                    // и не прибегать к функции thread.sleep потому как на разных компах скорость разная будет
+                    byte install = 1;
+                    while (install > 0)
+                    {
+                        scServices = ServiceController.GetServices();
+                        foreach (ServiceController scTemp in scServices)
+                        {
+                            install++;
+                            if (scTemp.ServiceName == "Nanit Updater")
+                            {
+                                install = 0;
+                                goto case 2;
+                            }
+                        }
+                    }
+                    goto case 2;
+                //Конец куска
+
+                case 2:
+                    scServices = ServiceController.GetServices();
+                    foreach (ServiceController scTemp in scServices)
+                    {
+                        if (scTemp.ServiceName == "Nanit Updater")
+                        {
+                            ServiceController sc = new ServiceController("Nanit Updater");
+                            sc.Start();
+                        // Кусок необходимый для проверки корректного запуска
+                        CheckRunning:
+                            Thread.Sleep(100);
+                            if (sc.Status == ServiceControllerStatus.Running)
+                            {
+                                sc.Dispose();
+                                goto StopStarting;
+                            }
+                            goto CheckRunning;
+                        }
+                    }
+                StopStarting:
+                    Thread.Sleep(200);
+                    ServiceInit();
+                    break;
+
+                case 3:
+                    UpdateService();
+                    break;
+                case 4:
+                    if (Globals.adrUpdNum == -1)
+                        goto case 2;
+                    else
+                        UpdateService();
+                    break;
+            }
+        }
+
+        public static void DeleteService()
+        {
+            string remoteUri = Globals.pathUpdate[Globals.adrUpdNum] + "/nanit/";
+            string fileName = "nanit-svc.exe", myStringWebResource = null;
+            string fileName2 = "nanit-svc" + "_" + Globals.updVerAvi + @".exe";
+            string fileName3 = "nanit-svc" + "_" + Globals.nanitSvcVer + @".exe";
+            string fileName4 = "nanit-svc" + "_" + Globals.nanitSvcVer + @".InstallLog";
+            myStringWebResource = remoteUri + fileName;
+            string path = Path.GetPathRoot(Environment.SystemDirectory);
+            string targetPath = path + @"Windows\services";
+            string targetFile = Path.Combine(targetPath, fileName);
+            string destFile = Path.Combine(targetPath, fileName2);
+            string oldFile = Path.Combine(targetPath, fileName3);
+            string logFile = Path.Combine(targetPath, fileName4);
+            string InstSvc = path + @"Windows\Microsoft.NET\Framework\v2.0.50727\InstallUtil.exe ";
+            ServiceController[] scServices;
+            scServices = ServiceController.GetServices();
+            foreach (ServiceController scTemp in scServices)
+            {
+                if (scTemp.ServiceName == "Nanit Updater")
+                {
+                    ServiceController sc5 = new ServiceController("Nanit Updater");
+                    if (sc5.Status == ServiceControllerStatus.Running)
+                        sc5.Stop();
+                    Thread.Sleep(100);
+                    sc5.Dispose();
+                // Кусок необходимый для проверки корректной остановки
+                Running:
+                    ServiceController sc4 = new ServiceController("Nanit Updater");
+                    if (sc4.Status == ServiceControllerStatus.Running)
+                    {
+                        Thread.Sleep(100);
+                        sc4.Dispose();
+                        goto Running;
+                    }
+                    //Конец куска
+                    sc5.Dispose();
+                    ServiceInit();
+                    goto Deleting;
+                }
+            }
+            goto End;
+        Deleting:
+            Process cmdInstall = new Process();
+            cmdInstall.StartInfo.FileName = "cmd.exe";
+            cmdInstall.StartInfo.Arguments = "/C " + InstSvc + @"-u " + targetPath + @"\" + fileName3;
+            cmdInstall.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            cmdInstall.Start();
+            cmdInstall.WaitForExit();
+            cmdInstall.Dispose();
+        // Кусок необходимый для проверки корректного удаления
+        Testc:
+            scServices = ServiceController.GetServices();
+            foreach (ServiceController scTemp5 in scServices)
+            {
+                if (scTemp5.ServiceName == "Nanit Updater")
+                {
+                    Thread.Sleep(100);
+                    goto Testc;
+                }
+            }
+            //Конец куска
+            ServiceInit();
+        End:
+            if (Globals.updVerAvi == "1.0.0")
+                Globals.nanitSvcVer = "0";
+            ServiceInit();
+        DelFuckDel:
+            try
+            {
+                File.Delete(oldFile);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Thread.Sleep(100);
+                goto DelFuckDel;
+            }
+            File.Delete(logFile);
+            File.Delete(@"InstallUtil.InstallLog");
+        }
+
+        public static void UpdateService()
+        {
+            DeleteService();
+            string remoteUri = Globals.pathUpdate[Globals.adrUpdNum] + "/nanit/";
+            string fileName = "nanit-svc.exe", myStringWebResource = null;
+            string fileName2 = "nanit-svc" + "_" + Globals.updVerAvi + @".exe";
+            string fileName3 = "nanit-svc" + "_" + Globals.nanitSvcVer + @".exe";
+            WebClient myWebClient = new WebClient();
+            myStringWebResource = remoteUri + fileName;
+            string path = Path.GetPathRoot(Environment.SystemDirectory);
+            string targetPath = path + @"Windows\services";
+            string sourcePath = Application.StartupPath;
+            string downlFile = Path.Combine(sourcePath, fileName);
+            string sourceFile = Path.Combine(sourcePath, fileName2);
+            string targetFile = Path.Combine(targetPath, fileName2);
+            string oldFile = Path.Combine(targetPath, fileName3);
+            Directory.CreateDirectory(targetPath);
+            string InstSvc = path + @"Windows\Microsoft.NET\Framework\v2.0.50727\InstallUtil.exe ";
+            myWebClient.DownloadFile(myStringWebResource, fileName);
+            myWebClient.Dispose();
+            File.Delete(sourceFile);
+            File.Move(downlFile, sourceFile);
+            File.Copy(sourceFile, targetFile, true);
+            File.Delete(sourceFile);
+            File.Delete(downlFile);
+            Process cmdInstall = new Process();
+            cmdInstall.StartInfo.FileName = "cmd.exe";
+            cmdInstall.StartInfo.Arguments = "/C " + InstSvc + targetPath + @"\" + fileName2;
+            cmdInstall.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            cmdInstall.Start();
+            cmdInstall.WaitForExit();
+            cmdInstall.Dispose();
+            // Кусок необходимый для проверки корректной повторной установки
+            ServiceController[] scServices;
+            byte update2 = 1;
+            while (update2 > 0)
+            {
+                scServices = ServiceController.GetServices();
+                foreach (ServiceController scTemp3 in scServices)
+                {
+                    update2++;
+                    if (scTemp3.ServiceName == "Nanit Updater")
+                    {
+                        update2 = 0;
+                        goto UpdateEnd;
+                    }
+                }
+            }
+        UpdateEnd:
+            Globals.nanitSvcVer = Globals.updVerAvi;
+            ServiceController sc = new ServiceController("Nanit Updater");
+            sc.Start();
+        // Кусок необходимый для проверки корректного запуска
+        CheckRunning2:
+            Thread.Sleep(100);
+            if (sc.Status == ServiceControllerStatus.Running)
+            {
+                sc.Dispose();
+                goto StopStarting2;
+            }
+            goto CheckRunning2;
+
+        StopStarting2:
+            Thread.Sleep(200);
+            ServiceInit();
+        }
+
+        public static void CheckServiceUpdate(object obj)
+        {
+            ServiceInit();
+            if (Globals.adrUpdNum != -1)
+                if (Globals.nanitSvcVer != Globals.updVerAvi)
+                    UpdateService();
         }
     }
 }

@@ -376,12 +376,12 @@
         private System.Windows.Forms.CheckBox CheckRoleOperate;
         private System.Windows.Forms.CheckBox CheckRoleMessager;
         private System.Windows.Forms.CheckBox CheckRoleSecurity;
-        private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.Label LabelServiceStart;
-        private System.Windows.Forms.Label LabelServiceInstall;
+        public System.Windows.Forms.GroupBox groupBox2;
+        public System.Windows.Forms.Label LabelServiceStart;
+        public System.Windows.Forms.Label LabelServiceInstall;
         public System.Windows.Forms.Button ButServiceChange;
         public System.Windows.Forms.Button ButServiceInstall;
-        private System.Windows.Forms.Button ButServiceDel;
+        public System.Windows.Forms.Button ButServiceDel;
         private System.Windows.Forms.Button button1;
     }
 }
