@@ -98,6 +98,12 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="ServiceWork.cs" />
+    <Compile Include="FormSoft.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormSoft.Designer.cs">
+      <DependentUpon>FormSoft.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -123,6 +129,9 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormSoft.resx">
+      <DependentUpon>FormSoft.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

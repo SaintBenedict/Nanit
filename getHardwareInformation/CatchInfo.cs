@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -73,23 +74,27 @@ namespace NaNiT
             OutputSimple("");
             OutputResult("• Монитор:", GetHardwareInfo("Win32_DesktopMonitor", "DeviceID"), 28);
 
+            OutputIniBlock("Установленные программы");
+            OutputSimple(Globals.programs[5, 0]);
             Process.Start(Globals.nameFile);
 
             ///Application.Exit(); /* Кусок кода для версии со сбором данных и не более того */
             ///Process.GetCurrentProcess().Kill(); /*Кусок кода для версии со сбором данных и не более того */
-
-
-            /*
-            ManagementObjectSearcher searcher_soft =
-            new ManagementObjectSearcher("root\\CIMV2",
-           "SELECT * FROM Win32_Product");
-
-            foreach (ManagementObject queryObj in searcher_soft.Get())
-            {
-                Console.WriteLine("<soft> Caption: {0} ; InstallDate: {1}</soft>",
-                                  queryObj["Caption"], queryObj["InstallDate"]);
-            }*/
+            
             ///Console.ReadLine();
+            ///
+            /*string displayName;
+            RegistryKey key;
+            StreamWriter file = new StreamWriter(Globals.nameFile, true);
+            key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall");
+            foreach (String keyName in key.GetSubKeyNames())
+            {
+                RegistryKey subkey = key.OpenSubKey(keyName);
+                displayName = subkey.GetValue("DisplayName") as string + subkey.GetValue("InstallLocation") as string;
+                //DisplayIcon
+                file.WriteLine(displayName);
+            }
+            file.Dispose();*/
         }
 
         private static List<string> GetHardwareInfo(string WIN32_Class, string ClassItemField)
@@ -120,8 +125,8 @@ namespace NaNiT
                     for (byte i = 0; i < result.Count; ++i)
                     {
                         file.WriteLine(result[i]);
-                        dataResult[pNumber, i, 0] = result[i];
-                        dataResult[pNumber, i, 1] = result.Count.ToString();
+                        //dataResult[pNumber, i, 0] = result[i];
+                        //dataResult[pNumber, i, 1] = result.Count.ToString();
                         ///file.WriteLine(" DEBUG *номер запроса* "+ pNumber + " DEBUG *значение* " + dataResult[pNumber, i, 0] + " DEBUG *номер значения в листе* " + (i + 1) + " DEBUG *число значений в листе* " + dataResult[pNumber, i, 1]);
                     }
                 }

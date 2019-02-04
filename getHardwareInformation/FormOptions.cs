@@ -35,7 +35,7 @@ namespace NaNiT
             progressBar1.Step = 1;
             backgroundWorker1.WorkerReportsProgress = true;
             backgroundWorker1.RunWorkerAsync();
-            if (Globals.DEBUGMODE == true)
+            if (Globals.DEBUGMODE)
             {
                 button1.Visible = true;
                 button2.Visible = true;

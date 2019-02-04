@@ -18,7 +18,15 @@ namespace NaNiT
             item.Click += new EventHandler(DataHover_Click);
 			menu.Items.Add(item);
 
-			item = new ToolStripMenuItem();
+            if (!Globals.DEBUGMODE)
+            {
+                item = new ToolStripMenuItem();
+                item.Text = "Просмотр программ";
+                item.Click += new EventHandler(Software_Click);
+                menu.Items.Add(item);
+            }
+
+            item = new ToolStripMenuItem();
 			item.Text = "Настройки";
 			item.Click += new EventHandler(Options_Click);
 			///item.Image = Resources.About;
@@ -42,7 +50,13 @@ namespace NaNiT
             CatchInfo.InfoGet();
         }
 
-		void Options_Click(object sender, EventArgs e)
+        void Software_Click(object sender, EventArgs e)
+        {
+            Globals.form4 = new FormSoft();
+            Globals.form4.Show();
+        }
+
+        void Options_Click(object sender, EventArgs e)
 		{
             if (!Globals.isAboutLoaded)
 			{

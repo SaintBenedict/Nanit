@@ -23,6 +23,7 @@ namespace NaNiT
         public static FormLogin form1 = null;
         public static FormOptions form2 = null;
         public static FormUpdater form3 = null;
+        public static FormSoft form4 = null;
         public static bool RoleSecurity = false;
         public static bool RoleMessager = false;
         public static bool RoleOperate = false;
@@ -42,6 +43,7 @@ namespace NaNiT
         public static bool UpdateLock = false;
         public static int itemsInList = 0;
         public static int updateIn = 11;
+        public static string[,] programs = null;
     }
     class Program
     {
@@ -74,6 +76,8 @@ namespace NaNiT
             //ServiceWork.ServiceInit();
             TimerCallback tm1 = new TimerCallback(CheckServiceUpdate);
             Timer timer1 = new Timer(tm1, 0, 0, 300000);
+            Globals.form4 = new FormSoft();
+            Globals.form4.Dispose();
             Application.Run();
         }
 
