@@ -112,92 +112,76 @@ namespace NaNiT
             RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
             RegistryKey regNanit = localMachineSoftKey.CreateSubKey(@"N.A.N.I.T");
             RegistryKey updateKey = regNanit.CreateSubKey("Update");
-            if (regNanit.GetValue("install") == null)
+
+            Globals.servIP = CheckRegString("ip_server", regNanit, Globals.servIP);
+            Globals.servPort = CheckRegString("port_server", regNanit, Globals.servPort);
+            Globals.md5PortIp = CheckRegString("validate_ip_port", regNanit, Globals.md5PortIp);
+            Globals.md5Clients = CheckRegString("validate_clients", regNanit, Globals.md5Clients);
+            Globals.RoleSecurity = CheckRegBool("RoleSecurity", regNanit, Globals.RoleSecurity);
+            Globals.RoleMessager = CheckRegBool("RoleMessager", regNanit, Globals.RoleMessager);
+            Globals.RoleOperate = CheckRegBool("RoleOperate", regNanit, Globals.RoleOperate);
+            Globals.RoleAdmin = CheckRegBool("RoleAdmin", regNanit, Globals.RoleAdmin);
+            Globals.RoleAgent = CheckRegBool("RoleAgent", regNanit, Globals.RoleAgent);
+            Globals.optionsPasswordReg = CheckRegString("password", regNanit, Globals.optionsPasswordReg);
+            Globals.nanitSvcVer = CheckRegString("nanitSvcVer", updateKey, Globals.nanitSvcVer);
+            Globals.itemsInList = 0;
+            for (int j = 0; j < 11; j++)
             {
-                regNanit.SetValue("install", "1");
-                regNanit.SetValue("ip_server", Globals.servIP);
-                regNanit.SetValue("port_server", Globals.servPort);
-                regNanit.SetValue("validate_ip_port", Globals.md5PortIp);
-                regNanit.SetValue("password", MD5Code(Globals.optionsPasswordDefault));
-                Globals.optionsPasswordReg = MD5Code(Globals.optionsPasswordDefault);
-                regNanit.SetValue("RoleSecurity", Globals.RoleSecurity.ToString().ToLower());
-                regNanit.SetValue("RoleMessager", Globals.RoleMessager.ToString().ToLower());
-                regNanit.SetValue("RoleOperate", Globals.RoleOperate.ToString().ToLower());
-                regNanit.SetValue("RoleAdmin", Globals.RoleAdmin.ToString().ToLower());
-                regNanit.SetValue("RoleAgent", Globals.RoleAgent.ToString().ToLower());
-                regNanit.SetValue("validate_clients", Globals.md5Clients);
-                updateKey.SetValue("nanitSvcVer", Globals.nanitSvcVer);
-                updateKey.SetValue("path_update_0", Globals.pathUpdate[0]);
-                for (byte j = 1; j < 11; j++)
+                Globals.pathUpdate[j] = CheckRegString("path_update_" + j.ToString(), updateKey, "NULL");
+                if (Globals.pathUpdate[j] != "NULL")
                 {
-                    updateKey.SetValue("path_update_" + j.ToString(), "NULL");
+                    Globals.pathUpdate[j] = UrlCorrect(Globals.pathUpdate[j]);
+                    Globals.itemsInList++;
                 }
-                regNanit.Close();
-                updateKey.Close();
+                else
+                    Globals.pathUpdate[j] = null;
             }
-            else
+            Globals.updateIn = Globals.itemsInList;
+
+            string CheckRegString(string toRegName, RegistryKey toDo, string variant)
             {
-                Globals.servIP = regNanit.GetValue("ip_server").ToString();
-                Globals.servPort = regNanit.GetValue("port_server").ToString();
-                Globals.md5PortIp = regNanit.GetValue("validate_ip_port").ToString();
-                Globals.md5Clients = regNanit.GetValue("validate_clients").ToString();
-                Globals.RoleSecurity = regNanit.GetValue("RoleSecurity").Equals("true");
-                Globals.RoleMessager = regNanit.GetValue("RoleMessager").Equals("true");
-                Globals.RoleOperate = regNanit.GetValue("RoleOperate").Equals("true");
-                Globals.RoleAdmin = regNanit.GetValue("RoleAdmin").Equals("true");
-                Globals.RoleAgent = regNanit.GetValue("RoleAgent").Equals("true");
-                Globals.optionsPasswordReg = regNanit.GetValue("password").ToString();
-                Globals.nanitSvcVer = CheckRegString("nanitSvcVer", updateKey, Globals.nanitSvcVer);
-                //Globals.pathUpdate[0] = @"http://mail.niitv.ru";
-                Globals.itemsInList = 0;
-                for (byte j = 0; j < 11; j++)
-                {
-                    if (updateKey.GetValue("path_update_" + j.ToString()).ToString() != "NULL")
-                    {
-                        Globals.pathUpdate[j] = updateKey.GetValue("path_update_" + j.ToString()).ToString();
-                        Globals.pathUpdate[j] = UrlCorrect(Globals.pathUpdate[j]);
-                        Globals.itemsInList++;
-                    }
-                    else
-                        Globals.pathUpdate[j] = null;
-                }
-                Globals.updateIn = Globals.itemsInList;
+                string result = variant;
+                if (toDo.GetValue(toRegName) != null)
+                    result = toDo.GetValue(toRegName).ToString();
+                else
+                    toDo.SetValue(toRegName, variant);
+                return result;
+            }
+            bool CheckRegBool(string toRegName, RegistryKey toDo, bool variant)
+            {
+                bool result = variant;
+                if (toDo.GetValue(toRegName) != null)
+                    result = toDo.GetValue(toRegName).Equals("true");
+                else
+                    toDo.SetValue(toRegName, variant.ToString().ToLower());
+                return result;
+            }
 
-                string CheckRegString(string toRegName, RegistryKey toDo, string variant)
-                {
-                    if (toDo.GetValue(toRegName) != null)
-                        variant = toDo.GetValue(toRegName).ToString();
-                    else
-                        toDo.SetValue(toRegName, variant);
-                    return variant;
-                }
+            regNanit.Close();
+            updateKey.Close();
 
-                regNanit.Close();
-                updateKey.Close();
-
-                if (Globals.md5PortIp != MD5Code(Globals.servPort + Globals.servIP))
+            if (Globals.md5PortIp != MD5Code(Globals.servPort + Globals.servIP))
+            {
+                const string message = "Указаны неверные настройки. Отправлено сообщение администратору.";
+                const string caption = "";
+                var result = MessageBox.Show(message, caption, MessageBoxButtons.OK);
+                if (result == DialogResult.OK)
                 {
-                    const string message = "Указаны неверные настройки. Отправлено сообщение администратору.";
-                    const string caption = "";
-                    var result = MessageBox.Show(message, caption, MessageBoxButtons.OK);
-                    if (result == DialogResult.OK)
-                    {
-                        Program.notifyIcon.Dispose();
-                        Application.Exit();
-                        Process.GetCurrentProcess().Kill();
-                    }
+                    Program.notifyIcon.Dispose();
+                    Application.Exit();
+                    Process.GetCurrentProcess().Kill();
                 }
-                if (Globals.md5Clients != Functions.MD5Code(Globals.RoleSecurity.ToString().ToLower() + Globals.RoleMessager.ToString().ToLower() + Globals.RoleOperate.ToString().ToLower() + Globals.RoleAdmin.ToString().ToLower() + Globals.RoleAgent.ToString().ToLower()))
+            }
+            if (Globals.md5Clients != MD5Code(Globals.RoleSecurity.ToString().ToLower() + Globals.RoleMessager.ToString().ToLower() + Globals.RoleOperate.ToString().ToLower() + Globals.RoleAdmin.ToString().ToLower() + Globals.RoleAgent.ToString().ToLower()))
+            {
+                const string message = "Указаны неверные политики. Отправлено сообщение администратору.";
+                const string caption = "";
+                var result = MessageBox.Show(message, caption, MessageBoxButtons.OK);
+                if (result == DialogResult.OK)
                 {
-                    const string message = "Указаны неверные политики. Отправлено сообщение администратору.";
-                    const string caption = "";
-                    var result = MessageBox.Show(message, caption, MessageBoxButtons.OK);
-                    if (result == DialogResult.OK)
-                    {
-                        Program.notifyIcon.Dispose();
-                        Application.Exit();
-                        Process.GetCurrentProcess().Kill();
-                    }
+                    Program.notifyIcon.Dispose();
+                    Application.Exit();
+                    Process.GetCurrentProcess().Kill();
                 }
             }
         }
