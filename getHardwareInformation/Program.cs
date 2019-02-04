@@ -38,6 +38,8 @@ namespace NaNiT
         public static string updVerAvi = "1.0.0"; // Стринг для версии файла доступного для обновления
         public static byte work = 30;
         public static byte workTmp = 30;
+        public static int itemsInList = 0;
+        public static bool updateIn = false;
     }
     class Program
     {
@@ -54,7 +56,7 @@ namespace NaNiT
             notifyIcon.Visible = true;
             notifyIcon.ContextMenuStrip = new ContextMenus().Create();
             notifyIcon.Text = "Сетевой агент НИИ Телевидения";
-            Globals.pathUpdate[0] = @"http://mail.niitv.ru";
+            //Globals.pathUpdate[0] = @"http://mail.niitv.ru";
             Globals.appVersion = Globals.version;
 
 

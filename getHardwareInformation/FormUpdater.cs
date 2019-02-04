@@ -7,8 +7,8 @@ namespace NaNiT
 {
     public partial class FormUpdater : Form
     {
-        sbyte chInd = -1;
-        sbyte numInd = -1;
+        int chInd = -1;
+        int numInd = -1;
         public FormUpdater()
         {
             InitializeComponent();
@@ -30,9 +30,9 @@ namespace NaNiT
 
         private void Enables()
         {
+            Globals.itemsInList = ChList.Items.Count;
             if (ChList.CheckedIndices.Count != 0)
             {
-                ChList.SetItemCheckState(0, CheckState.Indeterminate);
                 if (ChList.CheckedIndices.Count == 1)
                     ButChg.Enabled = true;
                 else
@@ -54,18 +54,13 @@ namespace NaNiT
 
         private void ChList_ItemCheck(Object sender, EventArgs e)
         {
-            /*foreach (sbyte indexChecked in ChList.CheckedIndices)
-            {
-                if (indexChecked == 0)
-                    ChList.SetItemCheckState(0, CheckState.Unchecked);
-            }*/
             Enables();
         }
 
         private void ButChg_Click(object sender, EventArgs e)
         {
             chInd = 1;
-            foreach (sbyte indexChecked in ChList.CheckedIndices)
+            foreach (int indexChecked in ChList.CheckedIndices)
                 numInd = indexChecked;
             foreach (object itemChecked in ChList.CheckedItems)
                 textBox1.Text = itemChecked.ToString();
@@ -77,8 +72,8 @@ namespace NaNiT
         private void ButDel_Click(object sender, EventArgs e)
         {
             sbyte i = 0;
-            short[] k = new short[15];
-            foreach (short indexChecked in ChList.CheckedIndices)
+            int[] k = new int[15];
+            foreach (int indexChecked in ChList.CheckedIndices)
             {
                 k[i] = indexChecked;
                 i++;
@@ -93,18 +88,29 @@ namespace NaNiT
 
         private void button1_Click(object sender, EventArgs e)
         {
+            string tempAdr = Functions.UrlCorrect(textBox1.Text);
             if (chInd == -1)
             {
-                ChList.Items.Add(textBox1.Text);
-                textBox1.Text = "";
+                if (tempAdr != null)
+                {
+                    ChList.Items.Add(tempAdr);
+                    textBox1.Text = "";
+                }
+                else
+                    MessageBox.Show("Задан некорректный адрес");
             }
             else
             {
-                ChList.Items.Insert(numInd, textBox1.Text);
-                ChList.Items.RemoveAt(numInd + 1);
-                textBox1.Text = "";
-                chInd = -1;
-                ChList.Enabled = true;
+                if (tempAdr != null)
+                {
+                    ChList.Items.Insert(numInd, tempAdr);
+                    ChList.Items.RemoveAt(numInd + 1);
+                    textBox1.Text = "";
+                    chInd = -1;
+                    ChList.Enabled = true;
+                }
+                else
+                    MessageBox.Show("Задан некорректный адрес");
             }
             Enables();
         }
@@ -127,6 +133,7 @@ namespace NaNiT
             }
             regNanit.Close();
             updateKey.Close();
+            Globals.itemsInList = ChList.Items.Count;
 
             //ServiceWork.CheckUpdServer();
             if (Globals.work == 30)

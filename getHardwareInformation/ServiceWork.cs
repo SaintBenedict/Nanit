@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -13,54 +14,79 @@ namespace NaNiT
     class ServiceWork
     {
         static object locker = new object();
+        static int files = 0;
 
         public static void CheckUpdServer()
         {
-            lock (locker)
+            if (Globals.updateIn)
+                goto End;
+            Globals.updateIn = true;
+            files = 0;
+            for (sbyte j = 0; j < 11; j++)
             {
-                for (sbyte j = 0; j < 11; j++)
+                if (Functions.UrlCorrect(Globals.pathUpdate[j]) == null)
+                    continue;
+                string normalAdress = Functions.UrlCorrect(Globals.pathUpdate[j]) + "/nanit/";
+                string fileNameVer = "version.txt";
+                try
                 {
-                    Globals.adrUpdNum = -1;
-                    if (Globals.pathUpdate[j] == null)
-                        continue;
-                    if (Globals.pathUpdate[j].Length < 10)
-                        continue;
-                    if (FileExists(Globals.pathUpdate[j] + "/nanit/") == true)
-                    {
+                    Uri tempUri = new Uri(normalAdress + fileNameVer);
+                    WebClient ClientDownl = new WebClient();
+                    ClientDownl.DownloadFileCompleted += new AsyncCompletedEventHandler(DownloadFileCallback);
+                    ClientDownl.DownloadFileAsync(tempUri, j + fileNameVer);
+                    ClientDownl.Dispose();
+                    tempUri = null;
+                }
+                catch (WebException)
+                { files++; }
+            }
+            Thread waited = new Thread(new ThreadStart(WaitingDownl));
+            waited.Name = "Ожидание прогруза файлов";
+            waited.Start();
+        End:
+            Thread.Sleep(100);
 
-                        string[] Mass = File.ReadAllLines(@"version.txt", Encoding.Default);
+
+            void DownloadFileCallback(object sender, AsyncCompletedEventArgs e)
+            {
+                files++;
+                //MessageBox.Show(files.ToString());
+            }
+
+            void WaitingDownl()
+            {
+                lock (locker)
+                {
+                    while (files != Globals.itemsInList)
+                    {
+                        Thread.Sleep(100);
+                    }
+                    for (sbyte i = 0; i < Globals.itemsInList; i++)
+                    {
+                        string[] Mass = File.ReadAllLines(i + @"version.txt", Encoding.Default);
+                        if (Mass.Length == 0)
+                            continue;
                         if (Mass[0] == "version-nanit-service")
                         {
-                            Globals.adrUpdNum = j;
+                            Globals.adrUpdNum = i;
                             Globals.updVerAvi = Mass[1].Substring(0, 5);
                             Mass = null;
-                            j = 11;
+                            i = 11;
                         }
                         else
                         {
                             Globals.adrUpdNum = -1;
                             continue;
                         }
-                        File.Delete(@"version.txt");
-
+                    }
+                    MessageBox.Show("Файл найден - " + Globals.pathUpdate[Globals.adrUpdNum] + "/nanit/version.txt");
+                    Thread.Sleep(2000);
+                    for (sbyte i = 0; i < Globals.itemsInList; i++)
+                    {
+                        File.Delete(i + @"version.txt");
                     }
                 }
-            }
-            bool FileExists(string url)
-            {
-                bool result = true;
-                try
-                {
-                    string remoteUri8 = url;
-                    string fileName8 = "version.txt", myStringWebResourceF8 = null;
-                    WebClient myWebClient8 = new WebClient();
-                    myStringWebResourceF8 = remoteUri8 + fileName8;
-                    myWebClient8.DownloadFile(myStringWebResourceF8, fileName8);
-                    myWebClient8.Dispose();
-                }
-                catch (WebException)
-                { result = false; }
-                return result;
+                Globals.updateIn = false;
             }
         }
 

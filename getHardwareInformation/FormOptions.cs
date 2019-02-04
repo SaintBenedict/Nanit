@@ -166,9 +166,6 @@ namespace NaNiT
 
         public void ServiceInit()
         {
-            /*Globals.isOptOpen = false;
-            ServiceWork.ServiceInit();
-            Globals.isOptOpen = true;*/
             lock (locker)
             {
                 switch (Globals.serviceStatus)
@@ -264,18 +261,19 @@ namespace NaNiT
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)                  // Кнопка для тестирования всякой фигни
         {
-            Process cmdInstall = new Process();
+            /*Process cmdInstall = new Process();
             cmdInstall.StartInfo.FileName = "cmd.exe";
             cmdInstall.StartInfo.Arguments = "/C " + @"ping google.com";
             cmdInstall.Start();
-            cmdInstall.WaitForExit();
+            cmdInstall.WaitForExit();*/
+            ServiceWork.CheckUpdServer();
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            MessageBox.Show(e.ProgressPercentage.ToString());
+            //MessageBox.Show(e.ProgressPercentage.ToString());
             ServiceInit();
         }
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
@@ -285,7 +283,7 @@ namespace NaNiT
             {
                 Globals.workTmp = Globals.work;
                 worker.ReportProgress(Globals.work);
-                MessageBox.Show(Globals.work.ToString() + "fsdfs");
+                //MessageBox.Show(Globals.work.ToString() + "fsdfs");
             }
             Thread.Sleep(2000);
         }

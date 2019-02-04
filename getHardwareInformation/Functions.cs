@@ -24,6 +24,80 @@ namespace NaNiT
             return result;
         }
 
+        public static string UrlCorrect(string url)
+        {
+            if (url == null)
+                return null;
+            string result = null;
+            string urlTemp = null;
+            int len = url.Length;
+            if (len <= 4)
+                return null;
+            if (url.Substring(len - 1, 1) == @"/")
+            {
+                url = url.Substring(0, url.Length - 1);
+                len = len - 1;
+            }
+            if (url.Substring(len - 6, 6) == @"/nanit")
+            {
+                url = url.Substring(0, url.Length - 6);
+                len = len - 6;
+            }
+            if (len > 4)
+            {
+                string urlStart = url.Substring(0, 4);
+                switch (urlStart)
+                {
+                    case "http":
+                        if (url.Substring(0, 7) == @"http://")
+                            result = url;
+                        else
+                        {
+                            if (url.Substring(0, 8) == @"https://")
+                                result = url;
+                            else
+                                result = null;
+                        }
+                        break;
+                    case "file":
+                        if (url.Substring(0, 8) == @"file:///")
+                            result = url;
+                        else
+                            result = null;
+                        break;
+                    case "www.":
+                        urlTemp = url.Substring(4, len - 4);
+                        result = urlTemp.Insert(0, @"http://");
+                        break;
+                    default:
+                        IPAddress address;
+                        if (IPAddress.TryParse(url, out address))
+                            result = url.Insert(0, @"file:///\\");
+                        else
+                        {
+                            urlTemp = url.Substring(2, len - 2);
+                            if (url.Substring(0, 2) == @"\\")
+                                if (IPAddress.TryParse(urlTemp, out address))
+                                    result = urlTemp.Insert(0, @"file:///\\");
+                                else
+                                    result = null;
+                            else
+                            {
+                                if (url.Contains(@"."))
+                                    result = url.Insert(0, @"http://");
+                                else
+                                    result = null;
+                            }
+                        }
+                        break;
+                }
+            }
+            else
+                result = null;
+
+            return result;
+        }
+
         public static void RegCheck()
         {
             RegistryKey localMachineKey = Registry.LocalMachine;
@@ -36,8 +110,8 @@ namespace NaNiT
                 regNanit.SetValue("ip_server", Globals.servIP);
                 regNanit.SetValue("port_server", Globals.servPort);
                 regNanit.SetValue("validate_ip_port", Globals.md5PortIp);
-                regNanit.SetValue("password", Functions.MD5Code(Globals.optionsPasswordDefault));
-                Globals.optionsPasswordReg = Functions.MD5Code(Globals.optionsPasswordDefault);
+                regNanit.SetValue("password", MD5Code(Globals.optionsPasswordDefault));
+                Globals.optionsPasswordReg = MD5Code(Globals.optionsPasswordDefault);
                 regNanit.SetValue("RoleSecurity", Globals.RoleSecurity.ToString().ToLower());
                 regNanit.SetValue("RoleMessager", Globals.RoleMessager.ToString().ToLower());
                 regNanit.SetValue("RoleOperate", Globals.RoleOperate.ToString().ToLower());
@@ -46,7 +120,7 @@ namespace NaNiT
                 regNanit.SetValue("validate_clients", Globals.md5Clients);
                 updateKey.SetValue("nanitSvcVer", Globals.nanitSvcVer);
                 updateKey.SetValue("path_update_0", Globals.pathUpdate[0]);
-                for (byte j = 1; j < 11; j++)
+                for (byte j = 0; j < 11; j++)
                 {
                     updateKey.SetValue("path_update_" + j.ToString(), "NULL");
                 }
@@ -66,12 +140,15 @@ namespace NaNiT
                 Globals.RoleAgent = regNanit.GetValue("RoleAgent").Equals("true");
                 Globals.optionsPasswordReg = regNanit.GetValue("password").ToString();
                 Globals.nanitSvcVer = CheckRegString("nanitSvcVer", updateKey, Globals.nanitSvcVer);
-
-                updateKey.SetValue("path_update_0", Globals.pathUpdate[0]);
-                for (byte j = 1; j < 11; j++)
+                Globals.itemsInList = 0;
+                for (byte j = 0; j < 11; j++)
                 {
                     if (updateKey.GetValue("path_update_" + j.ToString()).ToString() != "NULL")
+                    {
                         Globals.pathUpdate[j] = updateKey.GetValue("path_update_" + j.ToString()).ToString();
+                        Globals.pathUpdate[j] = UrlCorrect(Globals.pathUpdate[j]);
+                        Globals.itemsInList++;
+                    }
                     else
                         Globals.pathUpdate[j] = null;
                 }
