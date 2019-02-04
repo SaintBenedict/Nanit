@@ -1,7 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -181,8 +180,7 @@ namespace NaNiT
                 //0 не установлена и не запущена. 1 установлена и запущена. 2 установлена не запущена. 3 обновление запущена 4 обновление не запущена
                 {
                     case 0:
-                        Globals.form2.ButServiceDel.Visible = false;
-                        Globals.form2.ButServiceChange.Visible = true;
+                        Globals.form2.ButServiceDel.Enabled = false;
                         Globals.form2.ButServiceInstall.Text = "Установить";
                         Globals.form2.LabelServiceStart.Text = "Не запущена";
                         Globals.form2.LabelServiceStart.ForeColor = System.Drawing.Color.Red;
@@ -200,8 +198,7 @@ namespace NaNiT
                         }
                         break;
                     case 1:
-                        Globals.form2.ButServiceDel.Visible = true;
-                        Globals.form2.ButServiceChange.Visible = false;
+                        Globals.form2.ButServiceDel.Enabled = true;
                         Globals.form2.ButServiceInstall.Text = "ОК";
                         Globals.form2.ButServiceInstall.Enabled = false;
                         Globals.form2.LabelServiceStart.Text = "Запущена";
@@ -214,8 +211,7 @@ namespace NaNiT
                             Globals.form2.groupBox2.Text = "Доступная версия службы обновлений " + Globals.nanitSvcVer;
                         break;
                     case 2:
-                        Globals.form2.ButServiceDel.Visible = false;
-                        Globals.form2.ButServiceChange.Visible = true;
+                        Globals.form2.ButServiceDel.Enabled = true;
                         Globals.form2.ButServiceInstall.Text = "Запустить";
                         Globals.form2.ButServiceInstall.Enabled = true;
                         Globals.form2.LabelServiceStart.Text = "Не запущена";
@@ -228,8 +224,7 @@ namespace NaNiT
                             Globals.form2.groupBox2.Text = "Доступная версия службы обновлений " + Globals.nanitSvcVer;
                         break;
                     case 3:
-                        Globals.form2.ButServiceDel.Visible = false;
-                        Globals.form2.ButServiceChange.Visible = true;
+                        Globals.form2.ButServiceDel.Enabled = true;
                         Globals.form2.ButServiceInstall.Text = "Обновить";
                         Globals.form2.LabelServiceStart.Text = "Запущена";
                         Globals.form2.LabelServiceStart.ForeColor = System.Drawing.Color.Green;
@@ -248,7 +243,6 @@ namespace NaNiT
                         break;
                     case 4:
                         Globals.form2.ButServiceDel.Visible = false;
-                        Globals.form2.ButServiceChange.Visible = true;
                         Globals.form2.LabelServiceStart.Text = "Не запущена";
                         Globals.form2.LabelServiceStart.ForeColor = System.Drawing.Color.Red;
                         Globals.form2.LabelServiceInstall.Text = "Установлена (" + Globals.nanitSvcVer + ")";

@@ -50,7 +50,7 @@ namespace NaNiT
                 Mass = null;
                 ServiceInit();
             }
-            //MessageBox.Show("Адрес " + tempUri + ", Номер " + numb + ", Файл " + newName); // Какие обработаны данные
+        //MessageBox.Show("Адрес " + tempUri + ", Номер " + numb + ", Файл " + newName); // Какие обработаны данные
         Finish:
             Thread.Sleep(8000);
             File.Delete(newName);
@@ -171,7 +171,7 @@ namespace NaNiT
                 {
                     case 0:
                         if (Globals.isOptOpen)
-                            Globals.work = Functions.Revers(Globals.work);
+                            Globals.work = Functions.Revers(Globals.work); // Функция обновления интерфейса формы настроек
                         myWebClient.DownloadFile(installResource, fileName);
                         myWebClient.Dispose();
                         File.Delete(sourceFile);
@@ -209,7 +209,7 @@ namespace NaNiT
 
                     case 2:
                         if (Globals.isOptOpen)
-                            Globals.work = Functions.Revers(Globals.work);
+                            Globals.work = Functions.Revers(Globals.work); // Функция обновления интерфейса формы настроек
                         scServices = ServiceController.GetServices();
                         foreach (ServiceController scTemp in scServices)
                         {
@@ -235,7 +235,7 @@ namespace NaNiT
 
                     case 3:
                         if (Globals.isOptOpen)
-                            Globals.work = Functions.Revers(Globals.work);
+                            Globals.work = Functions.Revers(Globals.work); // Функция обновления интерфейса формы настроек
                         Globals.InstallLock = false;
                         UpdateService();
                         break;
@@ -245,7 +245,7 @@ namespace NaNiT
                         else
                         {
                             if (Globals.isOptOpen)
-                                Globals.work = Functions.Revers(Globals.work);
+                                Globals.work = Functions.Revers(Globals.work); // Функция обновления интерфейса формы настроек
                             Globals.InstallLock = false;
                             UpdateService();
                         }
@@ -344,6 +344,8 @@ namespace NaNiT
                 Globals.InstallLock = true;
                 Globals.UpdateLock = true;
                 DeleteService();
+                if (Globals.isOptOpen)
+                    Globals.work = Functions.Revers(Globals.work); // Функция обновления интерфейса формы настроек
                 string remoteUri = Globals.pathUpdate[Globals.adrUpdNum] + "/nanit/";
                 string fileName = "nanit-svc.exe", myStringWebResourceU = null;
                 string fileName2 = "nanit-svc" + "_" + Globals.updVerAvi + @".exe";
@@ -390,6 +392,8 @@ namespace NaNiT
                     }
                 }
             UpdateEnd:
+                if (Globals.isOptOpen)
+                    Globals.work = Functions.Revers(Globals.work); // Функция обновления интерфейса формы настроек
                 Globals.nanitSvcVer = Globals.updVerAvi;
                 ServiceController sc = new ServiceController("Nanit Updater");
                 sc.Start();

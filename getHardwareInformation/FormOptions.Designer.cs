@@ -263,9 +263,9 @@
             // 
             // ButServiceDel
             // 
-            this.ButServiceDel.Location = new System.Drawing.Point(107, 18);
+            this.ButServiceDel.Location = new System.Drawing.Point(125, 18);
             this.ButServiceDel.Name = "ButServiceDel";
-            this.ButServiceDel.Size = new System.Drawing.Size(26, 26);
+            this.ButServiceDel.Size = new System.Drawing.Size(25, 26);
             this.ButServiceDel.TabIndex = 23;
             this.ButServiceDel.Text = "X";
             this.ButServiceDel.UseVisualStyleBackColor = true;
@@ -273,9 +273,9 @@
             // 
             // ButServiceChange
             // 
-            this.ButServiceChange.Location = new System.Drawing.Point(107, 18);
+            this.ButServiceChange.Location = new System.Drawing.Point(95, 18);
             this.ButServiceChange.Name = "ButServiceChange";
-            this.ButServiceChange.Size = new System.Drawing.Size(26, 26);
+            this.ButServiceChange.Size = new System.Drawing.Size(25, 26);
             this.ButServiceChange.TabIndex = 22;
             this.ButServiceChange.Text = "...";
             this.ButServiceChange.UseVisualStyleBackColor = true;
@@ -285,7 +285,7 @@
             // 
             this.ButServiceInstall.Location = new System.Drawing.Point(7, 18);
             this.ButServiceInstall.Name = "ButServiceInstall";
-            this.ButServiceInstall.Size = new System.Drawing.Size(94, 26);
+            this.ButServiceInstall.Size = new System.Drawing.Size(83, 26);
             this.ButServiceInstall.TabIndex = 21;
             this.ButServiceInstall.Text = "Установить";
             this.ButServiceInstall.UseVisualStyleBackColor = true;
