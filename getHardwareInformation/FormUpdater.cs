@@ -135,7 +135,7 @@ namespace NaNiT
             updateKey.Close();
             Globals.itemsInList = ChList.Items.Count;
 
-            //ServiceWork.CheckUpdServer();
+            ServiceWork.CheckUpdServer();
             Globals.work = Functions.Revers(Globals.work); // Функция обновления интерфейса формы настроек
             ServiceWork.ServiceInit();
             Globals.isUpdOpen = false;

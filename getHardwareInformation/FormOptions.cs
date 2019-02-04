@@ -40,7 +40,7 @@ namespace NaNiT
             {
                 button1.Visible = true;
                 button2.Visible = true;
-                progressBar1.Visible = true;
+                //progressBar1.Visible = true;
             }
             ServiceInit();
             ServiceWork.ServiceInit();

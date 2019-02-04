@@ -10,7 +10,7 @@ namespace NaNiT
     static class Globals
     {
         public static bool DEBUGMODE = true;
-        public static string appVersion = "1.3.4"; // ЕТО НЕ НАСТОЯЩИЕ ЦИФРЫ, НЕ ЕШЬ ПОДУМОЙ
+        public static string appVersion = "1.4.0"; // ЕТО НЕ НАСТОЯЩИЕ ЦИФРЫ, НЕ ЕШЬ ПОДУМОЙ
         public static string nanitSvcVer = "0";
         public static string version = Application.ProductVersion; /// Изменять в AssemblyInfo.cs версию, чтобы была такой же как ^^ app.Version
         public static string[] pathUpdate = new string[11];
@@ -38,6 +38,8 @@ namespace NaNiT
         public static string updVerAvi = "1.0.0"; // Стринг для версии файла доступного для обновления
         public static bool work = true;
         public static bool ServiceInitLock = false;
+        public static bool InstallLock = false;
+        public static bool UpdateLock = false;
         public static int itemsInList = 0;
         public static int updateIn = 11;
     }
@@ -68,11 +70,11 @@ namespace NaNiT
 
             Thread t = Thread.CurrentThread;
             t.Name = "Main Program";
-            ServiceWork.CheckUpdServer();
-            ServiceWork.ServiceInit();
+            //ServiceWork.CheckUpdServer();
+            //ServiceWork.ServiceInit();
             TimerCallback tm1 = new TimerCallback(CheckServiceUpdate);
+            Timer timer1 = new Timer(tm1, 0, 0, 300000);
             Application.Run();
-            Timer timer1 = new Timer(tm1, 0, 0, 8000);
         }
 
 
@@ -81,13 +83,14 @@ namespace NaNiT
         {
             Thread t2 = Thread.CurrentThread;
             t2.Name = "Ебучий таймер";
-            //ServiceWork.CheckUpdServer();
+            ServiceWork.CheckUpdServer();
             ServiceWork.ServiceInit();
+            Thread.Sleep(5000);
 
             if (Globals.adrUpdNum != -1)
                 if (Globals.nanitSvcVer != Globals.updVerAvi)
                 {
-                    //ServiceWork.UpdateService();
+                    ServiceWork.UpdateService();
                 }
         }
     }

@@ -128,7 +128,7 @@ namespace NaNiT
                 regNanit.SetValue("validate_clients", Globals.md5Clients);
                 updateKey.SetValue("nanitSvcVer", Globals.nanitSvcVer);
                 updateKey.SetValue("path_update_0", Globals.pathUpdate[0]);
-                for (byte j = 0; j < 11; j++)
+                for (byte j = 1; j < 11; j++)
                 {
                     updateKey.SetValue("path_update_" + j.ToString(), "NULL");
                 }
@@ -148,6 +148,7 @@ namespace NaNiT
                 Globals.RoleAgent = regNanit.GetValue("RoleAgent").Equals("true");
                 Globals.optionsPasswordReg = regNanit.GetValue("password").ToString();
                 Globals.nanitSvcVer = CheckRegString("nanitSvcVer", updateKey, Globals.nanitSvcVer);
+                //Globals.pathUpdate[0] = @"http://mail.niitv.ru";
                 Globals.itemsInList = 0;
                 for (byte j = 0; j < 11; j++)
                 {

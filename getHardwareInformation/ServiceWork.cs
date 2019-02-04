@@ -145,8 +145,9 @@ namespace NaNiT
 
         public static void InstallService()
         {
-            lock (locker)
+            if (!Globals.InstallLock)
             {
+                Globals.InstallLock = true;
                 ServiceInit();
                 string remoteUri = Globals.pathUpdate[Globals.adrUpdNum] + "/nanit/";
                 string fileName = "nanit-svc.exe", installResource = null;
@@ -235,6 +236,7 @@ namespace NaNiT
                     case 3:
                         if (Globals.isOptOpen)
                             Globals.work = Functions.Revers(Globals.work);
+                        Globals.InstallLock = false;
                         UpdateService();
                         break;
                     case 4:
@@ -244,17 +246,21 @@ namespace NaNiT
                         {
                             if (Globals.isOptOpen)
                                 Globals.work = Functions.Revers(Globals.work);
+                            Globals.InstallLock = false;
                             UpdateService();
                         }
                         break;
                 }
+                Globals.InstallLock = false;
             }
         }
 
         public static void DeleteService()
         {
-            lock (locker)
+            if (!Globals.InstallLock || Globals.UpdateLock)
             {
+                Globals.InstallLock = true;
+                Globals.UpdateLock = false;
                 ServiceInit();
                 string fileName2 = "nanit-svc" + "_" + Globals.updVerAvi + @".exe";
                 string fileName3 = "nanit-svc" + "_" + Globals.nanitSvcVer + @".exe";
@@ -326,14 +332,17 @@ namespace NaNiT
                 }
                 File.Delete(logFile);
                 File.Delete(@"InstallUtil.InstallLog");
+                Globals.InstallLock = false;
                 ServiceInit();
             }
         }
 
         public static void UpdateService()
         {
-            lock (locker)
+            if (!Globals.InstallLock)
             {
+                Globals.InstallLock = true;
+                Globals.UpdateLock = true;
                 DeleteService();
                 string remoteUri = Globals.pathUpdate[Globals.adrUpdNum] + "/nanit/";
                 string fileName = "nanit-svc.exe", myStringWebResourceU = null;
@@ -397,6 +406,7 @@ namespace NaNiT
             StopStarting2:
                 Thread.Sleep(200);
                 ServiceInit();
+                Globals.InstallLock = false;
             }
         }
 
