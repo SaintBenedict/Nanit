@@ -1,6 +1,5 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -14,80 +13,56 @@ namespace NaNiT
     class ServiceWork
     {
         static object locker = new object();
-        static int files = 0;
+
+        public static void DownlAndCheck(string url, string name, sbyte numb)
+        {
+            string newName = numb + name;
+            Uri tempUri = new Uri(url + name);
+            try
+            {
+                WebClient ClientDownl = new WebClient();
+                ClientDownl.DownloadFile(tempUri, newName);
+                ClientDownl.Dispose();
+            }
+            catch (WebException)
+            { goto Finish; }
+            Thread.Sleep(100);
+            string[] Mass = File.ReadAllLines(newName, Encoding.Default);
+            if (Mass.Length == 0)
+                goto Finish;
+            if (Mass[0] == "version-nanit-service")
+            {
+                Globals.adrUpdNum = numb;
+                Globals.updVerAvi = Mass[1].Substring(0, 5);
+                Mass = null;
+            }
+        Finish:
+            Thread.Sleep(8000);
+            File.Delete(newName);
+            Globals.updateIn++;
+        }
 
         public static void CheckUpdServer()
         {
-            if (Globals.updateIn)
+            if (Globals.updateIn < Globals.itemsInList)
                 goto End;
-            Globals.updateIn = true;
-            files = 0;
-            for (sbyte j = 0; j < 11; j++)
+            Globals.updateIn = 0;
+            Globals.adrUpdNum = -1;
+            for (sbyte j = 0; j < Globals.itemsInList; j++)
             {
                 if (Functions.UrlCorrect(Globals.pathUpdate[j]) == null)
+                {
+                    Globals.updateIn++;
                     continue;
+                }
                 string normalAdress = Functions.UrlCorrect(Globals.pathUpdate[j]) + "/nanit/";
                 string fileNameVer = "version.txt";
-                try
-                {
-                    Uri tempUri = new Uri(normalAdress + fileNameVer);
-                    WebClient ClientDownl = new WebClient();
-                    ClientDownl.DownloadFileCompleted += new AsyncCompletedEventHandler(DownloadFileCallback);
-                    ClientDownl.DownloadFileAsync(tempUri, j + fileNameVer);
-                    ClientDownl.Dispose();
-                    tempUri = null;
-                }
-                catch (WebException)
-                { files++; }
+                Thread dnl = new Thread(delegate () { DownlAndCheck(normalAdress, fileNameVer, j); });
+                dnl.Name = "Загрузка файла " + j;
+                dnl.Start();
             }
-            Thread waited = new Thread(new ThreadStart(WaitingDownl));
-            waited.Name = "Ожидание прогруза файлов";
-            waited.Start();
         End:
             Thread.Sleep(100);
-
-
-            void DownloadFileCallback(object sender, AsyncCompletedEventArgs e)
-            {
-                files++;
-                //MessageBox.Show(files.ToString());
-            }
-
-            void WaitingDownl()
-            {
-                lock (locker)
-                {
-                    while (files != Globals.itemsInList)
-                    {
-                        Thread.Sleep(100);
-                    }
-                    for (sbyte i = 0; i < Globals.itemsInList; i++)
-                    {
-                        string[] Mass = File.ReadAllLines(i + @"version.txt", Encoding.Default);
-                        if (Mass.Length == 0)
-                            continue;
-                        if (Mass[0] == "version-nanit-service")
-                        {
-                            Globals.adrUpdNum = i;
-                            Globals.updVerAvi = Mass[1].Substring(0, 5);
-                            Mass = null;
-                            i = 11;
-                        }
-                        else
-                        {
-                            Globals.adrUpdNum = -1;
-                            continue;
-                        }
-                    }
-                    MessageBox.Show("Файл найден - " + Globals.pathUpdate[Globals.adrUpdNum] + "/nanit/version.txt");
-                    Thread.Sleep(2000);
-                    for (sbyte i = 0; i < Globals.itemsInList; i++)
-                    {
-                        File.Delete(i + @"version.txt");
-                    }
-                }
-                Globals.updateIn = false;
-            }
         }
 
         public static void ServiceInit()

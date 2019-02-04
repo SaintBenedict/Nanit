@@ -152,6 +152,7 @@ namespace NaNiT
                     else
                         Globals.pathUpdate[j] = null;
                 }
+                Globals.updateIn = Globals.itemsInList;
 
                 string CheckRegString(string toRegName, RegistryKey toDo, string variant)
                 {

@@ -39,7 +39,7 @@ namespace NaNiT
         public static byte work = 30;
         public static byte workTmp = 30;
         public static int itemsInList = 0;
-        public static bool updateIn = false;
+        public static int updateIn = 11;
     }
     class Program
     {
