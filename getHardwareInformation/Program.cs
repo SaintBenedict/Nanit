@@ -34,10 +34,10 @@ namespace NaNiT
         public static bool isOptOpen = false;
         public static string exMessage = null;
         public static byte serviceStatus = 0; // Проверка службы обновлений. 0 не установлена и не запущена. 1 установлена и запущена. 2 установлена не запущена. 3 обновление. 4 обновление
-        public static sbyte adrUpdNum = -1;
+        public static int adrUpdNum = -1;
         public static string updVerAvi = "1.0.0"; // Стринг для версии файла доступного для обновления
-        public static byte work = 30;
-        public static byte workTmp = 30;
+        public static bool work = true;
+        public static bool ServiceInitLock = false;
         public static int itemsInList = 0;
         public static int updateIn = 11;
     }
@@ -68,6 +68,8 @@ namespace NaNiT
 
             Thread t = Thread.CurrentThread;
             t.Name = "Main Program";
+            ServiceWork.CheckUpdServer();
+            ServiceWork.ServiceInit();
             TimerCallback tm1 = new TimerCallback(CheckServiceUpdate);
             Application.Run();
             Timer timer1 = new Timer(tm1, 0, 0, 8000);

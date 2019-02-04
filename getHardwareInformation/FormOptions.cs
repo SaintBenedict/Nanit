@@ -11,11 +11,13 @@ namespace NaNiT
     public partial class FormOptions : Form
     {
         static object locker = new object();
+        static bool workerByte = true;
 
         public FormOptions()
         {
             InitializeComponent();
             Globals.form2 = this;
+            Globals.isOptOpen = true;
             ControlBoxIpServ.Text = Globals.servIP;
             ControlBoxPortServ.Text = Globals.servPort;
             CheckRoleAdmin.Checked = Globals.RoleAdmin;
@@ -29,12 +31,19 @@ namespace NaNiT
             LabelServiceStart.ForeColor = System.Drawing.Color.Black;
             ButServiceInstall.Enabled = false;
             button1.Visible = false;
+            button2.Visible = false;
+            progressBar1.Visible = false;
+            progressBar1.Step = 1;
             backgroundWorker1.WorkerReportsProgress = true;
             backgroundWorker1.RunWorkerAsync();
-            backgroundWorker1.ReportProgress(30);
             if (Globals.DEBUGMODE == true)
+            {
                 button1.Visible = true;
+                button2.Visible = true;
+                progressBar1.Visible = true;
+            }
             ServiceInit();
+            ServiceWork.ServiceInit();
         }
 
         public void FormOptions_Close(object sender, EventArgs e)
@@ -274,18 +283,39 @@ namespace NaNiT
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             //MessageBox.Show(e.ProgressPercentage.ToString());
+            progressBar1.Value = (int)((progressBar1.Maximum / 100.0) * e.ProgressPercentage);
             ServiceInit();
         }
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
-            BackgroundWorker worker = sender as BackgroundWorker;
-            if (Globals.work != Globals.workTmp)
+            while (Globals.isOptOpen)
             {
-                Globals.workTmp = Globals.work;
-                worker.ReportProgress(Globals.work);
-                //MessageBox.Show(Globals.work.ToString() + "fsdfs");
+                /*for (int i = 0; i <= 20; i++) // Проверка работы воркера
+                {
+                    backgroundWorker1.ReportProgress(i * 100 / 20);
+                    Thread.Sleep(200);
+                }*/
+                if (workerByte)
+                {
+                    if (!Globals.work)
+                    {
+                        backgroundWorker1.ReportProgress(30);
+                        workerByte = Functions.Revers(workerByte);
+                    }
+                    else
+                        Thread.Sleep(200);
+                }
+                else
+                {
+                    if (Globals.work)
+                    {
+                        backgroundWorker1.ReportProgress(60);
+                        workerByte = Functions.Revers(workerByte);
+                    }
+                    else
+                        Thread.Sleep(200);
+                }
             }
-            Thread.Sleep(2000);
         }
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -299,8 +329,16 @@ namespace NaNiT
             }
             else
             {
-                MessageBox.Show("Что-то пошло не так. Я закончил работать");
+                if (Globals.isOptOpen)
+                    MessageBox.Show("Что-то пошло не так. Я закончил работать");
             }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Thread DeleteService = new Thread(new ThreadStart(ServiceWork.DeleteService));
+            DeleteService.Name = "Delete on click";
+            DeleteService.Start();
         }
     }
 }

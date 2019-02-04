@@ -11,6 +11,14 @@ namespace NaNiT
 {
     class Functions
     {
+        public static bool Revers(bool first)
+        {
+            if (first == true)
+                return false;
+            else
+                return true;
+        }
+
         public static string MD5Code(string getCode)
         {
             byte[] hash = Encoding.ASCII.GetBytes(getCode);
@@ -166,7 +174,7 @@ namespace NaNiT
                 regNanit.Close();
                 updateKey.Close();
 
-                if (Globals.md5PortIp != Functions.MD5Code(Globals.servPort + Globals.servIP))
+                if (Globals.md5PortIp != MD5Code(Globals.servPort + Globals.servIP))
                 {
                     const string message = "Указаны неверные настройки. Отправлено сообщение администратору.";
                     const string caption = "";

@@ -136,10 +136,8 @@ namespace NaNiT
             Globals.itemsInList = ChList.Items.Count;
 
             //ServiceWork.CheckUpdServer();
-            if (Globals.work == 30)
-                Globals.work = 40;
-            else
-                Globals.work = 30;
+            Globals.work = Functions.Revers(Globals.work); // Функция обновления интерфейса формы настроек
+            ServiceWork.ServiceInit();
             Globals.isUpdOpen = false;
             Globals.form2.ButServiceChange.Enabled = true;
         }

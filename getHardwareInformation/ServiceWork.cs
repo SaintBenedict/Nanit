@@ -14,8 +14,21 @@ namespace NaNiT
     {
         static object locker = new object();
 
-        public static void DownlAndCheck(string url, string name, sbyte numb)
+        public static void DownlAndCheck(string urlAndJ, string name)
         {
+            string slash = urlAndJ.Substring(urlAndJ.Length - 2, 1);
+            string numb = null;
+            string url = null;
+            if (slash == @"/")
+            {
+                url = urlAndJ.Substring(0, urlAndJ.Length - 1);
+                numb = urlAndJ.Substring(urlAndJ.Length - 1, 1);
+            }
+            else
+            {
+                url = urlAndJ.Substring(0, urlAndJ.Length - 2);
+                numb = urlAndJ.Substring(urlAndJ.Length - 2, 2);
+            }
             string newName = numb + name;
             Uri tempUri = new Uri(url + name);
             try
@@ -32,10 +45,12 @@ namespace NaNiT
                 goto Finish;
             if (Mass[0] == "version-nanit-service")
             {
-                Globals.adrUpdNum = numb;
+                Globals.adrUpdNum = Convert.ToInt32(numb);
                 Globals.updVerAvi = Mass[1].Substring(0, 5);
                 Mass = null;
+                ServiceInit();
             }
+            //MessageBox.Show("Адрес " + tempUri + ", Номер " + numb + ", Файл " + newName); // Какие обработаны данные
         Finish:
             Thread.Sleep(8000);
             File.Delete(newName);
@@ -48,7 +63,7 @@ namespace NaNiT
                 goto End;
             Globals.updateIn = 0;
             Globals.adrUpdNum = -1;
-            for (sbyte j = 0; j < Globals.itemsInList; j++)
+            for (int j = 0; j < Globals.itemsInList; j++)
             {
                 if (Functions.UrlCorrect(Globals.pathUpdate[j]) == null)
                 {
@@ -57,7 +72,9 @@ namespace NaNiT
                 }
                 string normalAdress = Functions.UrlCorrect(Globals.pathUpdate[j]) + "/nanit/";
                 string fileNameVer = "version.txt";
-                Thread dnl = new Thread(delegate () { DownlAndCheck(normalAdress, fileNameVer, j); });
+                string AdressToTranslate = normalAdress + j.ToString();
+                Thread dnl = new Thread(delegate () { DownlAndCheck(AdressToTranslate, fileNameVer); });
+                //MessageBox.Show("Адрес " + normalAdress + ", Файл " + fileNameVer + ", Номер " + j.ToString()); // Какие переданы данные
                 dnl.Name = "Загрузка файла " + j;
                 dnl.Start();
             }
@@ -67,9 +84,10 @@ namespace NaNiT
 
         public static void ServiceInit()
         {
-            lock (locker)
+            if (!Globals.ServiceInitLock)
             {
                 byte k = 0;
+                Globals.ServiceInitLock = true;
                 ServiceController[] scServices;
                 scServices = ServiceController.GetServices();
                 foreach (ServiceController scTemp in scServices)
@@ -78,13 +96,14 @@ namespace NaNiT
                     {
                         ServiceController sc = new ServiceController("Nanit Updater");
                         k = 1;
-                        string path = Path.GetPathRoot(Environment.SystemDirectory);
-                        string targetPath = path + @"Windows\services";
+                        string pathC = Path.GetPathRoot(Environment.SystemDirectory);
+                        string targetPathC = pathC + @"Windows\services";
                         if (Globals.nanitSvcVer == "0")
-                            GoToHackMyself(targetPath);
-                        FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(targetPath + @"\nanit-svc" + "_" + Globals.nanitSvcVer + @".exe");
-                        string str = myFileVersionInfo.FileVersion.Substring(0, 5);
+                            GoToHackMyself(targetPathC);
+                        FileVersionInfo UpdVersionListen = FileVersionInfo.GetVersionInfo(targetPathC + @"\nanit-svc" + "_" + Globals.nanitSvcVer + @".exe");
+                        string str = UpdVersionListen.FileVersion.Substring(0, 5);
                         Globals.nanitSvcVer = str;
+                        //MessageBox.Show(str); // Какая получена версия из файла
                         if (sc.Status == ServiceControllerStatus.Running)
                         {
                             Globals.serviceStatus = 1;
@@ -98,14 +117,17 @@ namespace NaNiT
                                 Globals.serviceStatus = 4;
                         }
                         File.Delete(@"InstallUtil.InstallLog");
+                        goto EndServiceEach;
                     }
                     else
                     {
                         Globals.serviceStatus = 0;
                     }
                 }
+            EndServiceEach:
                 if (k == 0)
                     Globals.nanitSvcVer = "0";
+                //MessageBox.Show(Globals.adrUpdNum.ToString()); //с какого сервера грузим
                 RegistryKey localMachineKey = Registry.LocalMachine;
                 RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
                 RegistryKey regNanit = localMachineSoftKey.CreateSubKey(@"N.A.N.I.T");
@@ -113,13 +135,11 @@ namespace NaNiT
                 updateKey.SetValue("nanitSvcVer", Globals.nanitSvcVer);
                 regNanit.Close();
                 updateKey.Close();
-
-                if (Globals.work == 30)
-                    Globals.work = 40;
-                else
-                    Globals.work = 30;
-                MessageBox.Show("НУ ПИЗДЕЦ " + Globals.work.ToString());
-                //Thread.Sleep(2000);
+                //MessageBox.Show(Globals.serviceStatus.ToString()); // Какой получен статус сервера
+                //MessageBox.Show(k.ToString()); // Найден ли апдейтер
+                if (Globals.isOptOpen)
+                    Globals.work = Functions.Revers(Globals.work); // Функция обновления интерфейса формы настроек
+                Globals.ServiceInitLock = false;
             }
         }
 
@@ -129,11 +149,12 @@ namespace NaNiT
             {
                 ServiceInit();
                 string remoteUri = Globals.pathUpdate[Globals.adrUpdNum] + "/nanit/";
-                string fileName = "nanit-svc.exe", myStringWebResource = null;
+                string fileName = "nanit-svc.exe", installResource = null;
                 string fileName2 = "nanit-svc" + "_" + Globals.updVerAvi + @".exe";
                 string fileName3 = "nanit-svc" + "_" + Globals.nanitSvcVer + @".exe";
                 WebClient myWebClient = new WebClient();
-                myStringWebResource = remoteUri + fileName;
+                installResource = remoteUri + fileName;
+                //MessageBox.Show(installResource); // Uri для загрузки файла
                 string path = Path.GetPathRoot(Environment.SystemDirectory);
                 string sourcePath = Application.StartupPath;
                 string targetPath = path + @"Windows\services";
@@ -143,11 +164,14 @@ namespace NaNiT
                 string oldFile = Path.Combine(targetPath, fileName3);
                 Directory.CreateDirectory(targetPath);
                 string InstSvc = path + @"Windows\Microsoft.NET\Framework\v2.0.50727\InstallUtil.exe ";
+                //MessageBox.Show(Globals.adrUpdNum.ToString()); //с какого сервера грузим
 
                 switch (Globals.serviceStatus)
                 {
                     case 0:
-                        myWebClient.DownloadFile(myStringWebResource, fileName);
+                        if (Globals.isOptOpen)
+                            Globals.work = Functions.Revers(Globals.work);
+                        myWebClient.DownloadFile(installResource, fileName);
                         myWebClient.Dispose();
                         File.Delete(sourceFile);
                         File.Move(downlFile, sourceFile);
@@ -183,6 +207,8 @@ namespace NaNiT
                     //Конец куска
 
                     case 2:
+                        if (Globals.isOptOpen)
+                            Globals.work = Functions.Revers(Globals.work);
                         scServices = ServiceController.GetServices();
                         foreach (ServiceController scTemp in scServices)
                         {
@@ -207,13 +233,19 @@ namespace NaNiT
                         break;
 
                     case 3:
+                        if (Globals.isOptOpen)
+                            Globals.work = Functions.Revers(Globals.work);
                         UpdateService();
                         break;
                     case 4:
                         if (Globals.adrUpdNum == -1)
                             goto case 2;
                         else
+                        {
+                            if (Globals.isOptOpen)
+                                Globals.work = Functions.Revers(Globals.work);
                             UpdateService();
+                        }
                         break;
                 }
             }
