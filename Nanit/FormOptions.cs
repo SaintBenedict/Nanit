@@ -1,6 +1,9 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.ComponentModel;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -11,6 +14,7 @@ namespace NaNiT
     {
         static object locker = new object();
         static bool workerByte = true;
+        Socket socket;
 
         public FormOptions()
         {
@@ -18,7 +22,7 @@ namespace NaNiT
             Globals.form2 = this;
             Globals.isOptOpen = true;
             ControlBoxIpServ.Text = Globals.servIP;
-            ControlBoxPortServ.Text = Globals.servPort;
+            ControlBoxPortServ.Text = Globals.servPort.ToString();
             CheckRoleAdmin.Checked = Globals.RoleAdmin;
             CheckRoleOperate.Checked = Globals.RoleOperate;
             CheckRoleMessager.Checked = Globals.RoleMessager;
@@ -54,20 +58,20 @@ namespace NaNiT
         private void ButOptSave_Click(object sender, EventArgs e)
         {
             Globals.servIP = ControlBoxIpServ.Text;
-            Globals.servPort = ControlBoxPortServ.Text;
+            Globals.servPort = Convert.ToInt32(ControlBoxPortServ.Text);
             Globals.RoleAdmin = CheckRoleAdmin.Checked;
             Globals.RoleOperate = CheckRoleOperate.Checked;
             Globals.RoleMessager = CheckRoleMessager.Checked;
             Globals.RoleSecurity = CheckRoleSecurity.Checked;
             Globals.RoleAgent = CheckRoleAgent.Checked;
-            Globals.md5PortIp = Functions.MD5Code(Globals.servPort + Globals.servIP + Globals.OSdate);
+            Globals.md5PortIp = Functions.MD5Code(Globals.servPort.ToString() + Globals.servIP + Globals.OSdate);
             Globals.md5Clients = Functions.MD5Code(Globals.OSdate + Globals.RoleSecurity.ToString().ToLower() + Globals.RoleMessager.ToString().ToLower() + Globals.RoleOperate.ToString().ToLower() + Globals.RoleAdmin.ToString().ToLower() + Globals.RoleAgent.ToString().ToLower());
 
             RegistryKey localMachineKey = Registry.LocalMachine;
             RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
             RegistryKey regNanit = localMachineSoftKey.CreateSubKey(@"N.A.N.I.T");
             regNanit.SetValue("ip_server", Globals.servIP);
-            regNanit.SetValue("port_server", Globals.servPort);
+            regNanit.SetValue("port_server", Globals.servPort.ToString());
             regNanit.SetValue("validate_ip_port", Globals.md5PortIp);
             regNanit.SetValue("RoleSecurity", Globals.RoleSecurity.ToString().ToLower());
             regNanit.SetValue("RoleMessager", Globals.RoleMessager.ToString().ToLower());
@@ -271,7 +275,33 @@ namespace NaNiT
             cmdInstall.StartInfo.Arguments = "/C " + @"ping google.com";
             cmdInstall.Start();
             cmdInstall.WaitForExit();*/
-            MessageBox.Show(Functions.GetOSDate());
+            IPEndPoint ipPoint = new IPEndPoint(IPAddress.Parse(Globals.servIP), Globals.servPort);
+            socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            // подключаемся к удаленному хосту
+            socket.Connect(ipPoint);
+            string message = "----------------";
+            byte[] data = Encoding.Unicode.GetBytes(message);
+            socket.Send(data);
+            MessageBox.Show("Подключились к серверу и отправили сообщение" + Environment.NewLine);
+            // получаем ответ
+            data = new byte[256]; // буфер для ответа
+            StringBuilder builder = new StringBuilder();
+            int bytes = 0; // количество полученных байт
+            bool GetMessage = false;
+            while (GetMessage == false)
+            {
+                if (socket.Available > 0)
+                {
+                    GetMessage = true;
+                    while (socket.Available > 0)
+                    {
+                        bytes = socket.Receive(data, data.Length, 0);
+                        builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
+                    }
+                }
+                Thread.Sleep(300);
+            }
+            MessageBox.Show("Ответ сервера: " + builder.ToString() + Environment.NewLine);
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)

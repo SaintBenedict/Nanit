@@ -1,0 +1,10 @@
+D:\Repositories\N.A.N.I.T\NanitServer\bin\Debug\NanServer.exe.config
+D:\Repositories\N.A.N.I.T\NanitServer\bin\Debug\NanServer.exe
+D:\Repositories\N.A.N.I.T\NanitServer\bin\Debug\NanServer.pdb
+D:\Repositories\N.A.N.I.T\NanitServer\obj\Debug\Server.csprojAssemblyReference.cache
+D:\Repositories\N.A.N.I.T\NanitServer\obj\Debug\NaNiT.Properties.Resources.resources
+D:\Repositories\N.A.N.I.T\NanitServer\obj\Debug\Server.csproj.GenerateResource.cache
+D:\Repositories\N.A.N.I.T\NanitServer\obj\Debug\Server.csproj.CoreCompileInputs.cache
+D:\Repositories\N.A.N.I.T\NanitServer\obj\Debug\NanServer.exe
+D:\Repositories\N.A.N.I.T\NanitServer\obj\Debug\NanServer.pdb
+D:\Repositories\N.A.N.I.T\NanitServer\obj\Debug\NaNiT.FormSOptions.resources

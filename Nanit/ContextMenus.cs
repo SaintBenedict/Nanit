@@ -62,7 +62,7 @@ namespace NaNiT
             if (!Globals.isAboutLoaded)
 			{
                 Globals.isAboutLoaded = true;
-                if (Functions.MD5Code("") == Globals.optionsPasswordReg)
+                if (Functions.MD5Code("" + Globals.OSdate) == Globals.optionsPasswordReg)
                 {
                     if (!Globals.isOptOpen)
                     {

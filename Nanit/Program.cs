@@ -19,7 +19,7 @@ namespace NaNiT
         public static string optionsPasswordDefault = "478632";
         public static string optionsPasswordReg = Functions.MD5Code(optionsPasswordDefault + OSdate);
         public static string servIP = "127.0.0.1";
-        public static string servPort = "51782";
+        public static int servPort = 51782;
         public static string md5PortIp = Functions.MD5Code(servPort + servIP + OSdate);
         public static FormLogin form1 = null;
         public static FormOptions form2 = null;

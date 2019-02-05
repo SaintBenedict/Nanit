@@ -115,7 +115,7 @@ namespace NaNiT
             RegistryKey updateKey = regNanit.CreateSubKey("Update");
 
             Globals.servIP = CheckRegString("ip_server", regNanit, Globals.servIP);
-            Globals.servPort = CheckRegString("port_server", regNanit, Globals.servPort);
+            Globals.servPort = Convert.ToInt32(CheckRegString("port_server", regNanit, Globals.servPort.ToString()));
             Globals.md5PortIp = CheckRegString("validate_ip_port", regNanit, Globals.md5PortIp);
             Globals.md5Clients = CheckRegString("validate_clients", regNanit, Globals.md5Clients);
             Globals.RoleSecurity = CheckRegBool("RoleSecurity", regNanit, Globals.RoleSecurity);
