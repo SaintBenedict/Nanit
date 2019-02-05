@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{758AD18F-0F92-48FB-8D53-61D3BE71701A}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>NanitSvc</RootNamespace>
+    <RootNamespace>NaNiT</RootNamespace>
     <AssemblyName>nanit-svc</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

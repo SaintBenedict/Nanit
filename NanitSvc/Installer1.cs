@@ -2,7 +2,7 @@
 using System.ServiceProcess;
 using System.Configuration.Install;
 
-namespace NanitSvc
+namespace NaNiT
 {
     [RunInstaller(true)]
     public partial class Installer1 : Installer

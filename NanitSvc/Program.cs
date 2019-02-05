@@ -1,6 +1,6 @@
 ﻿using System.ServiceProcess;
 
-namespace NanitSvc
+namespace NaNiT
 {
     static class Program
     {

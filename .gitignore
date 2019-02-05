@@ -1,7 +1,6 @@
 *.lock
 **/.vs/
-**/NanitSvc/.vs/
-**/getHardwareInformation/bin/Debug/
-**/getHardwareInformation/obj/Debug/
-**/NanitSvc/NanitSvc/bin/Debug/
-**/NanitSvc/NanitSvc/obj/Debug/
+**/Nanit/bin/Debug/
+**/Nanit/obj/Debug/
+**/NanitSvc/bin/Debug/
+**/NanitSvc/obj/Debug/

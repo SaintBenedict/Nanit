@@ -1,4 +1,4 @@
-﻿namespace NanitSvc
+﻿namespace NaNiT
 {
     partial class Service1
     {
