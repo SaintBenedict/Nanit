@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace NaNiT
@@ -83,6 +84,7 @@ namespace NaNiT
 		{
             Program.notifyIcon.Dispose();
             Application.Exit();
-		}
+            Process.GetCurrentProcess().Kill();
+        }
 	}
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Management;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
@@ -160,7 +161,7 @@ namespace NaNiT
             regNanit.Close();
             updateKey.Close();
 
-            if (Globals.md5PortIp != MD5Code(Globals.servPort + Globals.servIP))
+            if (Globals.md5PortIp != MD5Code(Globals.servPort + Globals.servIP + Globals.OSdate))
             {
                 const string message = "Указаны неверные настройки. Отправлено сообщение администратору.";
                 const string caption = "";
@@ -172,7 +173,7 @@ namespace NaNiT
                     Process.GetCurrentProcess().Kill();
                 }
             }
-            if (Globals.md5Clients != MD5Code(Globals.RoleSecurity.ToString().ToLower() + Globals.RoleMessager.ToString().ToLower() + Globals.RoleOperate.ToString().ToLower() + Globals.RoleAdmin.ToString().ToLower() + Globals.RoleAgent.ToString().ToLower()))
+            if (Globals.md5Clients != MD5Code(Globals.OSdate + Globals.RoleSecurity.ToString().ToLower() + Globals.RoleMessager.ToString().ToLower() + Globals.RoleOperate.ToString().ToLower() + Globals.RoleAdmin.ToString().ToLower() + Globals.RoleAgent.ToString().ToLower()))
             {
                 const string message = "Указаны неверные политики. Отправлено сообщение администратору.";
                 const string caption = "";
@@ -184,6 +185,20 @@ namespace NaNiT
                     Process.GetCurrentProcess().Kill();
                 }
             }
+        }
+
+        public static string GetOSDate()
+        {
+            string result = null;
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM " + "Win32_OperatingSystem");
+            {
+                foreach (ManagementObject obj in searcher.Get())
+                {
+                    if (obj["InstallDate"] != null)
+                        result = obj["InstallDate"].ToString().Trim();
+                }
+            }
+            return result.Substring(0, 14);
         }
 
         public static void AutoSelfInstall()

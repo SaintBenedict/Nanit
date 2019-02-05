@@ -18,7 +18,7 @@ namespace NaNiT
 
         private void ButPassEntOk_Click(object sender, EventArgs e)
         {
-            if (Functions.MD5Code(BoxPass.Text) == Globals.optionsPasswordReg)
+            if (Functions.MD5Code(BoxPass.Text + Globals.OSdate) == Globals.optionsPasswordReg)
             {
                 Globals.form2 = new FormOptions();
                 Globals.form2.Text = (@"N.A.N.I.T (((ver." + Globals.version + ")))");
