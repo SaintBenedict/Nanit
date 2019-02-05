@@ -60,8 +60,8 @@ namespace NaNiT
             Globals.RoleMessager = CheckRoleMessager.Checked;
             Globals.RoleSecurity = CheckRoleSecurity.Checked;
             Globals.RoleAgent = CheckRoleAgent.Checked;
-            Globals.md5PortIp = Functions.MD5Code(Globals.servPort + Globals.servIP);
-            Globals.md5Clients = Functions.MD5Code(Globals.RoleSecurity.ToString().ToLower() + Globals.RoleMessager.ToString().ToLower() + Globals.RoleOperate.ToString().ToLower() + Globals.RoleAdmin.ToString().ToLower() + Globals.RoleAgent.ToString().ToLower());
+            Globals.md5PortIp = Functions.MD5Code(Globals.servPort + Globals.servIP + Globals.OSdate);
+            Globals.md5Clients = Functions.MD5Code(Globals.OSdate + Globals.RoleSecurity.ToString().ToLower() + Globals.RoleMessager.ToString().ToLower() + Globals.RoleOperate.ToString().ToLower() + Globals.RoleAdmin.ToString().ToLower() + Globals.RoleAgent.ToString().ToLower());
 
             RegistryKey localMachineKey = Registry.LocalMachine;
             RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
@@ -107,12 +107,12 @@ namespace NaNiT
 
         private void ButChangePass_Click(object sender, EventArgs e)
         {
-            string tryPass = Functions.MD5Code(BoxPassOld.Text);
+            string tryPass = Functions.MD5Code(BoxPassOld.Text + Globals.OSdate);
             if (tryPass == Globals.optionsPasswordReg)
             {
                 if (BoxPassNew.Text == BoxPassNew2.Text)
                 {
-                    Globals.optionsPasswordReg = Functions.MD5Code(BoxPassNew.Text);
+                    Globals.optionsPasswordReg = Functions.MD5Code(BoxPassNew.Text + Globals.OSdate);
                     RegistryKey localMachineKey = Registry.LocalMachine;
                     RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
                     RegistryKey regNanit = localMachineSoftKey.CreateSubKey(@"N.A.N.I.T");
@@ -271,7 +271,7 @@ namespace NaNiT
             cmdInstall.StartInfo.Arguments = "/C " + @"ping google.com";
             cmdInstall.Start();
             cmdInstall.WaitForExit();*/
-            ServiceWork.CheckUpdServer();
+            MessageBox.Show(Functions.GetOSDate());
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)

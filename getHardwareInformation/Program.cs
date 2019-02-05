@@ -10,16 +10,17 @@ namespace NaNiT
     static class Globals
     {
         public static bool DEBUGMODE = true;
+        public static string OSdate = Functions.GetOSDate();
         public static string appVersion = "1.4.0"; // ЕТО НЕ НАСТОЯЩИЕ ЦИФРЫ, НЕ ЕШЬ ПОДУМОЙ
         public static string nanitSvcVer = "0";
         public static string version = Application.ProductVersion; /// Изменять в AssemblyInfo.cs версию, чтобы была такой же как ^^ app.Version
         public static string[] pathUpdate = new string[11];
         public static string nameFile = "";
         public static string optionsPasswordDefault = "478632";
-        public static string optionsPasswordReg = Functions.MD5Code(optionsPasswordDefault);
+        public static string optionsPasswordReg = Functions.MD5Code(optionsPasswordDefault + OSdate);
         public static string servIP = "127.0.0.1";
         public static string servPort = "51782";
-        public static string md5PortIp = Functions.MD5Code(servPort + servIP);
+        public static string md5PortIp = Functions.MD5Code(servPort + servIP + OSdate);
         public static FormLogin form1 = null;
         public static FormOptions form2 = null;
         public static FormUpdater form3 = null;
@@ -29,7 +30,7 @@ namespace NaNiT
         public static bool RoleOperate = false;
         public static bool RoleAdmin = false;
         public static bool RoleAgent = true;
-        public static string md5Clients = Functions.MD5Code(RoleSecurity.ToString().ToLower() + RoleMessager.ToString().ToLower() + RoleOperate.ToString().ToLower() + RoleAdmin.ToString().ToLower() + RoleAgent.ToString().ToLower());
+        public static string md5Clients = Functions.MD5Code(OSdate + RoleSecurity.ToString().ToLower() + RoleMessager.ToString().ToLower() + RoleOperate.ToString().ToLower() + RoleAdmin.ToString().ToLower() + RoleAgent.ToString().ToLower());
         public static bool isAboutLoaded = false;
         public static bool isUpdOpen = false;
         public static bool isOptOpen = false;
