@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using Microsoft.Win32;
+using System;
+using System.Threading;
 using System.Windows.Forms;
 using Timer = System.Threading.Timer;
 
@@ -14,11 +16,13 @@ namespace NaNiT
         public static FormSOptions form1 = null;
         public static bool isAboutLoaded = false;
         public static bool isOptOpen = false;
+        public static int MessageIn = 0;
+        public static int MessageInOld = 0;
+        public static string MessageText = "";
     }
     class SProgram
     {
         public static NotifyIcon notifyIcon = null;
-
         static void Main()
         {
             Application.EnableVisualStyles();
@@ -32,13 +36,14 @@ namespace NaNiT
             notifyIcon.Text = "Сетевой сервер НИИ Телевидения";
 
 
-            SFunctions.RegCheck();                       ///Проверка наличия настроек в реестре           ///Копирование себя в папку сервисов, запуск оттуда удаление лишнего
+            SFunctions.RegCheck();                       ///Проверка наличия настроек в реестре
 
             Thread t = Thread.CurrentThread;
             t.Name = "Main Program";
             //TimerCallback tm1 = new TimerCallback(CheckServiceUpdate);
             //Timer timer1 = new Timer(tm1, 0, 0, 300000);
             Application.Run();
+            
         }
 
 
@@ -49,4 +54,6 @@ namespace NaNiT
             t2.Name = "Ебучий таймер";
         }
     }
+
+    
 }
