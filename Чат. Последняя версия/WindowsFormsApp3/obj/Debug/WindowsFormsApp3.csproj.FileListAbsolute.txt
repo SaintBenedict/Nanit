@@ -1,0 +1,18 @@
+C:\Users\User\source\repos\WindowsFormsApp3\WindowsFormsApp3\obj\Debug\WindowsFormsApp3.csprojAssemblyReference.cache
+C:\Users\User\source\repos\WindowsFormsApp3\WindowsFormsApp3\obj\Debug\ChatClient.СlientForm.resources
+C:\Users\User\source\repos\WindowsFormsApp3\WindowsFormsApp3\obj\Debug\WindowsFormsApp3.Properties.Resources.resources
+C:\Users\User\source\repos\WindowsFormsApp3\WindowsFormsApp3\obj\Debug\WindowsFormsApp3.csproj.GenerateResource.cache
+C:\Users\User\source\repos\WindowsFormsApp3\WindowsFormsApp3\obj\Debug\WindowsFormsApp3.csproj.CoreCompileInputs.cache
+C:\Users\User\source\repos\WindowsFormsApp3\WindowsFormsApp3\bin\Debug\WindowsFormsApp3.exe
+C:\Users\User\source\repos\WindowsFormsApp3\WindowsFormsApp3\bin\Debug\WindowsFormsApp3.pdb
+C:\Users\User\source\repos\WindowsFormsApp3\WindowsFormsApp3\obj\Debug\WindowsFormsApp3.exe
+C:\Users\User\source\repos\WindowsFormsApp3\WindowsFormsApp3\obj\Debug\WindowsFormsApp3.pdb
+Y:\Repository\Чат. Последняя версия\WindowsFormsApp3\bin\Debug\WindowsFormsApp3.exe
+Y:\Repository\Чат. Последняя версия\WindowsFormsApp3\bin\Debug\WindowsFormsApp3.pdb
+Y:\Repository\Чат. Последняя версия\WindowsFormsApp3\obj\Debug\WindowsFormsApp3.csprojAssemblyReference.cache
+Y:\Repository\Чат. Последняя версия\WindowsFormsApp3\obj\Debug\ChatClient.СlientForm.resources
+Y:\Repository\Чат. Последняя версия\WindowsFormsApp3\obj\Debug\WindowsFormsApp3.Properties.Resources.resources
+Y:\Repository\Чат. Последняя версия\WindowsFormsApp3\obj\Debug\WindowsFormsApp3.csproj.GenerateResource.cache
+Y:\Repository\Чат. Последняя версия\WindowsFormsApp3\obj\Debug\WindowsFormsApp3.csproj.CoreCompileInputs.cache
+Y:\Repository\Чат. Последняя версия\WindowsFormsApp3\obj\Debug\WindowsFormsApp3.exe
+Y:\Repository\Чат. Последняя версия\WindowsFormsApp3\obj\Debug\WindowsFormsApp3.pdb
