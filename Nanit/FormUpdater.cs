@@ -16,6 +16,7 @@ namespace NaNiT
             ToolTip chgB = new ToolTip();
             chgB.SetToolTip(ButDel, "Редактировать");
             ChList.Items.Clear();
+            Globals.isUpdOpen = true;
 
             for (byte j = 0; j < 11; j++)
             {
@@ -49,6 +50,11 @@ namespace NaNiT
                 button1.Enabled = false;
             else
                 button1.Enabled = true;
+        }
+
+        private void FormUpdater_Deactivate(object sender, EventArgs e)
+        {
+            this.TopMost = true;
         }
 
         private void ChList_ItemCheck(Object sender, EventArgs e)

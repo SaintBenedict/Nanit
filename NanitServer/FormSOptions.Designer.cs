@@ -103,7 +103,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(485, 289);
+            this.ClientSize = new System.Drawing.Size(487, 289);
             this.ControlBox = false;
             this.Controls.Add(this.listView1);
             this.Controls.Add(this.ButStart);
@@ -121,6 +121,7 @@
             this.Closed += new System.EventHandler(this.FormOptions_Close);
             this.ResumeLayout(false);
             this.PerformLayout();
+            this.Deactivate += new System.EventHandler(this.FormSOptions_Deactivate);
 
         }
 

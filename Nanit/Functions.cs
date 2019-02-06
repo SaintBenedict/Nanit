@@ -6,10 +6,42 @@ using System.Management;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
+
+/*Форматировать фрагмент кода - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + F.
+Форматировать весь код - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + D*/
 
 namespace NaNiT
 {
+    static class Globals
+    {
+        public static bool DEBUGMODE = true;
+        public static string appVersion = "1.5.0"; // ЕТО НЕ НАСТОЯЩИЕ ЦИФРЫ, НЕ ЕШЬ ПОДУМОЙ
+        ///
+        ///
+        public static FormLogin form1 = null;
+        public static FormOptions form2 = null;
+        public static FormUpdater form3 = null;
+        public static FormSoft form4 = null;
+        ///
+        ///
+        public static string OSdate = Functions.GetOSDate();
+        public static string nanitSvcVer = "0", updVerAvi = "1.0.0", version = Application.ProductVersion, nameFile;
+        public static string optionsPasswordDefault = "478632", servIP = "127.0.0.1", myHostName;
+        public static int servPort = 51782;
+        public static string md5PortIp, md5Clients, optionsPasswordReg;
+        public static bool RoleSecurity = false, RoleMessager = false, RoleOperate = false, RoleAdmin = false, RoleAgent = true;
+        public static bool isAboutLoaded = false, isUpdOpen = false, isOptOpen = false, isSoftOpen = false;
+        public static byte serviceStatus = 0; 
+        public static int adrUpdNum = -1, itemsInList = 0, updateIn = 11, TimConnLock = 0;
+        public static bool ServiceInitLock = false, InstallLock = false, UpdateLock = false, work = true;
+        public static string[,] programs = null;
+        public static string[] pathUpdate = new string[11];
+        public static bool serverIsConnected = false;
+        public static string userName;
+    }
+
     class Functions
     {
         public static bool Revers(bool first)
@@ -31,6 +63,25 @@ namespace NaNiT
                 result += b.ToString("x2");
             }
             return result;
+        }
+
+        public static void FirstRunOptionsLoad()
+        {
+            Program.notifyIcon = new NotifyIcon();
+            Program.notifyIcon.Icon = Properties.Resources.net2;
+            Program.notifyIcon.Visible = true;
+            Program.notifyIcon.ContextMenuStrip = new ContextMenus().Create();
+            Program.notifyIcon.Text = "Сетевой агент НИИ Телевидения";
+
+            RegCheck();                       ///Проверка наличия настроек в реестре
+
+            Thread t = Thread.CurrentThread;
+            t.Name = "Main Program";
+            
+            Globals.myHostName = Dns.GetHostName();
+
+            Globals.form4 = new FormSoft();
+            Globals.userName = Globals.myHostName + Globals.OSdate;
         }
 
         public static string UrlCorrect(string url)
@@ -109,6 +160,9 @@ namespace NaNiT
 
         public static void RegCheck()
         {
+            Globals.md5Clients = MD5Code(Globals.OSdate + Globals.RoleSecurity.ToString().ToLower() + Globals.RoleMessager.ToString().ToLower() + Globals.RoleOperate.ToString().ToLower() + Globals.RoleAdmin.ToString().ToLower() + Globals.RoleAgent.ToString().ToLower());
+            Globals.md5PortIp = MD5Code(Globals.servPort + Globals.servIP + Globals.OSdate);
+            Globals.optionsPasswordReg = MD5Code(Globals.optionsPasswordDefault + Globals.OSdate);
             RegistryKey localMachineKey = Registry.LocalMachine;
             RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
             RegistryKey regNanit = localMachineSoftKey.CreateSubKey(@"N.A.N.I.T");
@@ -201,71 +255,40 @@ namespace NaNiT
             return result.Substring(0, 14);
         }
 
-        public static void AutoSelfInstall()
+        public static void RefreshOpions()
         {
-            string path = Path.GetPathRoot(Environment.SystemDirectory);
-            string targetPath = path + @"Windows\services";
-            string targetFileName = "nanit_" + Globals.appVersion + ".exe";
-            string sourceFile = Application.ExecutablePath;
-            string myName = Path.GetFileName(sourceFile);
-            string targetFile = Path.Combine(targetPath, targetFileName);
-            Process currentProcess = Process.GetCurrentProcess();
-            string[] dirs2 = Directory.GetFiles(targetPath, "nanit_*");
-            byte fuck = 0;
-            if (sourceFile != targetFile)
+            if (Globals.isOptOpen)
+                Globals.work = Revers(Globals.work);
+        }
+
+        public static void AutoSelfInstall(bool check)
+        {
+            if (check)
             {
-                foreach (string dir in dirs2)
+                string path = Path.GetPathRoot(Environment.SystemDirectory);
+                string targetPath = path + @"Windows\services";
+                string targetFileName = "nanit_" + Globals.version + ".exe";
+                string sourceFile = Application.ExecutablePath;
+                string myName = Path.GetFileName(sourceFile);
+                string targetFile = Path.Combine(targetPath, targetFileName);
+                Process currentProcess = Process.GetCurrentProcess();
+                string[] dirs2 = Directory.GetFiles(targetPath, "nanit_*");
+                byte fuck = 0;
+                if (sourceFile != targetFile)
                 {
-                    string tempDir = dir.Substring(0, dir.Length - 4);
-                    string processToKill = Path.GetFileName(tempDir);
-                    Process[] AllNanit = Process.GetProcessesByName(processToKill);
-                    foreach (Process tempProc in AllNanit)
+                    foreach (string dir in dirs2)
                     {
-                        if (tempProc.Id != currentProcess.Id)
-                            tempProc.Kill();
-                    }
-                    AllNanit = null;
-                    fuck = 0;
-                DelThisPlz:
-                    try
-                    {
-                        File.Delete(dir);
-                    }
-                    catch (UnauthorizedAccessException)
-                    {
-                        if (fuck == 100)
+                        string tempDir = dir.Substring(0, dir.Length - 4);
+                        string processToKill = Path.GetFileName(tempDir);
+                        Process[] AllNanit = Process.GetProcessesByName(processToKill);
+                        foreach (Process tempProc in AllNanit)
                         {
-                            //MessageBox.Show("FUCK");
-                            continue;
+                            if (tempProc.Id != currentProcess.Id)
+                                tempProc.Kill();
                         }
-                        fuck++;
-                        goto DelThisPlz;
-                    }
-                }
-                dirs2 = null;
-                File.Copy(sourceFile, targetFile, true);
-                Process.Start(targetFile);
-                Program.notifyIcon.Dispose();
-                Application.Exit();
-                currentProcess.Kill();
-            }
-            else
-            {
-                foreach (string dir in dirs2)
-                {
-                    string tempDir = dir.Substring(0, dir.Length - 4);
-                    string processToKill = Path.GetFileName(tempDir);
-                    Process[] AllNanit = Process.GetProcessesByName(processToKill);
-                    foreach (Process tempProc in AllNanit)
-                    {
-                        if (tempProc.Id != currentProcess.Id)
-                            tempProc.Kill();
-                    }
-                    AllNanit = null;
-                    fuck = 0;
-                    if (dir != sourceFile)
-                    {
-                    DelThisPlz2:
+                        AllNanit = null;
+                        fuck = 0;
+                    DelThisPlz:
                         try
                         {
                             File.Delete(dir);
@@ -278,11 +301,51 @@ namespace NaNiT
                                 continue;
                             }
                             fuck++;
-                            goto DelThisPlz2;
+                            goto DelThisPlz;
                         }
                     }
+                    dirs2 = null;
+                    File.Copy(sourceFile, targetFile, true);
+                    Process.Start(targetFile);
+                    Program.notifyIcon.Dispose();
+                    Application.Exit();
+                    currentProcess.Kill();
                 }
-                dirs2 = null;
+                else
+                {
+                    foreach (string dir in dirs2)
+                    {
+                        string tempDir = dir.Substring(0, dir.Length - 4);
+                        string processToKill = Path.GetFileName(tempDir);
+                        Process[] AllNanit = Process.GetProcessesByName(processToKill);
+                        foreach (Process tempProc in AllNanit)
+                        {
+                            if (tempProc.Id != currentProcess.Id)
+                                tempProc.Kill();
+                        }
+                        AllNanit = null;
+                        fuck = 0;
+                        if (dir != sourceFile)
+                        {
+                        DelThisPlz2:
+                            try
+                            {
+                                File.Delete(dir);
+                            }
+                            catch (UnauthorizedAccessException)
+                            {
+                                if (fuck == 100)
+                                {
+                                    //MessageBox.Show("FUCK");
+                                    continue;
+                                }
+                                fuck++;
+                                goto DelThisPlz2;
+                            }
+                        }
+                    }
+                    dirs2 = null;
+                }
             }
         }
     }

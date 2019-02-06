@@ -16,8 +16,10 @@
             if (disposing && (components != null))
             {
                 components.Dispose();
+                Globals.isUpdOpen = false;
             }
             base.Dispose(disposing);
+            Globals.isUpdOpen = false;
         }
 
         #region Windows Form Designer generated code
@@ -115,6 +117,7 @@
             this.Closed += new System.EventHandler(this.FormUpdater_Close);
             this.ResumeLayout(false);
             this.PerformLayout();
+            this.Deactivate += new System.EventHandler(this.FormUpdater_Deactivate);
 
         }
 

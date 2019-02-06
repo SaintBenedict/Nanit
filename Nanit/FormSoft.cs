@@ -12,8 +12,13 @@ namespace NaNiT
         {
             InitializeComponent();
             GetInstalledSoftware();
+            Globals.form4 = this;
         }
-        
+        public void FormSoft_Close(object sender, EventArgs e)
+        {
+            Globals.isSoftOpen = false;
+        }
+
 
         private void GetInstalledSoftware()
         {
@@ -72,7 +77,7 @@ namespace NaNiT
             listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
             listView1.ListViewItemSorter = new ListViewColumnComparer(0);
             int progs = listView1.Items.Count;
-            Globals.programs = new string[progs+1, 3];
+            Globals.programs = new string[progs + 1, 3];
             for (int i = 0; i < progs; i++)
             {
                 Globals.programs[i, 0] = listView1.Items[i].SubItems[0].Text;

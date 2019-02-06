@@ -41,7 +41,7 @@ namespace NaNiT
 			{
                     if (!Globals.isOptOpen)
                     {
-                        Globals.form1 = new FormSOptions();
+                        //Globals.form1 = new FormSOptions();
                         Globals.form1.Text = (@"N.A.N.I.T Server");
                         Globals.form1.Show();
                         Globals.isOptOpen = true;
@@ -51,6 +51,8 @@ namespace NaNiT
 
 		void Exit_Click(object sender, EventArgs e)
 		{
+            Globals.form1.Stop();
+            Globals.form1.Dispose();
             SProgram.notifyIcon.Dispose();
             Application.Exit();
             Process.GetCurrentProcess().Kill();

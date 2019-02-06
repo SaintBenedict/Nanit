@@ -14,6 +14,7 @@ namespace NaNiT
 
         public ClientObject(TcpClient tcpClient, ServerObject serverObject)
         {
+            
             Id = Guid.NewGuid().ToString();
             client = tcpClient;
             server = serverObject;
@@ -30,16 +31,16 @@ namespace NaNiT
                 userName = message;
 
                 message = userName + " подключился";
+                Globals.MessageText = message;
+                Globals.MessageIn = 2;
+                Globals.ClientId = this.Id;
                 // посылаем сообщение о входе в чат всем подключенным пользователям
                 server.BroadcastMessage(message, this.Id);
-
-                Globals.MessageText = message;
-                Globals.MessageIn++;
                 // в бесконечном цикле получаем сообщения от клиента
                 while (true)
                 {
                     message = GetMessage();
-                    if (String.Format("{0}: {1}", userName, message) != String.Format("{0}: {1}", userName, "ex"))
+                    if (String.Format("{0}: {1}", userName, message) != String.Format("{0}: {1}", userName, null))
                     {
                         
                         message = String.Format("{0}: {1}", userName, message);
@@ -74,17 +75,32 @@ namespace NaNiT
         // чтение входящего сообщения и преобразование в строку
         private string GetMessage()
         {
-            byte[] data = new byte[64]; // буфер для получаемых данных
-            StringBuilder builder = new StringBuilder();
-            int bytes = 0;
-            do
+            if (Stream.CanRead)
             {
-                bytes = Stream.Read(data, 0, data.Length);
-                builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
-            }
-            while (Stream.DataAvailable);
+                try
+                {
+                    byte[] data = new byte[64]; // буфер для получаемых данных
+                    StringBuilder builder = new StringBuilder();
+                    int bytes = 0;
+                    do
+                    {
+                        bytes = Stream.Read(data, 0, data.Length);
+                        builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
+                    }
+                    while (Stream.DataAvailable);
 
-            return builder.ToString();
+                    return builder.ToString();
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
+            }
+            
         }
 
 

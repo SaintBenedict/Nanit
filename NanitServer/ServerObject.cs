@@ -11,7 +11,7 @@ namespace NaNiT
     public class ServerObject
     {
         static TcpListener tcpListener; // сервер для прослушивания
-        List<ClientObject> clients = new List<ClientObject>(); // все подключения
+        public static List<ClientObject> clients = new List<ClientObject>(); // все подключения
 
         protected internal void AddConnection(ClientObject clientObject)
         {
@@ -22,11 +22,16 @@ namespace NaNiT
             // получаем по id закрытое подключение
             foreach (ClientObject clTemp in clients)
             {
-                ClientObject client = clTemp;
-                if (client != null)
-                    continue;
-                else
+                if (clTemp.Id == id)
+                {
+                    if (clTemp != null)
+                        clients.Remove(clTemp);
                     break;
+                }
+                else
+                {
+                    continue;
+                }
             }
         }
         // прослушивание входящих подключений
@@ -34,9 +39,11 @@ namespace NaNiT
         {
             try
             {
+                string dateStart = DateTime.Now.ToString();
                 tcpListener = new TcpListener(IPAddress.Any, Globals.servPort);
                 tcpListener.Start();
                 Globals.MessageIn = 1;
+                Globals.MessageText = "Сервер запущен: " + dateStart;
 
                 while (true)
                 {
@@ -49,7 +56,7 @@ namespace NaNiT
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                //MessageBox.Show(ex.Message);
                 Disconnect();
             }
         }
@@ -69,13 +76,16 @@ namespace NaNiT
         // отключение всех клиентов
         protected internal void Disconnect()
         {
+            string dateStop = DateTime.Now.ToString();
             tcpListener.Stop(); //остановка сервера
 
             for (int i = 0; i < clients.Count; i++)
             {
                 clients[i].Close(); //отключение клиента
             }
-            Environment.Exit(0); //завершение процесса
+            Globals.MessageIn = 3;
+            Globals.MessageText = "Сервер прекратил работу: " + dateStop;
+            //Environment.Exit(0); //завершение процесса
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -15,19 +14,17 @@ namespace NaNiT
         {
             DeleteExist(); /// Удаление имеющегося файла информации
 
-            string myHost = Dns.GetHostName();
-            string myIP = null;
+            
 
             OutputSimple("Данные об Автоматизированном Рабочем Месте");
 
             OutputIniBlock("Данные о сетях");
-            OutputSimple("• Имя компьютера: " + myHost);
-
-            for (byte i = 0; i <= Dns.GetHostEntry(myHost).AddressList.Length - 1; i++)
+            OutputSimple("• Имя компьютера: " + Globals.myHostName);
+            for (byte i = 0; i <= Dns.GetHostEntry(Globals.myHostName).AddressList.Length - 1; i++)
             {
-                if (Dns.GetHostEntry(myHost).AddressList[i].IsIPv6LinkLocal == false)
+                if (Dns.GetHostEntry(Globals.myHostName).AddressList[i].IsIPv6LinkLocal == false)
                 {
-                    myIP = Dns.GetHostEntry(myHost).AddressList[i].ToString();
+                    string myIP = Dns.GetHostEntry(Globals.myHostName).AddressList[i].ToString();
                     OutputSimple(myIP);
                 }
             }

@@ -12,6 +12,8 @@
                 Globals.isOptOpen = false;
             }
             base.Dispose(disposing);
+            Globals.isAboutLoaded = false;
+            Globals.isOptOpen = false;
         }
 
         #region Windows Form Designer generated code
@@ -382,6 +384,7 @@
             this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
+            this.Deactivate += new System.EventHandler(this.FormOptions_Deactivate);
 
         }
 

@@ -16,6 +16,7 @@
             if (disposing && (components != null))
             {
                 components.Dispose();
+                Globals.isSoftOpen = false;
             }
             base.Dispose(disposing);
         }
@@ -66,6 +67,7 @@
             this.ClientSize = new System.Drawing.Size(800, 614);
             this.Controls.Add(this.listView1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Closed += new System.EventHandler(this.FormSoft_Close);
             this.Name = "FormSoft";
             this.Text = "Soft";
             this.ResumeLayout(false);

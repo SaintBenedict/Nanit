@@ -103,31 +103,29 @@ namespace NaNiT
                         FileVersionInfo UpdVersionListen = FileVersionInfo.GetVersionInfo(targetPathC + @"\nanit-svc" + "_" + Globals.nanitSvcVer + @".exe");
                         string str = UpdVersionListen.FileVersion.Substring(0, 5);
                         Globals.nanitSvcVer = str;
-                        //MessageBox.Show(str); // Какая получена версия из файла
                         if (sc.Status == ServiceControllerStatus.Running)
                         {
-                            Globals.serviceStatus = 1;
+                            Globals.serviceStatus = 1;                                              // установлена и запущена
                             if (Globals.nanitSvcVer != Globals.updVerAvi)
-                                Globals.serviceStatus = 3;
+                                Globals.serviceStatus = 3;                                          // установлена и запущена есть обновление
                         }
                         else
                         {
-                            Globals.serviceStatus = 2;
+                            Globals.serviceStatus = 2;                                              // установлена не запущена
                             if (Globals.nanitSvcVer != Globals.updVerAvi)
-                                Globals.serviceStatus = 4;
+                                Globals.serviceStatus = 4;                                          // установлена не запущена есть обновление
                         }
                         File.Delete(@"InstallUtil.InstallLog");
                         goto EndServiceEach;
                     }
                     else
                     {
-                        Globals.serviceStatus = 0;
+                        Globals.serviceStatus = 0;                                                  // не установлена и не запущена
                     }
                 }
             EndServiceEach:
                 if (k == 0)
                     Globals.nanitSvcVer = "0";
-                //MessageBox.Show(Globals.adrUpdNum.ToString()); //с какого сервера грузим
                 RegistryKey localMachineKey = Registry.LocalMachine;
                 RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
                 RegistryKey regNanit = localMachineSoftKey.CreateSubKey(@"N.A.N.I.T");
@@ -135,10 +133,7 @@ namespace NaNiT
                 updateKey.SetValue("nanitSvcVer", Globals.nanitSvcVer);
                 regNanit.Close();
                 updateKey.Close();
-                //MessageBox.Show(Globals.serviceStatus.ToString()); // Какой получен статус сервера
-                //MessageBox.Show(k.ToString()); // Найден ли апдейтер
-                if (Globals.isOptOpen)
-                    Globals.work = Functions.Revers(Globals.work); // Функция обновления интерфейса формы настроек
+                Functions.RefreshOpions();                                                          // Функция обновления интерфейса формы настроек
                 Globals.ServiceInitLock = false;
             }
         }
@@ -155,7 +150,6 @@ namespace NaNiT
                 string fileName3 = "nanit-svc" + "_" + Globals.nanitSvcVer + @".exe";
                 WebClient myWebClient = new WebClient();
                 installResource = remoteUri + fileName;
-                //MessageBox.Show(installResource); // Uri для загрузки файла
                 string path = Path.GetPathRoot(Environment.SystemDirectory);
                 string sourcePath = Application.StartupPath;
                 string targetPath = path + @"Windows\services";
@@ -165,13 +159,11 @@ namespace NaNiT
                 string oldFile = Path.Combine(targetPath, fileName3);
                 Directory.CreateDirectory(targetPath);
                 string InstSvc = path + @"Windows\Microsoft.NET\Framework\v2.0.50727\InstallUtil.exe ";
-                //MessageBox.Show(Globals.adrUpdNum.ToString()); //с какого сервера грузим
 
                 switch (Globals.serviceStatus)
                 {
                     case 0:
-                        if (Globals.isOptOpen)
-                            Globals.work = Functions.Revers(Globals.work); // Функция обновления интерфейса формы настроек
+                        Functions.RefreshOpions();
                         myWebClient.DownloadFile(installResource, fileName);
                         myWebClient.Dispose();
                         File.Delete(sourceFile);
@@ -208,8 +200,7 @@ namespace NaNiT
                     //Конец куска
 
                     case 2:
-                        if (Globals.isOptOpen)
-                            Globals.work = Functions.Revers(Globals.work); // Функция обновления интерфейса формы настроек
+                        Functions.RefreshOpions();
                         scServices = ServiceController.GetServices();
                         foreach (ServiceController scTemp in scServices)
                         {
@@ -234,8 +225,7 @@ namespace NaNiT
                         break;
 
                     case 3:
-                        if (Globals.isOptOpen)
-                            Globals.work = Functions.Revers(Globals.work); // Функция обновления интерфейса формы настроек
+                        Functions.RefreshOpions();
                         Globals.InstallLock = false;
                         UpdateService();
                         break;
@@ -244,8 +234,7 @@ namespace NaNiT
                             goto case 2;
                         else
                         {
-                            if (Globals.isOptOpen)
-                                Globals.work = Functions.Revers(Globals.work); // Функция обновления интерфейса формы настроек
+                            Functions.RefreshOpions();
                             Globals.InstallLock = false;
                             UpdateService();
                         }
@@ -344,8 +333,7 @@ namespace NaNiT
                 Globals.InstallLock = true;
                 Globals.UpdateLock = true;
                 DeleteService();
-                if (Globals.isOptOpen)
-                    Globals.work = Functions.Revers(Globals.work); // Функция обновления интерфейса формы настроек
+                Functions.RefreshOpions();
                 string remoteUri = Globals.pathUpdate[Globals.adrUpdNum] + "/nanit/";
                 string fileName = "nanit-svc.exe", myStringWebResourceU = null;
                 string fileName2 = "nanit-svc" + "_" + Globals.updVerAvi + @".exe";
@@ -392,8 +380,7 @@ namespace NaNiT
                     }
                 }
             UpdateEnd:
-                if (Globals.isOptOpen)
-                    Globals.work = Functions.Revers(Globals.work); // Функция обновления интерфейса формы настроек
+                Functions.RefreshOpions();
                 Globals.nanitSvcVer = Globals.updVerAvi;
                 ServiceController sc = new ServiceController("Nanit Updater");
                 sc.Start();

@@ -16,9 +16,11 @@ namespace NaNiT
         public static FormSOptions form1 = null;
         public static bool isAboutLoaded = false;
         public static bool isOptOpen = false;
+        public static bool isOptOpenStatic = true;
         public static int MessageIn = 0;
         public static int MessageInOld = 0;
         public static string MessageText = "";
+        public static string ClientId = "";
     }
     class SProgram
     {
@@ -27,7 +29,6 @@ namespace NaNiT
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            //Globals.form2 = new FormOptions();
 
             notifyIcon = new NotifyIcon();
             notifyIcon.Icon = Properties.Resources.net2;
@@ -40,14 +41,12 @@ namespace NaNiT
 
             Thread t = Thread.CurrentThread;
             t.Name = "Main Program";
-            //TimerCallback tm1 = new TimerCallback(CheckServiceUpdate);
-            //Timer timer1 = new Timer(tm1, 0, 0, 300000);
+
+            Globals.form1 = new FormSOptions();
             Application.Run();
             
         }
-
-
-
+        
         public static void CheckServiceUpdate(object obj)
         {
             Thread t2 = Thread.CurrentThread;

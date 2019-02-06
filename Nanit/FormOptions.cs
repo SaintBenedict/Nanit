@@ -54,6 +54,14 @@ namespace NaNiT
             Globals.isOptOpen = false;
             Globals.isAboutLoaded = false;
         }
+        
+        private void FormOptions_Deactivate(object sender, EventArgs e)
+        {
+            if (!Globals.isUpdOpen)
+                this.TopMost = true;
+            else
+                this.TopMost = false;
+        }
 
         private void ButOptSave_Click(object sender, EventArgs e)
         {

@@ -19,7 +19,7 @@ namespace NaNiT
             item.Click += new EventHandler(DataHover_Click);
 			menu.Items.Add(item);
 
-            if (!Globals.DEBUGMODE)
+            if (Globals.DEBUGMODE)
             {
                 item = new ToolStripMenuItem();
                 item.Text = "Просмотр программ";
@@ -53,8 +53,12 @@ namespace NaNiT
 
         void Software_Click(object sender, EventArgs e)
         {
-            Globals.form4 = new FormSoft();
-            Globals.form4.Show();
+            if (!Globals.isSoftOpen)
+            {
+                Globals.form4 = new FormSoft();
+                Globals.form4.Show();
+                Globals.isSoftOpen = true;
+            }
         }
 
         void Options_Click(object sender, EventArgs e)

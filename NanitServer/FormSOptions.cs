@@ -19,13 +19,20 @@ namespace NaNiT
         {
             InitializeComponent();
             Globals.form1 = this;
-            Globals.isOptOpen = true;
             ControlBoxPortServ.Text = Globals.servPort.ToString();
             backgroundWorker1.WorkerReportsProgress = true;
             backgroundWorker1.RunWorkerAsync();
+            Start();
+            if (listenThread.ThreadState == 0)
+                ButStart.Text = "Остановить";
+            else
+            {
+                ButStart.Text = "Запустить";
+                Start();
+            }
         }
 
-        private void ButStart_Click(object sender, EventArgs e)
+        private void Start()
         {
             try
             {
@@ -36,13 +43,31 @@ namespace NaNiT
             catch (Exception ex)
             {
                 server.Disconnect();
-                Console.WriteLine(ex.Message);
+                MessageBox.Show(ex.Message);
+            }
+        }
+        public void Stop()
+        {
+            server.Disconnect();
+        }
+
+        private void ButStart_Click(object sender, EventArgs e)
+        {
+            if (listenThread.ThreadState == 0)
+            {
+                Stop();
+                ButStart.Text = "Запустить";
+            }
+            else
+            {
+                Start();
+                ButStart.Text = "Остановить";
             }
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            switch(Globals.MessageIn)
+            switch (Globals.MessageIn)
             {
                 case 0:
                     listView1.Items.Add(new ListViewItem("Ожидание запуска сервера."));
@@ -50,9 +75,14 @@ namespace NaNiT
                     listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
                     break;
                 case 1:
-                    listView1.Items.Add(new ListViewItem("Сервер запущен. Ожидание подключений..."));
+                    listView1.Items.Add(new ListViewItem(Globals.MessageText));
                     listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
                     listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+                    break;
+                case 2:
+                    listView1.Items.Add(new ListViewItem(Globals.MessageText));
+                    listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+                    Globals.ClientId = "";
                     break;
                 default:
                     listView1.Items.Add(new ListViewItem(Globals.MessageText));
@@ -60,12 +90,11 @@ namespace NaNiT
                     listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
                     break;
             }
-            
+
         }
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
-
-            while (Globals.isOptOpen)
+            while (Globals.isOptOpenStatic)
             {
                 if (Globals.MessageIn != Globals.MessageInOld)
                 {
@@ -76,7 +105,6 @@ namespace NaNiT
                     Globals.MessageInOld = Globals.MessageIn;
                     SFunctions.Revers(tempSwitch);
                 }
-
             }
         }
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -91,7 +119,7 @@ namespace NaNiT
             }
             else
             {
-                if (Globals.isOptOpen)
+                //if (Globals.isOptOpen)
                     MessageBox.Show("Что-то пошло не так. Я закончил работать");
             }
         }
@@ -100,6 +128,11 @@ namespace NaNiT
         {
             Globals.isOptOpen = false;
             Globals.isAboutLoaded = false;
+        }
+
+        private void FormSOptions_Deactivate(object sender, EventArgs e)
+        {
+                this.TopMost = true;
         }
 
         private void ButOptSave_Click(object sender, EventArgs e)
@@ -125,14 +158,14 @@ namespace NaNiT
 
                 if (result == DialogResult.Yes)
                 {
-                    this.Close();
+                    this.Hide();
                     Globals.isAboutLoaded = false;
                     Globals.isOptOpen = false;
                 }
             }
             else
             {
-                this.Close();
+                this.Hide();
                 Globals.isAboutLoaded = false;
                 Globals.isOptOpen = false;
             }

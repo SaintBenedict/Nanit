@@ -85,6 +85,7 @@
             this.TopMost = true;
             this.ResumeLayout(false);
             this.PerformLayout();
+            this.Deactivate += new System.EventHandler(this.ButPassEntCancel_Click);
 
         }
 

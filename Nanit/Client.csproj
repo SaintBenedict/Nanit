@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CatchInfo.cs" />
+    <Compile Include="CFunc.cs" />
     <Compile Include="ContextMenus.cs" />
     <Compile Include="FormLogin.cs">
       <SubType>Form</SubType>
@@ -118,12 +119,15 @@
   <ItemGroup>
     <EmbeddedResource Include="FormLogin.resx">
       <DependentUpon>FormLogin.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="FormOptions.resx">
       <DependentUpon>FormOptions.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="FormUpdater.resx">
       <DependentUpon>FormUpdater.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
@@ -132,6 +136,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormSoft.resx">
       <DependentUpon>FormSoft.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
