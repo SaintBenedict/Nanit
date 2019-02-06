@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 
@@ -11,6 +12,8 @@ namespace NaNiT
         protected internal int AwaitVarForCom;
         protected internal bool IsRegister;
         protected internal string userName;
+        protected internal string dateOfRegister;
+        protected internal string dateLastSeen;
         TcpClient client;
         ServerObject server; // объект сервера
 
@@ -25,6 +28,8 @@ namespace NaNiT
             serverObject.AddConnection(this);
             AwaitVarForCom = 0;
             IsRegister = false;
+            dateOfRegister = null;
+            dateLastSeen = null;
         }
 
         public void Process()
@@ -37,16 +42,20 @@ namespace NaNiT
                 userName = message;
 
                 message = userName + " подключился";
-                Globals.MessageText = message;
-                Globals.MessageIn = 2;
+                Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, message);
                 // посылаем сообщение о входе в чат всем подключенным пользователям
-                server.BroadcastMessage(message, this.Id);
+                if (!this.IsRegister)
+                    server.BroadcastMessage("@HowdyHu%$-", this.Id, ServerObject.clients, this, 0);
                 // в бесконечном цикле получаем сообщения от клиента
                 while (true)
                 {
                     message = GetMessage();
                     ServerCommands.CheckCommand(message, this, server, Stream);
                 }
+            }
+            catch
+            {
+                Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, "Произошла ошибка клиента");
             }
             finally
             {

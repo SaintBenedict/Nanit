@@ -67,42 +67,9 @@ namespace NaNiT
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            switch (Globals.MessageIn)
-            {
-                case 0:
-                    listView1.Items.Add(new ListViewItem("Ожидание запуска сервера."));
-                    listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-                    listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
-                    break;
-                case 1: // Сервер запущен
-                    listView1.Items.Add(new ListViewItem(Globals.MessageText));
-                    listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-                    listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
-                    break;
-                case 2: // Клиент подключился
-                    listView1.Items.Add(new ListViewItem(Globals.MessageText));
-                    listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-                    break;
-                case 10: // Команда на подключение
-                    break;
-                case 100: // Клиент отключился
-                    listView1.Items.Add(new ListViewItem(Globals.MessageText));
-                    listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-                    break;
-                case 500: // Сообщение от клиента
-                    listView1.Items.Add(new ListViewItem(Globals.MessageText));
-                    listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-                    listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
-                    break;
-                case 501: // Сообщение от клиента
-                    listView1.Items.Add(new ListViewItem(Globals.MessageText));
-                    listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-                    listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
-                    break;
-                default:
-                    break;
-            }
-
+            listView1.Items.Add(new ListViewItem(Globals.MessageText));
+            listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
         }
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -132,7 +99,7 @@ namespace NaNiT
             else
             {
                 //if (Globals.isOptOpen)
-                    MessageBox.Show("Что-то пошло не так. Я закончил работать");
+                MessageBox.Show("Что-то пошло не так. Я закончил работать");
             }
         }
 
@@ -144,7 +111,7 @@ namespace NaNiT
 
         private void FormSOptions_Deactivate(object sender, EventArgs e)
         {
-                this.TopMost = true;
+            this.TopMost = true;
         }
 
         private void ButOptSave_Click(object sender, EventArgs e)

@@ -39,7 +39,7 @@ namespace NaNiT
         public static string[,] programs = null;
         public static string[] pathUpdate = new string[11];
         public static bool serverIsConnected = false;
-        public static string userName;
+        public static string userName, serverStatus;
     }
 
     class Functions
@@ -50,6 +50,32 @@ namespace NaNiT
                 return false;
             else
                 return true;
+        }
+
+        public static int ChangeMesIn(int first)
+        {
+            if (first == 0)
+            {
+                return 1;
+            }
+            else
+            {
+                if (first == 1)
+                {
+                    return 2;
+                }
+                else
+                {
+                    if (first == 2)
+                    {
+                        return 3;
+                    }
+                    else
+                    {
+                        return 2;
+                    }
+                }
+            }
         }
 
         public static string MD5Code(string getCode)

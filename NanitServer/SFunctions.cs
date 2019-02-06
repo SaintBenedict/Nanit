@@ -15,12 +15,19 @@ namespace NaNiT
                 return true;
         }
 
-        public static int ChangeMesIn(int first)
+        public static int ChangeMesIn(int first, string message)
         {
             if (first == 500)
+            {
+                Globals.MessageText = message;
                 return 501;
+            }
             else
+            {
+                Globals.MessageText = message;
                 return 500;
+            }
+            
         }
 
         public static string MD5Code(string getCode)

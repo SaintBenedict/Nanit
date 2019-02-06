@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Windows.Forms;
 
 /*Форматировать фрагмент кода - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + F.
@@ -17,6 +18,7 @@ namespace NaNiT
         public static int MessageIn = 0;
         public static int MessageInOld = 0;
         public static string MessageText = "";
+        public static List<string> AutorisedRegistredClients = new List<string>();
     }
     class SProgram
     {

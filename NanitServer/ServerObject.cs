@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Sockets;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
@@ -41,8 +41,8 @@ namespace NaNiT
                 string dateStart = DateTime.Now.ToString();
                 tcpListener = new TcpListener(IPAddress.Any, Globals.servPort);
                 tcpListener.Start();
-                Globals.MessageIn = 1;
-                Globals.MessageText = "Сервер запущен: " + dateStart;
+                string message = "Сервер запущен: " + dateStart;
+                Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, message);
 
                 while (true)
                 {
@@ -60,15 +60,20 @@ namespace NaNiT
         }
 
         // трансляция сообщения подключенным клиентам
-        protected internal void BroadcastMessage(string message, string id)
+        protected internal void BroadcastMessage(string message, string id, List<ClientObject> clientsTemp, ClientObject clientOne, int whos)
         {
             byte[] data = Encoding.Unicode.GetBytes(message);
-            for (int i = 0; i < clients.Count; i++)
+            switch (whos)
             {
-               // if (clients[i].Id != id) // если id клиента не равно id отправляющего
-                {
-                    clients[i].Stream.Write(data, 0, data.Length); //передача данных
-                }
+                case 0:
+                    for (int i = 0; i < clientsTemp.Count; i++)
+                    {
+                        clients[i].Stream.Write(data, 0, data.Length); //передача данных
+                    }
+                    break;
+                case 1:
+                    clientOne.Stream.Write(data, 0, data.Length);
+                    break;
             }
         }
         // отключение всех клиентов
@@ -81,8 +86,8 @@ namespace NaNiT
             {
                 clients[i].Close(); //отключение клиента
             }
-            Globals.MessageIn = 3;
-            Globals.MessageText = "Сервер прекратил работу: " + dateStop;
+            string message = "Сервер прекратил работу: " + dateStop;
+            Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, message);
         }
     }
 }

@@ -27,13 +27,14 @@ namespace NaNiT
                 receiveThread.Start(); //старт потока
                 Globals.serverIsConnected = true;
                 Globals.TimConnLock = 0;
+                Globals.serverStatus = "Подключение установлено";
+                Thread.Sleep(100);
             }
             catch
             {
-                Program.notifyIcon.BalloonTipText = "Сервер недоступен";                // пришедшее сообщение от сервера
-                Program.notifyIcon.ShowBalloonTip(6);                                  // отображаем подсказку 12 секунд
+                Globals.serverStatus = "Сервер недоступен";
                 Globals.serverIsConnected = false;
-                Globals.TimConnLock++;
+                Globals.TimConnLock = Functions.ChangeMesIn(Globals.TimConnLock);
                 Program.TempServConnect(Globals.TimConnLock);
                 return;
             }
@@ -63,36 +64,34 @@ namespace NaNiT
                         int bytes = 0;
                         do
                         {
-
                             bytes = Program.stream.Read(data, 0, data.Length);
                             builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
-
+                            DoWithServerCommand(builder.ToString());
                         }
                         while (Program.stream.DataAvailable);
-                        string message = builder.ToString();
-                        Program.notifyIcon.BalloonTipText = message;
-                        Program.notifyIcon.ShowBalloonTip(6);
                     }
                     catch
                     {
-                        Program.notifyIcon.BalloonTipText = "Сервер стал недоступен";
-                        Program.notifyIcon.ShowBalloonTip(6);
+                        Globals.serverStatus = "Сервер стал недоступен";
                         Globals.serverIsConnected = false;
                         Disconnect();
-                        Globals.TimConnLock++;
+                        Globals.TimConnLock = Functions.ChangeMesIn(Globals.TimConnLock);
                         Program.TempServConnect(Globals.TimConnLock);
                     }
+
                 }
                 else
                 {
-                    Program.notifyIcon.BalloonTipText = "Сервер стал недоступен";
-                    Program.notifyIcon.ShowBalloonTip(6);
+                    Globals.serverStatus = "Сервер стал недоступен";
                     Globals.serverIsConnected = false;
                     Disconnect();
-                    Globals.TimConnLock++;
+                    Globals.TimConnLock = Functions.ChangeMesIn(Globals.TimConnLock);
                     Program.TempServConnect(Globals.TimConnLock);
                 }
             }
+            Globals.serverIsConnected = false;
+            Globals.TimConnLock = Functions.ChangeMesIn(Globals.TimConnLock);
+            Program.TempServConnect(Globals.TimConnLock);
         }
 
         //
@@ -104,6 +103,25 @@ namespace NaNiT
             if (Program.client != null)
                 Program.client.Close(); //отключение клиента
             Globals.serverIsConnected = false;
+            Globals.TimConnLock = Functions.ChangeMesIn(Globals.TimConnLock);
+        }
+
+        public static void DoWithServerCommand(string sent)
+        {
+            if (sent.Length > 10 && sent.Substring(0, 11) == @"@HowdyHu%$-")
+            {
+                string command = sent.Substring(0, 11);
+                string textCom = sent.Substring(11, sent.Length - 11);
+                
+                switch (command)
+                {
+                    default: // Просто рандомное сообщение
+                        break;
+                    case "@HowdyHu%$-": // Команда регистрации или авторизации
+                        SendMessage(@"R3GisSsTr-" + Globals.userName);
+                        break;
+                }
+            }
         }
     }
 }
