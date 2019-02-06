@@ -77,6 +77,7 @@
     <Compile Include="FormSOptions.Designer.cs">
       <DependentUpon>FormSOptions.cs</DependentUpon>
     </Compile>
+    <Compile Include="ServerCommands.cs" />
     <Compile Include="ServerObject.cs" />
     <Compile Include="SFunctions.cs" />
     <Compile Include="SProgram.cs" />

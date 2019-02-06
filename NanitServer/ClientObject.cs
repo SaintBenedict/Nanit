@@ -12,6 +12,8 @@ namespace NaNiT
         TcpClient client;
         ServerObject server; // объект сервера
 
+        
+
         public ClientObject(TcpClient tcpClient, ServerObject serverObject)
         {
             
@@ -33,19 +35,17 @@ namespace NaNiT
                 message = userName + " подключился";
                 Globals.MessageText = message;
                 Globals.MessageIn = 2;
-                Globals.ClientId = this.Id;
                 // посылаем сообщение о входе в чат всем подключенным пользователям
                 server.BroadcastMessage(message, this.Id);
                 // в бесконечном цикле получаем сообщения от клиента
                 while (true)
                 {
                     message = GetMessage();
+                    message = ServerCommands.CheckCommand(message);
                     if (String.Format("{0}: {1}", userName, message) != String.Format("{0}: {1}", userName, null))
                     {
                         
                         message = String.Format("{0}: {1}", userName, message);
-                        Globals.MessageText = message;
-                        Globals.MessageIn++;
                         server.BroadcastMessage(message, this.Id);
                     }
                     else 
@@ -53,7 +53,7 @@ namespace NaNiT
                         Stream.Close();
                         message = String.Format("{0}: покинул чат", userName);
                         Globals.MessageText = message;
-                        Globals.MessageIn++;
+                        Globals.MessageIn = 100;
                         message = null;
                         if (message != null)
                         server.BroadcastMessage(message, this.Id);

@@ -1,8 +1,5 @@
-﻿using Microsoft.Win32;
-using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Windows.Forms;
-using Timer = System.Threading.Timer;
 
 /*Форматировать фрагмент кода - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + F.
 Форматировать весь код - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + D*/
@@ -20,7 +17,6 @@ namespace NaNiT
         public static int MessageIn = 0;
         public static int MessageInOld = 0;
         public static string MessageText = "";
-        public static string ClientId = "";
     }
     class SProgram
     {

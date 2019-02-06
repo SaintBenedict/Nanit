@@ -4,7 +4,6 @@ using System.Net.Sockets;
 using System.Net;
 using System.Text;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace NaNiT
 {
@@ -54,9 +53,8 @@ namespace NaNiT
                     clientThread.Start();
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                //MessageBox.Show(ex.Message);
                 Disconnect();
             }
         }
@@ -85,7 +83,6 @@ namespace NaNiT
             }
             Globals.MessageIn = 3;
             Globals.MessageText = "Сервер прекратил работу: " + dateStop;
-            //Environment.Exit(0); //завершение процесса
         }
     }
 }
