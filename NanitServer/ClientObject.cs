@@ -8,7 +8,9 @@ namespace NaNiT
     {
         protected internal string Id { get; private set; }
         protected internal NetworkStream Stream { get; private set; }
-        string userName;
+        protected internal int AwaitVarForCom;
+        protected internal bool IsRegister;
+        protected internal string userName;
         TcpClient client;
         ServerObject server; // объект сервера
 
@@ -21,6 +23,8 @@ namespace NaNiT
             client = tcpClient;
             server = serverObject;
             serverObject.AddConnection(this);
+            AwaitVarForCom = 0;
+            IsRegister = false;
         }
 
         public void Process()
@@ -41,26 +45,7 @@ namespace NaNiT
                 while (true)
                 {
                     message = GetMessage();
-                    message = ServerCommands.CheckCommand(message);
-                    if (String.Format("{0}: {1}", userName, message) != String.Format("{0}: {1}", userName, null))
-                    {
-                        
-                        message = String.Format("{0}: {1}", userName, message);
-                        server.BroadcastMessage(message, this.Id);
-                    }
-                    else 
-                    {
-                        Stream.Close();
-                        message = String.Format("{0}: покинул чат", userName);
-                        Globals.MessageText = message;
-                        Globals.MessageIn = 100;
-                        message = null;
-                        if (message != null)
-                        server.BroadcastMessage(message, this.Id);
-                        else
-                        break;
-
-                    }
+                    ServerCommands.CheckCommand(message, this, server, Stream);
                 }
             }
             finally

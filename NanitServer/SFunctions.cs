@@ -15,6 +15,14 @@ namespace NaNiT
                 return true;
         }
 
+        public static int ChangeMesIn(int first)
+        {
+            if (first == 500)
+                return 501;
+            else
+                return 500;
+        }
+
         public static string MD5Code(string getCode)
         {
             byte[] hash = Encoding.ASCII.GetBytes(getCode);

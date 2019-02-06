@@ -83,14 +83,23 @@ namespace NaNiT
                     listView1.Items.Add(new ListViewItem(Globals.MessageText));
                     listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
                     break;
+                case 10: // Команда на подключение
+                    break;
                 case 100: // Клиент отключился
                     listView1.Items.Add(new ListViewItem(Globals.MessageText));
                     listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
                     break;
-                default: // Сообщение от клиента
+                case 500: // Сообщение от клиента
                     listView1.Items.Add(new ListViewItem(Globals.MessageText));
                     listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
                     listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+                    break;
+                case 501: // Сообщение от клиента
+                    listView1.Items.Add(new ListViewItem(Globals.MessageText));
+                    listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+                    listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+                    break;
+                default:
                     break;
             }
 
