@@ -1,5 +1,0 @@
-G:\N.A.N.I.T\NanitSvc\NanitSvc\bin\Debug\NanitSvc.exe
-G:\N.A.N.I.T\NanitSvc\NanitSvc\bin\Debug\NanitSvc.pdb
-G:\N.A.N.I.T\NanitSvc\NanitSvc\obj\Debug\NanitSvc.csproj.CoreCompileInputs.cache
-G:\N.A.N.I.T\NanitSvc\NanitSvc\obj\Debug\NanitSvc.exe
-G:\N.A.N.I.T\NanitSvc\NanitSvc\obj\Debug\NanitSvc.pdb
