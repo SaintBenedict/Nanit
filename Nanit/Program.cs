@@ -55,6 +55,8 @@ namespace NaNiT
                 {
                     CFunc.Chat();
                     Thread.Sleep(10000);
+                    if (Globals.serverIsConnected)
+                        CFunc.SendMessage(@"CH@T_AlL_-Подключение восстановлено");
                 }
                     
             }

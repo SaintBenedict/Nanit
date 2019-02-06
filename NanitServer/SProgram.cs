@@ -19,6 +19,7 @@ namespace NaNiT
         public static int MessageInOld = 0;
         public static string MessageText = "";
         public static List<string> AutorisedRegistredClients = new List<string>();
+        public static bool servState = false;
     }
     class SProgram
     {

@@ -32,10 +32,7 @@ namespace NaNiT
             }
             catch
             {
-                Globals.serverStatus = "Сервер недоступен";
-                Globals.serverIsConnected = false;
-                Globals.TimConnLock = Functions.ChangeMesIn(Globals.TimConnLock);
-                Program.TempServConnect(Globals.TimConnLock);
+                Disconnect();
                 return;
             }
         }
@@ -65,6 +62,10 @@ namespace NaNiT
                         do
                         {
                             bytes = Program.stream.Read(data, 0, data.Length);
+                            if (bytes == 0)
+                            {
+                                Disconnect();
+                            }
                             builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
                             DoWithServerCommand(builder.ToString());
                         }
@@ -72,26 +73,16 @@ namespace NaNiT
                     }
                     catch
                     {
-                        Globals.serverStatus = "Сервер стал недоступен";
-                        Globals.serverIsConnected = false;
                         Disconnect();
-                        Globals.TimConnLock = Functions.ChangeMesIn(Globals.TimConnLock);
-                        Program.TempServConnect(Globals.TimConnLock);
                     }
 
                 }
                 else
                 {
-                    Globals.serverStatus = "Сервер стал недоступен";
-                    Globals.serverIsConnected = false;
                     Disconnect();
-                    Globals.TimConnLock = Functions.ChangeMesIn(Globals.TimConnLock);
-                    Program.TempServConnect(Globals.TimConnLock);
                 }
             }
-            Globals.serverIsConnected = false;
-            Globals.TimConnLock = Functions.ChangeMesIn(Globals.TimConnLock);
-            Program.TempServConnect(Globals.TimConnLock);
+            Disconnect();
         }
 
         //
@@ -102,8 +93,10 @@ namespace NaNiT
                 Program.stream.Close(); //отключение потока
             if (Program.client != null)
                 Program.client.Close(); //отключение клиента
+            Globals.serverStatus = "Сервер стал недоступен";
             Globals.serverIsConnected = false;
             Globals.TimConnLock = Functions.ChangeMesIn(Globals.TimConnLock);
+            Program.TempServConnect(Globals.TimConnLock);
         }
 
         public static void DoWithServerCommand(string sent)
@@ -112,7 +105,7 @@ namespace NaNiT
             {
                 string command = sent.Substring(0, 11);
                 string textCom = sent.Substring(11, sent.Length - 11);
-                
+
                 switch (command)
                 {
                     default: // Просто рандомное сообщение

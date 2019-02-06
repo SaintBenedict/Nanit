@@ -24,8 +24,11 @@ namespace NaNiT
                 if (clTemp.Id == id)
                 {
                     if (clTemp != null)
+                    {
                         clients.Remove(clTemp);
-                    break;
+                        clTemp.Close();
+                        break;
+                    }
                 }
                 else
                 {
@@ -43,6 +46,7 @@ namespace NaNiT
                 tcpListener.Start();
                 string message = "Сервер запущен: " + dateStart;
                 Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, message);
+                Globals.servState = true;
 
                 while (true)
                 {
@@ -86,8 +90,12 @@ namespace NaNiT
             {
                 clients[i].Close(); //отключение клиента
             }
-            string message = "Сервер прекратил работу: " + dateStop;
-            Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, message);
+            if (Globals.servState)
+            {
+                string message = "Сервер прекратил работу: " + dateStop;
+                Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, message);
+                Globals.servState = false;
+            }
         }
     }
 }

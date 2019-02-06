@@ -55,7 +55,7 @@ namespace NaNiT
             }
             catch
             {
-                Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, "Произошла ошибка клиента");
+                Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, userName + " отключён");
             }
             finally
             {
