@@ -19,7 +19,7 @@ namespace NaNiT
         public static int MessageInOld = 0;
         public static string MessageText = "";
         public static List<string> AutorisedRegistredClients = new List<string>();
-        public static bool servState = false, myMessageNotAwait = false;
+        public static bool myMessageNotAwait = false, disconnectInProgress = false;
     }
     class SProgram
     {
@@ -42,6 +42,8 @@ namespace NaNiT
             t.Name = "Main Program";
 
             Globals.form1 = new FormSOptions();
+            Globals.form1.Show();
+            Globals.isOptOpen = true;
             Application.Run();
             
         }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 
@@ -10,13 +9,13 @@ namespace NaNiT
         protected internal string Id { get; private set; }
         protected internal NetworkStream Stream { get; private set; }
         protected internal int AwaitVarForCom;
-        protected internal bool IsRegister, IsActive, StupidCheck;
+        protected internal bool IsRegister, IsActive, StupidCheck, myMessageNotAwait, CloseMePliz;
         protected internal string userName;
         protected internal string dateOfRegister;
         protected internal string dateLastSeen;
-        TcpClient client;
+        protected internal TcpClient client;
         ServerObject server;
-        
+
         public ClientObject(TcpClient tcpClient, ServerObject serverObject)
         {
             Id = Guid.NewGuid().ToString();
@@ -39,8 +38,11 @@ namespace NaNiT
                 while (this.client != null)
                 {
                     string MessageTestNull = GetMessage();
-                    if(MessageTestNull == null)
+                    if (MessageTestNull == null)
+                    {
                         Close();
+                        return;
+                    }
                 }
             }
             catch
@@ -66,7 +68,7 @@ namespace NaNiT
                     do
                     {
                         bytes = Stream.Read(data, 0, data.Length);
-                        Globals.myMessageNotAwait = true;
+                        myMessageNotAwait = true;
                         if (bytes == 0)
                             return null;
                         builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
@@ -84,26 +86,17 @@ namespace NaNiT
             {
                 return null;
             }
-            
+
         }
 
 
         // закрытие подключения
         protected internal void Close()
         {
-            if (IsActive)
+            if (!Globals.disconnectInProgress)
             {
-                IsActive = false;
                 dateLastSeen = DateTime.Now.ToString();
-                Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, userName + " отключился " + dateLastSeen);
-                server.RemoveConnection(Id);
-                if (Stream != null)
-                    Stream.Close();
-                if (client != null)
-                    client.Close();
-                client = null;
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+                server.RemoveConnection(Id, userName, Stream, client);
             }
         }
     }

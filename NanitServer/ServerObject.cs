@@ -11,14 +11,14 @@ namespace NaNiT
     {
         static TcpListener tcpListener; // сервер для прослушивания
         public static List<ClientObject> clients = new List<ClientObject>(); // все подключения
+        public ClientObject[] ClientsToClose;
 
         protected internal void AddConnection(ClientObject clientObject)
         {
             clients.Add(clientObject);
         }
-        protected internal void RemoveConnection(string id)
+        protected internal void RemoveConnection(string id, string name, NetworkStream endStreamofThis, TcpClient lastCryOfYours)
         {
-            // получаем по id закрытое подключение
             foreach (ClientObject clTemp in clients)
             {
                 if (clTemp.Id == id)
@@ -26,6 +26,11 @@ namespace NaNiT
                     if (clTemp != null)
                     {
                         clients.Remove(clTemp);
+                        Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, name + " отключился " + DateTime.Now.ToString());
+                        if (endStreamofThis != null) { endStreamofThis.Close(); }
+                        if (lastCryOfYours != null) { lastCryOfYours.Close(); lastCryOfYours = null; }
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
                         break;
                     }
                 }
@@ -44,14 +49,16 @@ namespace NaNiT
                 tcpListener = new TcpListener(IPAddress.Any, Globals.servPort);
                 tcpListener.Start();
                 string message = "Сервер запущен: " + dateStart;
+                Globals.disconnectInProgress = false;
                 Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, message);
-                Globals.servState = true;
 
                 while (true)
                 {
                     TcpClient tcpClient = tcpListener.AcceptTcpClient();
 
                     ClientObject clientObject = new ClientObject(tcpClient, this);
+                    clientObject.myMessageNotAwait = false;
+                    clientObject.CloseMePliz = false;
                     Thread clientThread = new Thread(new ThreadStart(clientObject.Process));
                     clientThread.Start();
                 }
@@ -82,21 +89,44 @@ namespace NaNiT
         // отключение всех клиентов
         protected internal void Disconnect()
         {
-            string dateStop = DateTime.Now.ToString();
-            tcpListener.Stop(); //остановка сервера
-            if (clients.Count > 0)
+            bool CompletDel = false;
+            if (!Globals.disconnectInProgress)
             {
-                ClientObject[] toClose = new ClientObject[clients.Count - 1];
-                foreach (ClientObject clTemp in toClose)
+                Globals.disconnectInProgress = true;
+                Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, "Сервер прекратил работу: " + DateTime.Now.ToString());
+                Thread ClosedAll = new Thread(new ThreadStart(ClosedAllClients));
+                ClosedAll.Name = "Close all clients";
+                ClosedAll.Start();
+
+                void ClosedAllClients()
                 {
-                    clTemp.Close(); //отключение клиента
+                    while (clients.Count != 0)
+                    {
+                        foreach (ClientObject clTemp in clients)
+                        {
+                            if (clTemp != null)
+                            {
+                                Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, clTemp.userName + " отключился " + DateTime.Now.ToString());
+                                clTemp.dateLastSeen = DateTime.Now.ToString();
+                                clTemp.Stream.Close();
+                                clTemp.client.Close();
+                                clTemp.client = null;
+                            }
+                        }
+                        clients.Clear();
+                    }
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    CompletDel = true;
                 }
-            }
-            if (Globals.servState)
-            {
-                string message = "Сервер прекратил работу: " + dateStop;
-                Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, message);
-                Globals.servState = false;
+
+                ClosedAll.Join();
+                if (CompletDel == true)
+                {
+                    tcpListener.Stop(); //остановка сервера
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                }
             }
         }
     }

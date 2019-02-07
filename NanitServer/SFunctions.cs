@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -7,6 +8,19 @@ namespace NaNiT
 {
     class SFunctions
     {
+        public static ClientObject[] ReBirthOfMass(int Array)
+        {
+            ClientObject[] result = new ClientObject[Array];
+            foreach (ClientObject ClClTemp in ServerObject.clients)
+            {
+                for (int i = 0; i < Array; i++)
+                {
+                    result[i] = ClClTemp;
+                }
+            }
+            return result;
+        }
+
         public static bool Revers(bool first)
         {
             if (first == true)

@@ -25,6 +25,7 @@
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.ButStart = new System.Windows.Forms.Button();
             this.listView1 = new System.Windows.Forms.ListView();
+            this.listView1.DragOver += new System.Windows.Forms.DragEventHandler(this.RevealMoreItems);
             this.Messaging = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
@@ -89,7 +90,7 @@
             this.Messaging});
             this.listView1.Location = new System.Drawing.Point(12, 80);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(461, 196);
+            this.listView1.Size = new System.Drawing.Size(461, 444);
             this.listView1.TabIndex = 17;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -103,7 +104,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(487, 289);
+            this.ClientSize = new System.Drawing.Size(487, 536);
             this.ControlBox = false;
             this.Controls.Add(this.listView1);
             this.Controls.Add(this.ButStart);
@@ -111,6 +112,7 @@
             this.Controls.Add(this.LabelPortServ);
             this.Controls.Add(this.ButOptClose);
             this.Controls.Add(this.ButOptSave);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FormSOptions";
@@ -118,10 +120,11 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Настройки программы";
+            this.TopMost = true;
             this.Closed += new System.EventHandler(this.FormOptions_Close);
+            this.Deactivate += new System.EventHandler(this.FormSOptions_Deactivate);
             this.ResumeLayout(false);
             this.PerformLayout();
-            this.Deactivate += new System.EventHandler(this.FormSOptions_Deactivate);
 
         }
 
@@ -133,7 +136,7 @@
         private System.Windows.Forms.TextBox ControlBoxPortServ;
         public System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.Button ButStart;
-        private System.Windows.Forms.ListView listView1;
         private System.Windows.Forms.ColumnHeader Messaging;
+        private System.Windows.Forms.ListView listView1;
     }
 }

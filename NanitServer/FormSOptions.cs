@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -36,6 +37,7 @@ namespace NaNiT
         {
             try
             {
+                Globals.disconnectInProgress = false;
                 server = new ServerObject();
                 listenThread = new Thread(new ThreadStart(server.Listen));
                 listenThread.Start(); //старт потока
@@ -62,6 +64,29 @@ namespace NaNiT
             {
                 Start();
                 ButStart.Text = "Остановить";
+            }
+        }
+
+        private void RevealMoreItems(object sender, DragEventArgs e)
+        {
+            var listView = (ListView)sender;
+
+            var point = listView.PointToClient(new Point(e.X, e.Y));
+            var item = listView.GetItemAt(point.X, point.Y);
+            if (item == null)
+                return;
+
+            var index = item.Index;
+            var maxIndex = listView.Items.Count;
+            var scrollZoneHeight = listView.Font.Height;
+
+            if (index > 0 && point.Y < scrollZoneHeight)
+            {
+                listView.Items[index - 1].EnsureVisible();
+            }
+            else if (index < maxIndex && point.Y > listView.Height - scrollZoneHeight)
+            {
+                listView.Items[index + 1].EnsureVisible();
             }
         }
 

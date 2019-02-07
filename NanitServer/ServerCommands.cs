@@ -12,7 +12,7 @@ namespace NaNiT
             {
                 server.BroadcastMessage("@HowdyHu%$-", client.Id, ServerObject.clients, client, "self");
                 client.AwaitVarForCom = 1;
-                Globals.myMessageNotAwait = true;
+                client.myMessageNotAwait = true;
                 client.StupidCheck = true;
             }
             switch (client.AwaitVarForCom)
@@ -25,7 +25,7 @@ namespace NaNiT
                         switch (command)
                         {
                             default: // Просто рандомное сообщение
-                                Globals.myMessageNotAwait = false;
+                                client.myMessageNotAwait = false;
                                 break;
                             case "h@@lLloui-": //Приветствие подключившегося клиента
                                 client.userName = textCom;
@@ -33,17 +33,17 @@ namespace NaNiT
                                 // Проверка регистрации
                                 server.BroadcastMessage("@HowdyHu%$-", client.Id, ServerObject.clients, client, "self");
                                 client.AwaitVarForCom = 1;
-                                Globals.myMessageNotAwait = true;
+                                client.myMessageNotAwait = true;
                                 break;
                             case "CH@T_AlL_-": // Команда админской рассылки мессейджа
                                 SendChatToAll(textCom);
                                 client.AwaitVarForCom = 0;
-                                Globals.myMessageNotAwait = false;
+                                client.myMessageNotAwait = false;
                                 break;
                             case "i_C@N_Y0U-": // Мессага о подключении клиента после обрыва
                                 ReconnectUser(client);
                                 client.AwaitVarForCom = 0;
-                                Globals.myMessageNotAwait = false;
+                                client.myMessageNotAwait = false;
                                 break;
                         }
                     }
@@ -57,12 +57,12 @@ namespace NaNiT
                         {
                             default: // Пошёл нахуй, жид пархатый
                                 client.Close();
-                                Globals.myMessageNotAwait = false;
+                                client.myMessageNotAwait = false;
                                 break;
                             case "R3GisSsTr-": // Команда регистрации или авторизации
                                 RegistrationOrLogin(textCom);
                                 client.AwaitVarForCom = 0;
-                                Globals.myMessageNotAwait = false;
+                                client.myMessageNotAwait = false;
                                 break;
                         }
                     }
@@ -122,7 +122,7 @@ namespace NaNiT
             }
             void ReconnectUser(ClientObject ReconClient)
             {
-                string TempMessage = "Подключение восстановлено после разрыва" + DateTime.Now.ToString();
+                string TempMessage = client.userName + " Подключение восстановлено после разрыва " + DateTime.Now.ToString();
                 Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, TempMessage);
             }
         }
