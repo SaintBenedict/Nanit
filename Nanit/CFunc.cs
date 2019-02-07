@@ -7,8 +7,6 @@ namespace NaNiT
     class CFunc
     {
         static string userName = Globals.userName;
-        static private string host = Globals.servIP;
-        static private int port = Globals.servPort;
 
         //
         //Подключение
@@ -17,12 +15,13 @@ namespace NaNiT
             Program.client = new TcpClient();
             try
             {
-                Program.client.Connect(host, port); //подключение клиента
+                Program.client.Connect(Globals.servIP, Globals.servPort); //подключение клиента
                 Program.stream = Program.client.GetStream(); // получаем поток
-                string message = userName;
+                string message = "h@@lLloui-" + userName;
                 byte[] data = Encoding.Unicode.GetBytes(message);
                 Program.stream.Write(data, 0, data.Length);
                 // запускаем новый поток для получения данных
+                Globals.AwaitVarForCom = 0;
                 Thread receiveThread = new Thread(new ThreadStart(ReceiveMessage));
                 receiveThread.Start(); //старт потока
                 Globals.serverIsConnected = true;
@@ -43,7 +42,6 @@ namespace NaNiT
         {
             byte[] data = Encoding.Unicode.GetBytes(message);
             Program.stream.Write(data, 0, data.Length);
-
         }
 
         //
@@ -62,14 +60,13 @@ namespace NaNiT
                         do
                         {
                             bytes = Program.stream.Read(data, 0, data.Length);
+                            Globals.myMessageNotAwait = true;
                             if (bytes == 0)
-                            {
                                 Disconnect();
-                            }
                             builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
-                            DoWithServerCommand(builder.ToString());
                         }
                         while (Program.stream.DataAvailable);
+                        FromServerCommands.DoWithServerCommand(builder.ToString());
                     }
                     catch
                     {
@@ -95,26 +92,6 @@ namespace NaNiT
                 Program.client.Close(); //отключение клиента
             Globals.serverStatus = "Сервер стал недоступен";
             Globals.serverIsConnected = false;
-            Globals.TimConnLock = Functions.ChangeMesIn(Globals.TimConnLock);
-            Program.TempServConnect(Globals.TimConnLock);
-        }
-
-        public static void DoWithServerCommand(string sent)
-        {
-            if (sent.Length > 10 && sent.Substring(0, 11) == @"@HowdyHu%$-")
-            {
-                string command = sent.Substring(0, 11);
-                string textCom = sent.Substring(11, sent.Length - 11);
-
-                switch (command)
-                {
-                    default: // Просто рандомное сообщение
-                        break;
-                    case "@HowdyHu%$-": // Команда регистрации или авторизации
-                        SendMessage(@"R3GisSsTr-" + Globals.userName);
-                        break;
-                }
-            }
         }
     }
 }

@@ -29,7 +29,7 @@ namespace NaNiT
         public static string OSdate = Functions.GetOSDate();
         public static string nanitSvcVer = "0", updVerAvi = "1.0.0", version = Application.ProductVersion, nameFile;
         public static string optionsPasswordDefault = "478632", servIP = "127.0.0.1", myHostName;
-        public static int servPort = 51782;
+        public static int servPort = 51782, AwaitVarForCom = 0;
         public static string md5PortIp, md5Clients, optionsPasswordReg;
         public static bool RoleSecurity = false, RoleMessager = false, RoleOperate = false, RoleAdmin = false, RoleAgent = true;
         public static bool isAboutLoaded = false, isUpdOpen = false, isOptOpen = false, isSoftOpen = false;
@@ -38,7 +38,7 @@ namespace NaNiT
         public static bool ServiceInitLock = false, InstallLock = false, UpdateLock = false, work = true;
         public static string[,] programs = null;
         public static string[] pathUpdate = new string[11];
-        public static bool serverIsConnected = false;
+        public static bool serverIsConnected = false, myMessageNotAwait = false;
         public static string userName, serverStatus;
     }
 
@@ -51,33 +51,7 @@ namespace NaNiT
             else
                 return true;
         }
-
-        public static int ChangeMesIn(int first)
-        {
-            if (first == 0)
-            {
-                return 1;
-            }
-            else
-            {
-                if (first == 1)
-                {
-                    return 2;
-                }
-                else
-                {
-                    if (first == 2)
-                    {
-                        return 3;
-                    }
-                    else
-                    {
-                        return 2;
-                    }
-                }
-            }
-        }
-
+        
         public static string MD5Code(string getCode)
         {
             byte[] hash = Encoding.ASCII.GetBytes(getCode);

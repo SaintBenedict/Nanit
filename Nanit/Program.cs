@@ -21,6 +21,9 @@ namespace NaNiT
             CFunc.Chat();                                                   /// Старт соединения с сервером
 
             Timer UpdateTimer = new Timer(Upd, null, 0, 3000000);
+            Thread ServStates = new Thread(new ThreadStart(TempServRun));
+            ServStates.Name = "Server sender and reopener";
+            ServStates.Start();
 
             Application.Run();
         }
@@ -40,26 +43,25 @@ namespace NaNiT
                     ServiceWork.UpdateService();
                 }
         }
-        public static void TempServConnect(int i)
-        {
-            if (i == 1)
-            {
-                Thread ServConnect = new Thread(new ThreadStart(TryServConnect));
-                ServConnect.Name = "Try Connect Timer";
-                ServConnect.Start();
-            }
 
-            void TryServConnect()
+        public static void TempServRun()
+        {
+            do
             {
-                while(!Globals.serverIsConnected)
+                while (!Globals.serverIsConnected)
                 {
                     CFunc.Chat();
                     Thread.Sleep(10000);
                     if (Globals.serverIsConnected)
-                        CFunc.SendMessage(@"CH@T_AlL_-Подключение восстановлено");
+                        CFunc.SendMessage("i_C@N_Y0U-");
                 }
-                    
+                while (Globals.serverIsConnected)
+                {
+                    Thread.Sleep(10000);
+
+                }
             }
+            while (true);
         }
     }
 }

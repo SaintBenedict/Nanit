@@ -1,6 +1,4 @@
-﻿
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Net.Sockets;
 
 namespace NaNiT
@@ -10,37 +8,71 @@ namespace NaNiT
         public static int AwaitVarForCom = 0;
         public static void CheckCommand(string message, ClientObject client, ServerObject server, NetworkStream Stream)
         {
+            if (message == "IamStupid-")
+            {
+                server.BroadcastMessage("@HowdyHu%$-", client.Id, ServerObject.clients, client, "self");
+                client.AwaitVarForCom = 1;
+                Globals.myMessageNotAwait = true;
+                client.StupidCheck = true;
+            }
             switch (client.AwaitVarForCom)
             {
                 case 0: // Не ожидаем команды
-                    if (message.Length > 10)
+                    if (message.Length >= 10)
                     {
                         string command = message.Substring(0, 10);
-                        string textCom = message.Substring(10, message.Length-10);
+                        string textCom = message.Substring(10, message.Length - 10);
                         switch (command)
                         {
                             default: // Просто рандомное сообщение
+                                Globals.myMessageNotAwait = false;
                                 break;
-                            case "R3GisSsTr-": // Команда регистрации или авторизации
-                                RegistrationOrLogin(textCom);
-                                client.AwaitVarForCom = 0;
+                            case "h@@lLloui-": //Приветствие подключившегося клиента
+                                client.userName = textCom;
+                                Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, client.userName + " подключился");
+                                // Проверка регистрации
+                                server.BroadcastMessage("@HowdyHu%$-", client.Id, ServerObject.clients, client, "self");
+                                client.AwaitVarForCom = 1;
+                                Globals.myMessageNotAwait = true;
                                 break;
                             case "CH@T_AlL_-": // Команда админской рассылки мессейджа
                                 SendChatToAll(textCom);
                                 client.AwaitVarForCom = 0;
+                                Globals.myMessageNotAwait = false;
+                                break;
+                            case "i_C@N_Y0U-": // Мессага о подключении клиента после обрыва
+                                ReconnectUser(client);
+                                client.AwaitVarForCom = 0;
+                                Globals.myMessageNotAwait = false;
                                 break;
                         }
                     }
                     break;
-                case 1:
+                case 1: // Ожидаем регистрацию
+                    if (message.Length >= 10)
+                    {
+                        string command = message.Substring(0, 10);
+                        string textCom = message.Substring(10, message.Length - 10);
+                        switch (command)
+                        {
+                            default: // Пошёл нахуй, жид пархатый
+                                client.Close();
+                                Globals.myMessageNotAwait = false;
+                                break;
+                            case "R3GisSsTr-": // Команда регистрации или авторизации
+                                RegistrationOrLogin(textCom);
+                                client.AwaitVarForCom = 0;
+                                Globals.myMessageNotAwait = false;
+                                break;
+                        }
+                    }
                     break;
                 case 2:
                     break;
                 default:
                     break;
             }
-
-
+            
 
             void RegistrationOrLogin(string name)
             {
@@ -74,25 +106,24 @@ namespace NaNiT
             }
             void SendChatToAll(string textChat)
             {
-                if (client.IsRegister)
+                if (String.Format("{0}: {1}", client.userName, textChat) != String.Format("{0}: {1}", client.userName, null))
                 {
-                    if (String.Format("{0}: {1}", client.userName, textChat) != String.Format("{0}: {1}", client.userName, null))
-                    {
 
-                        textChat = String.Format("{0}: {1}", client.userName, textChat);
-                        Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, textChat);
-                        server.BroadcastMessage(textChat, client.Id, ServerObject.clients, client, 0);
-                    }
-                    else
-                    {
-                        Stream.Close();
-                        textChat = String.Format("{0}: отключился", client.userName);
-                        Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, textChat);
-                        textChat = null;
-                        if (textChat != null)
-                            server.BroadcastMessage(textChat, client.Id, ServerObject.clients, client, 0);
-                    }
+                    textChat = String.Format("{0}: {1}", client.userName, textChat);
+                    Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, textChat);
+                    server.BroadcastMessage(textChat, client.Id, ServerObject.clients, client, "all");
                 }
+                else
+                {
+                    Stream.Close();
+                    textChat = String.Format("{0}: отключился", client.userName);
+                    Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, textChat);
+                }
+            }
+            void ReconnectUser(ClientObject ReconClient)
+            {
+                string TempMessage = "Подключение восстановлено после разрыва" + DateTime.Now.ToString();
+                Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, TempMessage);
             }
         }
     }

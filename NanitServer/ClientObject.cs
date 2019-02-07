@@ -10,58 +10,45 @@ namespace NaNiT
         protected internal string Id { get; private set; }
         protected internal NetworkStream Stream { get; private set; }
         protected internal int AwaitVarForCom;
-        protected internal bool IsRegister;
+        protected internal bool IsRegister, IsActive, StupidCheck;
         protected internal string userName;
         protected internal string dateOfRegister;
         protected internal string dateLastSeen;
         TcpClient client;
-        ServerObject server; // объект сервера
-
+        ServerObject server;
         
-
         public ClientObject(TcpClient tcpClient, ServerObject serverObject)
         {
-            
             Id = Guid.NewGuid().ToString();
             client = tcpClient;
             server = serverObject;
             serverObject.AddConnection(this);
-            AwaitVarForCom = 0;
             IsRegister = false;
             dateOfRegister = null;
             dateLastSeen = null;
+            IsActive = true;
+            StupidCheck = false;
         }
 
         public void Process()
         {
-            try
+            try // в бесконечном цикле получаем сообщения от клиента
             {
+                AwaitVarForCom = 0;
                 Stream = client.GetStream();
-                // получаем имя пользователя
-                string message = GetMessage();
-                userName = message;
-
-                message = userName + " подключился";
-                Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, message);
-                // посылаем сообщение о входе в чат всем подключенным пользователям
-                if (!this.IsRegister)
-                    server.BroadcastMessage("@HowdyHu%$-", this.Id, ServerObject.clients, this, 0);
-                // в бесконечном цикле получаем сообщения от клиента
-                while (true)
+                while (this.client != null)
                 {
-                    message = GetMessage();
-                    ServerCommands.CheckCommand(message, this, server, Stream);
+                    string MessageTestNull = GetMessage();
+                    if(MessageTestNull == null)
+                        Close();
                 }
             }
             catch
             {
-                Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, userName + " отключён");
             }
             finally
             {
                 // в случае выхода из цикла закрываем ресурсы
-                server.RemoveConnection(this.Id);
-                Stream.Close();
                 Close();
             }
         }
@@ -79,10 +66,13 @@ namespace NaNiT
                     do
                     {
                         bytes = Stream.Read(data, 0, data.Length);
+                        Globals.myMessageNotAwait = true;
+                        if (bytes == 0)
+                            return null;
                         builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
                     }
                     while (Stream.DataAvailable);
-
+                    ServerCommands.CheckCommand(builder.ToString(), this, server, Stream);
                     return builder.ToString();
                 }
                 catch
@@ -101,10 +91,20 @@ namespace NaNiT
         // закрытие подключения
         protected internal void Close()
         {
-            if (Stream != null)
-                Stream.Close();
-            if (client != null)
-                client.Close();
+            if (IsActive)
+            {
+                IsActive = false;
+                dateLastSeen = DateTime.Now.ToString();
+                Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, userName + " отключился " + dateLastSeen);
+                server.RemoveConnection(Id);
+                if (Stream != null)
+                    Stream.Close();
+                if (client != null)
+                    client.Close();
+                client = null;
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+            }
         }
     }
 }

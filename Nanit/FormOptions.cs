@@ -65,8 +65,16 @@ namespace NaNiT
 
         private void ButOptSave_Click(object sender, EventArgs e)
         {
-            Globals.servIP = ControlBoxIpServ.Text;
-            Globals.servPort = Convert.ToInt32(ControlBoxPortServ.Text);
+            if (Globals.servIP != ControlBoxIpServ.Text)
+            {
+                Globals.servIP = ControlBoxIpServ.Text;
+                CFunc.Disconnect();
+            }
+            if (Globals.servPort != Convert.ToInt32(ControlBoxPortServ.Text))
+            {
+                Globals.servPort = Convert.ToInt32(ControlBoxPortServ.Text);
+            }
+            
             Globals.RoleAdmin = CheckRoleAdmin.Checked;
             Globals.RoleOperate = CheckRoleOperate.Checked;
             Globals.RoleMessager = CheckRoleMessager.Checked;

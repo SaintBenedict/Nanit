@@ -26,7 +26,6 @@ namespace NaNiT
                     if (clTemp != null)
                     {
                         clients.Remove(clTemp);
-                        clTemp.Close();
                         break;
                     }
                 }
@@ -64,18 +63,18 @@ namespace NaNiT
         }
 
         // трансляция сообщения подключенным клиентам
-        protected internal void BroadcastMessage(string message, string id, List<ClientObject> clientsTemp, ClientObject clientOne, int whos)
+        protected internal void BroadcastMessage(string message, string id, List<ClientObject> clientsTemp, ClientObject clientOne, string whos)
         {
             byte[] data = Encoding.Unicode.GetBytes(message);
             switch (whos)
             {
-                case 0:
+                case "all":
                     for (int i = 0; i < clientsTemp.Count; i++)
                     {
                         clients[i].Stream.Write(data, 0, data.Length); //передача данных
                     }
                     break;
-                case 1:
+                case "self":
                     clientOne.Stream.Write(data, 0, data.Length);
                     break;
             }
@@ -85,10 +84,13 @@ namespace NaNiT
         {
             string dateStop = DateTime.Now.ToString();
             tcpListener.Stop(); //остановка сервера
-
-            for (int i = 0; i < clients.Count; i++)
+            if (clients.Count > 0)
             {
-                clients[i].Close(); //отключение клиента
+                ClientObject[] toClose = new ClientObject[clients.Count - 1];
+                foreach (ClientObject clTemp in toClose)
+                {
+                    clTemp.Close(); //отключение клиента
+                }
             }
             if (Globals.servState)
             {
