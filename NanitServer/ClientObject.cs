@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 
 namespace NaNiT
 {
@@ -11,6 +12,7 @@ namespace NaNiT
         protected internal int AwaitVarForCom;
         protected internal bool IsRegister, IsActive, StupidCheck, myMessageNotAwait, CloseMePliz;
         protected internal string userName;
+        protected internal string HostName;
         protected internal string dateOfRegister;
         protected internal string dateLastSeen;
         protected internal TcpClient client;
@@ -31,6 +33,7 @@ namespace NaNiT
 
         public void Process()
         {
+            
             try // в бесконечном цикле получаем сообщения от клиента
             {
                 AwaitVarForCom = 0;
@@ -43,6 +46,8 @@ namespace NaNiT
                         Close();
                         return;
                     }
+                    Thread ClientThread = Thread.CurrentThread;
+                    ClientThread.Name = "Client " + HostName;
                 }
             }
             catch

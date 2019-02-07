@@ -63,6 +63,7 @@ namespace NaNiT
                                 RegistrationOrLogin(textCom);
                                 client.AwaitVarForCom = 0;
                                 client.myMessageNotAwait = false;
+                                client.HostName = textCom.Substring(0, textCom.Length - 14);
                                 break;
                         }
                     }

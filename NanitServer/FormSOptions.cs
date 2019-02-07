@@ -40,6 +40,7 @@ namespace NaNiT
                 Globals.disconnectInProgress = false;
                 server = new ServerObject();
                 listenThread = new Thread(new ThreadStart(server.Listen));
+                listenThread.Name = "ServerListen (Start sub-main)";
                 listenThread.Start(); //старт потока
             }
             catch (Exception ex)
