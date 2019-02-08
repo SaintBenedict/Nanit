@@ -86,12 +86,16 @@ namespace NaNiT
         // отключение
         public static void Disconnect()
         {
-            if (Program.stream != null)
-                Program.stream.Close(); //отключение потока
-            if (Program.client != null)
-                Program.client.Close(); //отключение клиента
-            Globals.serverStatus = "Сервер стал недоступен";
-            Globals.serverIsConnected = false;
+            if (!Globals.disconnectInProgress)
+            {
+                Globals.disconnectInProgress = true;
+                if (Program.stream != null)
+                    Program.stream.Close(); //отключение потока
+                if (Program.client != null)
+                    Program.client.Close(); //отключение клиента
+                Globals.serverStatus = "Сервер стал недоступен";
+                Globals.serverIsConnected = false;
+            }
         }
     }
 }

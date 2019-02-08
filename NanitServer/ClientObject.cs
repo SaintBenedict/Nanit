@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace NaNiT
 {
@@ -11,8 +12,7 @@ namespace NaNiT
         protected internal NetworkStream Stream { get; private set; }
         protected internal int AwaitVarForCom;
         protected internal bool IsRegister, IsActive, StupidCheck, myMessageNotAwait, CloseMePliz;
-        protected internal string userName;
-        protected internal string HostName;
+        protected internal string cryptoLogin, userName;
         protected internal string dateOfRegister;
         protected internal string dateLastSeen;
         protected internal TcpClient client;
@@ -33,7 +33,6 @@ namespace NaNiT
 
         public void Process()
         {
-            
             try // в бесконечном цикле получаем сообщения от клиента
             {
                 AwaitVarForCom = 0;
@@ -47,15 +46,16 @@ namespace NaNiT
                         return;
                     }
                     Thread ClientThread = Thread.CurrentThread;
-                    ClientThread.Name = "Client " + HostName;
+                    if (ClientThread.Name == null)
+                        ClientThread.Name = "Client " + userName + "Proc";
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                MessageBox.Show("ClientObject(proc) " + ex.Message);
             }
             finally
             {
-                // в случае выхода из цикла закрываем ресурсы
                 Close();
             }
         }
@@ -73,6 +73,11 @@ namespace NaNiT
                     do
                     {
                         bytes = Stream.Read(data, 0, data.Length);
+                        if (CloseMePliz)
+                        {
+                            Close();
+                            break;
+                        }
                         myMessageNotAwait = true;
                         if (bytes == 0)
                             return null;
@@ -82,8 +87,9 @@ namespace NaNiT
                     ServerCommands.CheckCommand(builder.ToString(), this, server, Stream);
                     return builder.ToString();
                 }
-                catch
+                catch (Exception ex)
                 {
+                    MessageBox.Show("ClientObject(get_msg) " + ex.Message);
                     return null;
                 }
             }
@@ -98,10 +104,17 @@ namespace NaNiT
         // закрытие подключения
         protected internal void Close()
         {
-            if (!Globals.disconnectInProgress)
+            try
             {
-                dateLastSeen = DateTime.Now.ToString();
-                server.RemoveConnection(Id, userName, Stream, client);
+                if (!Globals.disconnectInProgress)
+                {
+                    dateLastSeen = DateTime.Now.ToString();
+                    server.RemoveConnection(Id, cryptoLogin, Stream, client);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("ClientObject(close) " + ex.Message);
             }
         }
     }

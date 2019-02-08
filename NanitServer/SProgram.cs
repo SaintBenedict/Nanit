@@ -1,59 +1,33 @@
-﻿using System.Collections.Generic;
-using System.Threading;
+﻿using System.Threading;
 using System.Windows.Forms;
 
-/*Форматировать фрагмент кода - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + F.
-Форматировать весь код - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + D*/
 
 namespace NaNiT
 {
-    static class Globals
-    {
-        public static bool DEBUGMODE = true;
-        public static int servPort = 51782;
-        public static FormSOptions form1 = null;
-        public static bool isAboutLoaded = false;
-        public static bool isOptOpen = false;
-        public static bool isOptOpenStatic = true;
-        public static int MessageIn = 0;
-        public static int MessageInOld = 0;
-        public static string MessageText = "";
-        public static List<string> AutorisedRegistredClients = new List<string>();
-        public static bool myMessageNotAwait = false, disconnectInProgress = false;
-    }
     class SProgram
     {
         public static NotifyIcon notifyIcon = null;
+
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            // Первоначальная настройка. Загрузка из реестра и прописывание некоторых параметров
+            SFunctions.FirstRunOptionsLoad();
 
-            notifyIcon = new NotifyIcon();
-            notifyIcon.Icon = Properties.Resources.net2;
-            notifyIcon.Visible = true;
-            notifyIcon.ContextMenuStrip = new SContextMenus().Create();
-            notifyIcon.Text = "Сетевой сервер НИИ Телевидения";
-
-
-            SFunctions.RegCheck();                       ///Проверка наличия настроек в реестре
-
-            Thread t = Thread.CurrentThread;
-            t.Name = "Main Program";
-
-            Globals.form1 = new FormSOptions();
+            // Упрощённая версия загрузки, где окно сразу вылетает с логом
             Globals.form1.Show();
             Globals.isOptOpen = true;
+
+            // Старт сервера
+            FormSOptions.Start();
+
+            // Старт таймеров и тредов
+            /*Timer UpdateTimer = new Timer(Upd, null, 0, 3000000);
+            Thread ServStates = new Thread(new ThreadStart(TempServRun));
+            ServStates.Start();*/
+
+            //
             Application.Run();
-            
-        }
-        
-        public static void CheckServiceUpdate(object obj)
-        {
-            Thread t2 = Thread.CurrentThread;
-            t2.Name = "Ебучий таймер";
+
         }
     }
-
-    
 }

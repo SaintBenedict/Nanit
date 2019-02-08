@@ -1,19 +1,23 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace NaNiT
 {
 	class SContextMenus
-	{       
+	{
         public ContextMenuStrip Create()
 		{
 			ContextMenuStrip menu = new ContextMenuStrip();
 			ToolStripMenuItem item;
 			ToolStripSeparator sep;
+            Thread Tray = Thread.CurrentThread;
+            if (Tray.Name == null)
+                Tray.Name = "Tray Icon";
 
             /// Создание кнопок
-            
+
             item = new ToolStripMenuItem();
 			item.Text = "Настройки";
 			item.Click += new EventHandler(Options_Click);
@@ -33,8 +37,7 @@ namespace NaNiT
 			return menu;
 		}
 
-		
-
+        
         void Options_Click(object sender, EventArgs e)
 		{
             if (!Globals.isAboutLoaded)

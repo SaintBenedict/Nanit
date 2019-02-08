@@ -1,7 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.ComponentModel;
-using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -11,91 +10,72 @@ namespace NaNiT
     public partial class FormSOptions : Form
     {
         bool tempSwitch = true;
-        static ServerObject server; // сервер
-        static Thread listenThread; // потока для прослушивания
+        public static ServerObject server; // сервер
+        public static Thread listenThread; // потока для прослушивания
         int state1 = 10;
         int state2 = 20;
 
         public FormSOptions()
         {
-            InitializeComponent();
-            Globals.form1 = this;
-            ControlBoxPortServ.Text = Globals.servPort.ToString();
-            backgroundWorker1.WorkerReportsProgress = true;
-            backgroundWorker1.RunWorkerAsync();
-            Start();
-            if (listenThread.ThreadState == 0)
-                ButStart.Text = "Остановить";
-            else
+            try
             {
-                ButStart.Text = "Запустить";
-                Start();
+                InitializeComponent();
+                Globals.form1 = this;
+                ControlBoxPortServ.Text = Globals.servPort.ToString();
+                backgroundWorker1.WorkerReportsProgress = true;
+                backgroundWorker1.RunWorkerAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("FormsOptions(init) " + ex.Message);
             }
         }
 
-        private void Start()
+        public static void Start()
         {
             try
             {
                 Globals.disconnectInProgress = false;
                 server = new ServerObject();
                 listenThread = new Thread(new ThreadStart(server.Listen));
-                listenThread.Name = "ServerListen (Start sub-main)";
+                if (listenThread.Name == null)
+                    listenThread.Name = "ServerListen (Start sub-main)";
                 listenThread.Start(); //старт потока
+                Globals.form1.ButStart.Text = "Остановить";
             }
             catch (Exception ex)
             {
                 server.Disconnect();
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("FormsOptions(start) " + ex.Message);
             }
         }
+
         public void Stop()
         {
             server.Disconnect();
+            ButStart.Text = "Запустить";
         }
 
         private void ButStart_Click(object sender, EventArgs e)
         {
-            if (listenThread.ThreadState == 0)
-            {
-                Stop();
-                ButStart.Text = "Запустить";
-            }
-            else
-            {
+            if (listenThread == null)
                 Start();
-                ButStart.Text = "Остановить";
-            }
-        }
-
-        private void RevealMoreItems(object sender, DragEventArgs e)
-        {
-            var listView = (ListView)sender;
-
-            var point = listView.PointToClient(new Point(e.X, e.Y));
-            var item = listView.GetItemAt(point.X, point.Y);
-            if (item == null)
-                return;
-
-            var index = item.Index;
-            var maxIndex = listView.Items.Count;
-            var scrollZoneHeight = listView.Font.Height;
-
-            if (index > 0 && point.Y < scrollZoneHeight)
-            {
-                listView.Items[index - 1].EnsureVisible();
-            }
-            else if (index < maxIndex && point.Y > listView.Height - scrollZoneHeight)
-            {
-                listView.Items[index + 1].EnsureVisible();
-            }
+            else
+                Stop();
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            listView1.Items.Add(new ListViewItem(Globals.MessageText));
-            listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+            try
+            {
+                listView1.Items.Add(new ListViewItem(Globals.MessageText));
+                if (listView1.Items.Count > 1)
+                    listView1.EnsureVisible(listView1.Items.Count - 1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("FormsOptions(bwc_change) " + ex.Message);
+            }
         }
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -103,29 +83,32 @@ namespace NaNiT
             {
                 if (Globals.MessageIn != Globals.MessageInOld)
                 {
+                    Globals.MessageInOld = Globals.MessageIn;
                     if (tempSwitch)
                         backgroundWorker1.ReportProgress(state1);
                     else
                         backgroundWorker1.ReportProgress(state2);
-                    Globals.MessageInOld = Globals.MessageIn;
                     SFunctions.Revers(tempSwitch);
                 }
+                Thread BackWork = Thread.CurrentThread;
+                if (BackWork.Name == null)
+                    BackWork.Name = "BackWorker Options";
             }
         }
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Cancelled == true)
             {
-                MessageBox.Show("Canceled!");
+                MessageBox.Show("FormsOptions(bwc_canc)");
             }
             else if (e.Error != null)
             {
-                MessageBox.Show("Error: " + e.Error.Message);
+                MessageBox.Show("FormsOptions(bwc_comp) " + e.Error.Message);
             }
             else
             {
                 //if (Globals.isOptOpen)
-                MessageBox.Show("Что-то пошло не так. Я закончил работать");
+                MessageBox.Show("FormsOptions(bwc_??)");
             }
         }
 
@@ -137,42 +120,65 @@ namespace NaNiT
 
         private void FormSOptions_Deactivate(object sender, EventArgs e)
         {
-            this.TopMost = true;
+            TopMost = true;
         }
 
         private void ButOptSave_Click(object sender, EventArgs e)
         {
-            Globals.servPort = Convert.ToInt32(ControlBoxPortServ.Text); ;
-
-            RegistryKey localMachineKey = Registry.LocalMachine;
-            RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
-            RegistryKey regNanit = localMachineSoftKey.CreateSubKey(@"N.A.N.I.T");
-            RegistryKey servKey = regNanit.CreateSubKey("Update");
-            servKey.SetValue("port_server", Globals.servPort);
-            Globals.isOptOpen = false;
-            Globals.isAboutLoaded = false;
+            try
+            {
+                Globals.servPort = Convert.ToInt32(ControlBoxPortServ.Text);
+                RegistryKey localMachineKey = Registry.LocalMachine;
+                RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
+                RegistryKey regNanit = localMachineSoftKey.CreateSubKey(@"N.A.N.I.T");
+                RegistryKey servKey = regNanit.CreateSubKey("Update");
+                servKey.SetValue("port_server", Globals.servPort);
+                servKey.Close();
+                servKey = null;
+                regNanit.Close();
+                regNanit = null;
+                localMachineSoftKey.Close();
+                localMachineSoftKey = null;
+                localMachineKey.Close();
+                localMachineKey = null;
+                Globals.isOptOpen = false;
+                Globals.isAboutLoaded = false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("FormsOptions(save_reg) " + ex.Message);
+            }
+            Stop();
+            Start();
         }
 
         private void ButOptClose_Click(object sender, EventArgs e)
         {
-            if (Globals.servPort != Convert.ToInt32(ControlBoxPortServ.Text))
+            try
             {
-                const string message = "Закрыть настройки? Все несохранённые изменения будут потеряны";
-                const string caption = "";
-                var result = MessageBox.Show(message, caption, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+                if (Globals.servPort != Convert.ToInt32(ControlBoxPortServ.Text))
+                {
+                    const string message = "Закрыть настройки? Все несохранённые изменения будут потеряны";
+                    const string caption = "";
+                    var result = MessageBox.Show(message, caption, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
 
-                if (result == DialogResult.Yes)
+                    if (result == DialogResult.Yes)
+                    {
+                        this.Hide();
+                        Globals.isAboutLoaded = false;
+                        Globals.isOptOpen = false;
+                    }
+                }
+                else
                 {
                     this.Hide();
                     Globals.isAboutLoaded = false;
                     Globals.isOptOpen = false;
                 }
             }
-            else
+            catch (Exception ex)
             {
-                this.Hide();
-                Globals.isAboutLoaded = false;
-                Globals.isOptOpen = false;
+                MessageBox.Show("FormsOptions(close_click) " + ex.Message);
             }
         }
 

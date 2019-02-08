@@ -17,7 +17,7 @@ namespace NaNiT
     static class Globals
     {
         public static bool DEBUGMODE = true;
-        public static string appVersion = "1.5.0"; // ЕТО НЕ НАСТОЯЩИЕ ЦИФРЫ, НЕ ЕШЬ ПОДУМОЙ
+        public static string appVersion = "1.6.0"; // ЕТО НЕ НАСТОЯЩИЕ ЦИФРЫ, НЕ ЕШЬ ПОДУМОЙ
         ///
         ///
         public static FormLogin form1 = null;
@@ -33,17 +33,45 @@ namespace NaNiT
         public static string md5PortIp, md5Clients, optionsPasswordReg;
         public static bool RoleSecurity = false, RoleMessager = false, RoleOperate = false, RoleAdmin = false, RoleAgent = true;
         public static bool isAboutLoaded = false, isUpdOpen = false, isOptOpen = false, isSoftOpen = false;
-        public static byte serviceStatus = 0; 
+        public static byte serviceStatus = 0;
         public static int adrUpdNum = -1, itemsInList = 0, updateIn = 11, TimConnLock = 0;
         public static bool ServiceInitLock = false, InstallLock = false, UpdateLock = false, work = true;
         public static string[,] programs = null;
         public static string[] pathUpdate = new string[11];
-        public static bool serverIsConnected = false, myMessageNotAwait = false;
+        public static bool serverIsConnected = false, myMessageNotAwait = false, disconnectInProgress = false;
         public static string userName, serverStatus;
     }
 
     class Functions
     {
+        public static void FirstRunOptionsLoad()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            // Установка трей иконки
+            Program.notifyIcon = new NotifyIcon();
+            Program.notifyIcon.Icon = Properties.Resources.net2;
+            Program.notifyIcon.Visible = true;
+            Program.notifyIcon.ContextMenuStrip = new ContextMenus().Create();
+            Program.notifyIcon.Text = "Сетевой агент НИИ Телевидения";
+
+            // Проверка наличия настроек в реестре
+            RegCheck();
+
+            // Узнаём имя треда, для удобства дебага
+            Thread MyName = Thread.CurrentThread;
+            if (MyName.Name == null)
+                MyName.Name = "Main Program";
+
+
+            Globals.myHostName = Dns.GetHostName();
+
+            Globals.form4 = new FormSoft();
+            Globals.userName = Globals.myHostName + Globals.OSdate;
+        }
+
+
         public static bool Revers(bool first)
         {
             if (first == true)
@@ -51,7 +79,7 @@ namespace NaNiT
             else
                 return true;
         }
-        
+
         public static string MD5Code(string getCode)
         {
             byte[] hash = Encoding.ASCII.GetBytes(getCode);
@@ -63,25 +91,6 @@ namespace NaNiT
                 result += b.ToString("x2");
             }
             return result;
-        }
-
-        public static void FirstRunOptionsLoad()
-        {
-            Program.notifyIcon = new NotifyIcon();
-            Program.notifyIcon.Icon = Properties.Resources.net2;
-            Program.notifyIcon.Visible = true;
-            Program.notifyIcon.ContextMenuStrip = new ContextMenus().Create();
-            Program.notifyIcon.Text = "Сетевой агент НИИ Телевидения";
-
-            RegCheck();                       ///Проверка наличия настроек в реестре
-
-            Thread t = Thread.CurrentThread;
-            t.Name = "Main Program";
-            
-            Globals.myHostName = Dns.GetHostName();
-
-            Globals.form4 = new FormSoft();
-            Globals.userName = Globals.myHostName + Globals.OSdate;
         }
 
         public static string UrlCorrect(string url)
@@ -212,8 +221,14 @@ namespace NaNiT
                 return result;
             }
 
-            regNanit.Close();
             updateKey.Close();
+            updateKey = null;
+            regNanit.Close();
+            regNanit = null;
+            localMachineSoftKey.Close();
+            localMachineSoftKey = null;
+            localMachineKey.Close();
+            localMachineKey = null;
 
             if (Globals.md5PortIp != MD5Code(Globals.servPort + Globals.servIP + Globals.OSdate))
             {
@@ -297,7 +312,6 @@ namespace NaNiT
                         {
                             if (fuck == 100)
                             {
-                                //MessageBox.Show("FUCK");
                                 continue;
                             }
                             fuck++;
@@ -336,7 +350,6 @@ namespace NaNiT
                             {
                                 if (fuck == 100)
                                 {
-                                    //MessageBox.Show("FUCK");
                                     continue;
                                 }
                                 fuck++;
