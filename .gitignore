@@ -1,6 +1,0 @@
-*.lock
-**/.vs/
-**/Nanit/bin/Debug/
-**/Nanit/obj/Debug/
-**/NanitSvc/bin/Debug/
-**/NanitSvc/obj/Debug/

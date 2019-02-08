@@ -1,0 +1,5 @@
+D:\Repositories\N.A.N.I.T\-NanitServer\obj\Debug\! Nan Server.csprojAssemblyReference.cache
+D:\Repositories\N.A.N.I.T\-NanitServer\obj\Debug\NaNiT.FormSOptions.resources
+D:\Repositories\N.A.N.I.T\-NanitServer\obj\Debug\NaNiT.Resources.resources
+D:\Repositories\N.A.N.I.T\-NanitServer\obj\Debug\! Nan Server.csproj.GenerateResource.cache
+D:\Repositories\N.A.N.I.T\-NanitServer\obj\Debug\! Nan Server.csproj.CoreCompileInputs.cache

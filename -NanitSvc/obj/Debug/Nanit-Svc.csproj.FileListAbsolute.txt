@@ -1,0 +1,4 @@
+D:\Repositories\N.A.N.I.T\-NanitSvc\obj\Debug\Nanit-Svc.csprojAssemblyReference.cache
+D:\Repositories\N.A.N.I.T\-NanitSvc\obj\Debug\NaNiT.Resources.resources
+D:\Repositories\N.A.N.I.T\-NanitSvc\obj\Debug\Nanit-Svc.csproj.GenerateResource.cache
+D:\Repositories\N.A.N.I.T\-NanitSvc\obj\Debug\Nanit-Svc.csproj.CoreCompileInputs.cache
