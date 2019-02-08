@@ -61,9 +61,10 @@ namespace NaNiT
                 while (!Globals.serverIsConnected)
                 {
                     CFunc.Chat();
-                    Thread.Sleep(10000);
                     if (Globals.serverIsConnected)
-                        CFunc.SendMessage("i_C@N_Y0U-");
+                        break;
+                    else
+                        Thread.Sleep(10000);
                 }
                 while (Globals.serverIsConnected)
                 {

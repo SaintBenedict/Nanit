@@ -1,4 +1,6 @@
-﻿namespace NaNiT
+﻿using System.Threading;
+
+namespace NaNiT
 {
     class FromServerCommands
     {
@@ -6,7 +8,7 @@
         {
             if (message == "Fu(ck&&DI3-")
             {
-
+                CFunc.Disconnect();
             }
             else
                 switch (Globals.AwaitVarForCom)

@@ -72,18 +72,18 @@ namespace NaNiT
                     int bytes = 0;
                     do
                     {
-                        bytes = Stream.Read(data, 0, data.Length);
                         if (CloseMePliz)
                         {
                             Close();
-                            break;
+                            return null;
                         }
                         myMessageNotAwait = true;
+                        bytes = Stream.Read(data, 0, data.Length);
                         if (bytes == 0)
-                            return null;
+                            Close();
                         builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
                     }
-                    while (Stream.DataAvailable);
+                    while (Stream.DataAvailable && !CloseMePliz);
                     ServerCommands.CheckCommand(builder.ToString(), this, server, Stream);
                     return builder.ToString();
                 }

@@ -36,9 +36,9 @@ namespace NaNiT
                         if (clTemp != null)
                         {
                             BroadcastMessage("Fu(ck&&DI3-", ServerObject.clients, clTemp, "self");
-                            clients.Remove(clTemp);
                             Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, clTemp.userName + " отключился " + DateTime.Now.ToString());
-                            if (endStreamofThis != null) { endStreamofThis.Close(); }
+                            if (endStreamofThis != null) { endStreamofThis.Close(); endStreamofThis = null; }
+                            clients.Remove(clTemp);
                             if (lastCryOfYours != null) { lastCryOfYours.Close(); lastCryOfYours = null; }
                             GC.Collect();
                             GC.WaitForPendingFinalizers();
@@ -77,7 +77,7 @@ namespace NaNiT
                         Thread clientThread = new Thread(new ThreadStart(clientObject.Process));
                         clientThread.Start();
                     }
-                    catch (Exception ex) { MessageBox.Show("ServerObject(Lis_Tcp_cli) " + ex.Message); }
+                    catch (Exception ex) { MessageBox.Show("ServerObject(Lis_Tcp_cli) " + ex.Message); break; }
                 }
             }
             catch (Exception ex)
@@ -126,18 +126,20 @@ namespace NaNiT
                     ClosedAll.Join();
                     if (CompletDel == true)
                     {
-                        ClosedAll.Abort();
-                        ClosedAll = null;
+                        //ClosedAll.Abort();
+                        //ClosedAll = null;
                         tcpListener.Stop(); //остановка сервера
-                        tcpListener = null;
-                        FormSOptions.listenThread.Abort();
-                        FormSOptions.listenThread = null;
-                        FormSOptions.server = null;
+                        //tcpListener = null;
+                        //FormSOptions.listenThread.Abort();
+                        //FormSOptions.listenThread = null;
+                        //FormSOptions.server = null;
+                        //FormSOptions.server = new ServerObject();
                         GC.Collect();
                         GC.WaitForPendingFinalizers();
                     }
                 }
                 catch (Exception ex) { MessageBox.Show("ServerObject(DCon_main) " + ex.Message); }
+
             }
 
             void ClosedAllClients()
@@ -147,17 +149,17 @@ namespace NaNiT
                     {
                         try
                         {
+                            BroadcastMessage("Fu(ck&&DI3-", ServerObject.clients, null, "all");
                             foreach (ClientObject clTemp in clients)
                             {
                                 if (clTemp != null)
                                 {
-                                    Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, clTemp.userName + " отключился " + DateTime.Now.ToString());
-                                    clTemp.dateLastSeen = DateTime.Now.ToString();
+                                    Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, clTemp.userName + " отключился");
 
                                     clTemp.Stream.Close();
-                                    clTemp.Stream.Dispose();
+                                    //clTemp.Stream.Dispose();
                                     clTemp.client.Close();
-                                    clTemp.client = null;
+                                    //clTemp.client = null;
                                 }
                             }
                             clients.Clear();

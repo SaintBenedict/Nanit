@@ -36,6 +36,7 @@ namespace NaNiT
             try
             {
                 Globals.disconnectInProgress = false;
+                server = null;
                 server = new ServerObject();
                 listenThread = new Thread(new ThreadStart(server.Listen));
                 if (listenThread.Name == null)
@@ -45,14 +46,16 @@ namespace NaNiT
             }
             catch (Exception ex)
             {
-                server.Disconnect();
+                if (!Globals.disconnectInProgress)
+                    server.Disconnect();
                 MessageBox.Show("FormsOptions(start) " + ex.Message);
             }
         }
 
         public void Stop()
         {
-            server.Disconnect();
+            if (!Globals.disconnectInProgress)
+                server.Disconnect();
             ButStart.Text = "Запустить";
         }
 

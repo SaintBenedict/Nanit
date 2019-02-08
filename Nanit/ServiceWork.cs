@@ -75,7 +75,8 @@ namespace NaNiT
                 string AdressToTranslate = normalAdress + j.ToString();
                 Thread dnl = new Thread(delegate () { DownlAndCheck(AdressToTranslate, fileNameVer); });
                 //MessageBox.Show("Адрес " + normalAdress + ", Файл " + fileNameVer + ", Номер " + j.ToString()); // Какие переданы данные
-                dnl.Name = "Загрузка файла " + j;
+                if (dnl.Name == null)
+                    dnl.Name = "Загрузка файла " + j;
                 dnl.Start();
             }
         End:
