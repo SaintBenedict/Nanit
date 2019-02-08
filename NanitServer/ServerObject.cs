@@ -14,6 +14,48 @@ namespace NaNiT
         public static List<ClientObject> clients = new List<ClientObject>(); // все подключения
         public ClientObject[] ClientsToClose;
 
+        // прослушивание входящих подключений
+        protected internal void Listen()
+        {
+            try
+            {
+                tcpListener = new TcpListener(IPAddress.Any, Globals.servPort);
+                tcpListener.Start();
+                string message = "Сервер запущен: " + DateTime.Now.ToString();
+                Globals.disconnectInProgress = false;
+                Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, message);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("ServerObject(Listen) " + ex.Message);
+                Disconnect();
+            }
+
+            while (true)
+            {
+                try
+                {
+                    TcpClient tcpClient = tcpListener.AcceptTcpClient();
+                    // Вот тут кончается то, что относится напрямую к серверной части и начинается генерация клиента
+                    // Продолжение серверной части видимо будет уже в Процессе у клиента
+                    ClientObject clientObject = new ClientObject(tcpClient, this)
+                    {
+                        myMessageNotAwait = false,
+                        CloseMePliz = false,
+                        IsRegister = false,
+                        dateOfRegister = null,
+                        dateLastSeen = null,
+                        IsActive = true,
+                        StupidCheck = false
+                    };
+                    Thread clientThread = new Thread(new ThreadStart(clientObject.Process));
+                    clientThread.Start();
+                }
+                catch (Exception ex) { MessageBox.Show("ServerObject(Lis_Tcp_cli) " + ex.Message); break; }
+            }
+
+        }
+
         // добавление клиента
         protected internal void AddConnection(ClientObject clientObject)
         {
@@ -27,64 +69,30 @@ namespace NaNiT
         // удаление одного клиента
         protected internal void RemoveConnection(string id, string crypto, NetworkStream endStreamofThis, TcpClient lastCryOfYours)
         {
-            foreach (ClientObject clTemp in clients)
+            try
             {
-                try
+                ClientObject withoutList;
+                foreach (ClientObject clTemp in clients)
                 {
+
                     if (clTemp.Id == id || clTemp.cryptoLogin == crypto)
                     {
                         if (clTemp != null)
                         {
-                            BroadcastMessage("Fu(ck&&DI3-", ServerObject.clients, clTemp, "self");
-                            Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, clTemp.userName + " отключился " + DateTime.Now.ToString());
-                            if (endStreamofThis != null) { endStreamofThis.Close(); endStreamofThis = null; }
-                            clients.Remove(clTemp);
-                            if (lastCryOfYours != null) { lastCryOfYours.Close(); lastCryOfYours = null; }
-                            GC.Collect();
-                            GC.WaitForPendingFinalizers();
-                            break;
+                            withoutList = clTemp;
                         }
                     }
-                    else
-                    {
-                        continue;
-                    }
                 }
-                catch (Exception ex) { MessageBox.Show("ServerObject(Rem_cli) " + ex.Message); }
+                BroadcastMessage("Fu(ck&&DI3-", ServerObject.clients, withoutList, "self");
+                Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, withoutList.userName + " отключился " + DateTime.Now.ToString());
+                if (endStreamofThis != null) { endStreamofThis.Close(); endStreamofThis = null; }
+                clients.Remove(clTemp);
+                if (lastCryOfYours != null) { lastCryOfYours.Close(); lastCryOfYours = null; }
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                break;
             }
-        }
-
-        // прослушивание входящих подключений
-        protected internal void Listen()
-        {
-            try
-            {
-                string dateStart = DateTime.Now.ToString();
-                tcpListener = new TcpListener(IPAddress.Any, Globals.servPort);
-                tcpListener.Start();
-                string message = "Сервер запущен: " + dateStart;
-                Globals.disconnectInProgress = false;
-                Globals.MessageIn = SFunctions.ChangeMesIn(Globals.MessageIn, message);
-
-                while (true)
-                {
-                    try
-                    {
-                        TcpClient tcpClient = tcpListener.AcceptTcpClient();
-                        ClientObject clientObject = new ClientObject(tcpClient, this);
-                        clientObject.myMessageNotAwait = false;
-                        clientObject.CloseMePliz = false;
-                        Thread clientThread = new Thread(new ThreadStart(clientObject.Process));
-                        clientThread.Start();
-                    }
-                    catch (Exception ex) { MessageBox.Show("ServerObject(Lis_Tcp_cli) " + ex.Message); break; }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("ServerObject(Listen) " + ex.Message);
-                Disconnect();
-            }
+            catch (Exception ex) { MessageBox.Show("ServerObject(Rem_cli) " + ex.Message); }
         }
 
         // трансляция сообщения подключенным клиентам
@@ -129,11 +137,11 @@ namespace NaNiT
                         //ClosedAll.Abort();
                         //ClosedAll = null;
                         tcpListener.Stop(); //остановка сервера
-                        //tcpListener = null;
-                        //FormSOptions.listenThread.Abort();
-                        //FormSOptions.listenThread = null;
-                        //FormSOptions.server = null;
-                        //FormSOptions.server = new ServerObject();
+                                            //tcpListener = null;
+                                            //FormSOptions.listenThread.Abort();
+                                            //FormSOptions.listenThread = null;
+                                            //FormSOptions.server = null;
+                                            //FormSOptions.server = new ServerObject();
                         GC.Collect();
                         GC.WaitForPendingFinalizers();
                     }

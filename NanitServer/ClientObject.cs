@@ -24,11 +24,6 @@ namespace NaNiT
             client = tcpClient;
             server = serverObject;
             serverObject.AddConnection(this);
-            IsRegister = false;
-            dateOfRegister = null;
-            dateLastSeen = null;
-            IsActive = true;
-            StupidCheck = false;
         }
 
         public void Process()

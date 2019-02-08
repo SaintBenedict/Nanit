@@ -9,6 +9,8 @@ using System.Windows.Forms;
 /*Форматировать фрагмент кода - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + F.
 Форматировать весь код - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + D*/
 
+#region StartRegion
+
 namespace NaNiT
 {
     static class Globals
@@ -46,6 +48,9 @@ namespace NaNiT
             Globals.form1 = new FormSOptions();
         }
 
+        public static void Catch()
+        {
+        }
 
         public static bool Revers(bool first)
         {
