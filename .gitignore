@@ -1,0 +1,4 @@
+*.lock
+**/.vs/
+**/obj/
+**/bin/Debug/
