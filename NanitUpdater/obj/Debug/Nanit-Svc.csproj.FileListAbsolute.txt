@@ -1,6 +1,0 @@
-G:\N.A.N.I.T\NanitUpdater\obj\Debug\Nanit-Svc.csprojAssemblyReference.cache
-G:\N.A.N.I.T\NanitUpdater\obj\Debug\Nanit-Svc.csproj.CoreCompileInputs.cache
-G:\N.A.N.I.T\bin\Debug\nanit-svc.exe
-G:\N.A.N.I.T\bin\Debug\nanit-svc.pdb
-G:\N.A.N.I.T\NanitUpdater\obj\Debug\nanit-svc.exe
-G:\N.A.N.I.T\NanitUpdater\obj\Debug\nanit-svc.pdb
