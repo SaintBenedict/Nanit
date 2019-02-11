@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Sockets;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using static NaNiT.GlobalVariable;
 
 namespace NaNiT
 {
@@ -13,79 +14,141 @@ namespace NaNiT
         static TcpListener tcpListener; // сервер для прослушивания
         public static List<ClientObject> clients = new List<ClientObject>(); // все подключения
 
-        protected internal void AddConnection(ClientObject clientObject)
-        {
-            clients.Add(clientObject);
-        }
-        protected internal void RemoveConnection(string id)
-        {
-            // получаем по id закрытое подключение
-            foreach (ClientObject clTemp in clients)
-            {
-                if (clTemp.Id == id)
-                {
-                    if (clTemp != null)
-                        clients.Remove(clTemp);
-                    break;
-                }
-                else
-                {
-                    continue;
-                }
-            }
-        }
         // прослушивание входящих подключений
         protected internal void Listen()
         {
             try
             {
-                string dateStart = DateTime.Now.ToString();
-                tcpListener = new TcpListener(IPAddress.Any, Globals.servPort);
+                tcpListener = new TcpListener(IPAddress.Any, gl_i_servPort);
                 tcpListener.Start();
-                Globals.MessageIn = 1;
-                Globals.MessageText = "Сервер запущен: " + dateStart;
-
-                while (true)
-                {
-                    TcpClient tcpClient = tcpListener.AcceptTcpClient();
-
-                    ClientObject clientObject = new ClientObject(tcpClient, this);
-                    Thread clientThread = new Thread(new ThreadStart(clientObject.Process));
-                    clientThread.Start();
-                }
+                gl_b_disconnectInProgress = false;
+                gl_i_MessageIn = SFunctions.ChangeMesIn(gl_i_MessageIn, "Сервер запущен: " + DateTime.Now.ToString());
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.Message);
-                Disconnect();
+                if (!gl_b_disconnectInProgress)
+                {
+                    MessageBox.Show("ServerObject(Listen) " + ex.Message);
+                    Disconnect();
+                }
+                return;
             }
+
+            while (true)
+            {
+                try
+                {
+
+                    TcpClient tcpClient = tcpListener.AcceptTcpClient();
+                    // Вот тут кончается то, что относится напрямую к серверной части и начинается генерация клиента
+                    // Продолжение серверной части видимо будет уже в Процессе у клиента
+                    if (!gl_b_disconnectInProgress)
+                    {
+                        ClientObject clientObject = new ClientObject(tcpClient, this)
+                        {
+                            myMessageNotAwait = false,
+                            IsRegister = false,
+                            dateOfRegister = null,
+                            dateLastSeen = null,
+                            IsActive = true,
+                            StupidCheck = false
+                        };
+                        Thread clientThread = new Thread(new ThreadStart(clientObject.Process));
+                        clientThread.Start();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (!gl_b_disconnectInProgress)
+                    {
+                        MessageBox.Show("ServerObject(Lis_Tcp_cli) " + ex.Message);
+                    }
+                    break;
+                }
+            }
+
+        }
+
+        // добавление клиента
+        protected internal void AddConnection(ClientObject clientObject)
+        {
+            try
+            {
+                clients.Add(clientObject);
+            }
+            catch (Exception ex) { MessageBox.Show("ServerObject(Add_cli) " + ex.Message); }
+        }
+
+        // удаление одного клиента
+        protected internal void RemoveConnection(string id)
+        {
+            try
+            {
+                foreach (ClientObject ClTemp in clients)
+                {
+                    if (ClTemp.Id == id)
+                    {
+                        clients.Remove(ClTemp);
+                        return;
+                    }
+                }
+            }
+            catch (Exception ex) { MessageBox.Show("ServerObject(Rem_cli) " + ex.Message); }
         }
 
         // трансляция сообщения подключенным клиентам
-        protected internal void BroadcastMessage(string message, string id)
+        protected internal void BroadcastMessage(string message, List<ClientObject> clientsTemp, ClientObject clientOne, string whos)
         {
-            byte[] data = Encoding.Unicode.GetBytes(message);
-            for (int i = 0; i < clients.Count; i++)
+            try
             {
-               // if (clients[i].Id != id) // если id клиента не равно id отправляющего
+                byte[] data = Encoding.Unicode.GetBytes(message);
+                switch (whos)
                 {
-                    clients[i].Stream.Write(data, 0, data.Length); //передача данных
+                    case "all":
+                        if (clientsTemp.Count >= 1)
+                        {
+                            for (int i = 0; i < clientsTemp.Count; i++)
+                            {
+                                clients[i].Stream.Write(data, 0, data.Length); //передача данных
+                            }
+                            break;
+                        }
+                        else
+                            break;
+                    case "self":
+                        clientOne.Stream.Write(data, 0, data.Length);
+                        break;
                 }
             }
+            catch (Exception ex) { MessageBox.Show("ServerObject(Brodc) " + ex.Message); }
         }
+
         // отключение всех клиентов
         protected internal void Disconnect()
         {
-            string dateStop = DateTime.Now.ToString();
-            tcpListener.Stop(); //остановка сервера
-
-            for (int i = 0; i < clients.Count; i++)
+            if (!gl_b_disconnectInProgress)
             {
-                clients[i].Close(); //отключение клиента
+                try
+                {
+                    gl_i_MessageIn = SFunctions.ChangeMesIn(gl_i_MessageIn, "Сервер прекратил работу: " + DateTime.Now.ToString());
+                    gl_b_disconnectInProgress = true;
+                    BroadcastMessage("Fu(ck&&DI3-", ServerObject.clients, null, "all");
+                    foreach (ClientObject clTemp in clients)
+                    {
+                        if (clTemp != null)
+                        {
+                            gl_i_MessageIn = SFunctions.ChangeMesIn(gl_i_MessageIn, clTemp.userName + " отключился");
+                            clTemp.Close();
+                        }
+                    }
+                    tcpListener.Stop();
+                    tcpListener = null;
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    clients.Clear();
+                }
+                catch (Exception ex) { MessageBox.Show("ServerObject(DCon_main) " + ex.Message); }
             }
-            Globals.MessageIn = 3;
-            Globals.MessageText = "Сервер прекратил работу: " + dateStop;
-            //Environment.Exit(0); //завершение процесса
         }
     }
 }

@@ -1,6 +1,6 @@
 *.lock
-**/.vs/
-**/Nanit/bin/Debug/
-**/Nanit/obj/Debug/
-**/NanitSvc/bin/Debug/
-**/NanitSvc/obj/Debug/
+.vs/*
+obj/*
+bin/Debug/
+bin/Release/*.config
+bin/Release/*.pdb

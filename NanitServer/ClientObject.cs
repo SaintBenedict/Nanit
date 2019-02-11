@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
+using System.Windows.Forms;
+using static NaNiT.GlobalVariable;
 
 namespace NaNiT
 {
@@ -8,13 +11,17 @@ namespace NaNiT
     {
         protected internal string Id { get; private set; }
         protected internal NetworkStream Stream { get; private set; }
-        string userName;
-        TcpClient client;
-        ServerObject server; // объект сервера
+        protected internal int AwaitVarForCom;
+        protected internal bool IsRegister, IsActive, StupidCheck, myMessageNotAwait;
+        protected internal string cryptoLogin, userName;
+        protected internal string dateOfRegister;
+        protected internal string dateLastSeen;
+        protected internal TcpClient client;
+        protected internal Thread ClientThreadThis;
+        ServerObject server;
 
         public ClientObject(TcpClient tcpClient, ServerObject serverObject)
         {
-            
             Id = Guid.NewGuid().ToString();
             client = tcpClient;
             server = serverObject;
@@ -23,52 +30,36 @@ namespace NaNiT
 
         public void Process()
         {
-            try
+            try // в бесконечном цикле получаем сообщения от клиента
             {
+                AwaitVarForCom = 0;
                 Stream = client.GetStream();
-                // получаем имя пользователя
-                string message = GetMessage();
-                userName = message;
-
-                message = userName + " подключился";
-                Globals.MessageText = message;
-                Globals.MessageIn = 2;
-                Globals.ClientId = this.Id;
-                // посылаем сообщение о входе в чат всем подключенным пользователям
-                server.BroadcastMessage(message, this.Id);
-                // в бесконечном цикле получаем сообщения от клиента
-                while (true)
+                while (client != null && !gl_b_disconnectInProgress && IsActive)
                 {
-                    message = GetMessage();
-                    if (String.Format("{0}: {1}", userName, message) != String.Format("{0}: {1}", userName, null))
+                    string MessageTestNull = GetMessage();
+                    if (MessageTestNull == null)
                     {
-                        
-                        message = String.Format("{0}: {1}", userName, message);
-                        Globals.MessageText = message;
-                        Globals.MessageIn++;
-                        server.BroadcastMessage(message, this.Id);
+                            Close();
+                            return;
                     }
-                    else 
-                    {
-                        Stream.Close();
-                        message = String.Format("{0}: покинул чат", userName);
-                        Globals.MessageText = message;
-                        Globals.MessageIn++;
-                        message = null;
-                        if (message != null)
-                        server.BroadcastMessage(message, this.Id);
-                        else
-                        break;
-
-                    }
+                    Thread ClientThreadThis = Thread.CurrentThread;
+                    if (ClientThreadThis.Name == null)
+                        ClientThreadThis.Name = "Client " + userName + "Proc";
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!gl_b_disconnectInProgress && IsActive)
+                {
+                    MessageBox.Show("ClientObject(proc) " + ex.Message);
                 }
             }
             finally
             {
-                // в случае выхода из цикла закрываем ресурсы
-                server.RemoveConnection(this.Id);
-                Stream.Close();
-                Close();
+                if (!gl_b_disconnectInProgress && IsActive)
+                {
+                    Close();
+                }
             }
         }
 
@@ -84,15 +75,26 @@ namespace NaNiT
                     int bytes = 0;
                     do
                     {
+                        if (gl_b_disconnectInProgress || !IsActive)
+                        {
+                            return null;
+                        }
+                        myMessageNotAwait = true;
                         bytes = Stream.Read(data, 0, data.Length);
+                        if (bytes == 0)
+                            return null;
                         builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
                     }
-                    while (Stream.DataAvailable);
-
+                    while (Stream.DataAvailable && IsActive);
+                    ServerCommands.CheckCommand(builder.ToString(), this, server, Stream);
                     return builder.ToString();
                 }
-                catch
+                catch (Exception ex)
                 {
+                    if (!gl_b_disconnectInProgress && IsActive)
+                    {
+                        Close();
+                    }
                     return null;
                 }
             }
@@ -100,17 +102,34 @@ namespace NaNiT
             {
                 return null;
             }
-            
+
         }
 
 
         // закрытие подключения
         protected internal void Close()
         {
-            if (Stream != null)
-                Stream.Close();
-            if (client != null)
-                client.Close();
+            if (IsActive)
+            {
+                IsActive = false;
+                try
+                {
+                    dateLastSeen = DateTime.Now.ToString();
+                    if (Stream != null) { Stream.Close(); Stream = null; }
+                    if (client != null) { client.Close(); client = null; }
+                    if (!gl_b_disconnectInProgress)
+                    {
+                        gl_i_MessageIn = SFunctions.ChangeMesIn(gl_i_MessageIn, userName + " отключился");
+                        server.RemoveConnection(this.Id);
+                    }
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("ClientObject(close) " + ex.Message);
+                }
+            }
         }
     }
 }
