@@ -3,6 +3,7 @@ using System;
 using System.Windows.Forms;
 using static NaNiT.GlobalVariable;
 using static NaNiT.GlobalFunctions;
+using static NaNiT.LocalGlobals;
 
 namespace NaNiT
 {

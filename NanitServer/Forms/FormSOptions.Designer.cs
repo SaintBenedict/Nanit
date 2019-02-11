@@ -1,4 +1,5 @@
 ﻿using static NaNiT.GlobalVariable;
+using static NaNiT.LocalGlobals;
 
 namespace NaNiT
 {

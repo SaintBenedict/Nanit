@@ -19,14 +19,6 @@ namespace NaNiT
         public static bool gl_b_serviceInitLock = false, gl_b_installLock = false, gl_b_updateLock = false, gl_b_workLock = true; // Локеры функций
         ///
         ///
-        //-Forms-//
-        public static FormSOptions gl_f_optionsServ = null;
-        public static FormLogin gl_f_login = null;
-        public static FormOptions gl_f_options = null;
-        public static FormUpdater gl_f_updater = null;
-        public static FormSoft gl_f_soft = null;
-        ///
-        ///
         //-Strings-//
         public static string gl_s_OSdate = GlobalFunctions.GetOSDate(), gl_s_myHostName; // Получение даты установки ОС и имени компьютера
         public static string gl_s_nanitSvcVer = "0", gl_s_updVerAvi = "1.0.0", gl_s_version = Application.ProductVersion; // Версии

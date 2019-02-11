@@ -1,4 +1,5 @@
 ﻿using static NaNiT.GlobalVariable;
+using static NaNiT.LocalGlobals;
 
 namespace NaNiT
 {
@@ -49,8 +50,8 @@ namespace NaNiT
             this.LabelServiceInstall = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.button2 = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -319,11 +320,11 @@ namespace NaNiT
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(443, 121);
+            this.button1.Location = new System.Drawing.Point(442, 286);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(30, 26);
             this.button1.TabIndex = 21;
-            this.button1.Text = "ref";
+            this.button1.Text = "Ms";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -333,16 +334,9 @@ namespace NaNiT
             this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
             this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
             // 
-            // progressBar1
-            // 
-            this.progressBar1.Location = new System.Drawing.Point(347, 80);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(125, 10);
-            this.progressBar1.TabIndex = 22;
-            // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(407, 121);
+            this.button2.Location = new System.Drawing.Point(19, 286);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(30, 26);
             this.button2.TabIndex = 23;
@@ -350,14 +344,21 @@ namespace NaNiT
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(59, 289);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(373, 20);
+            this.textBox1.TabIndex = 24;
+            // 
             // FormOptions
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(485, 289);
+            this.ClientSize = new System.Drawing.Size(485, 319);
             this.ControlBox = false;
+            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.button2);
-            this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.CheckRoleSecurity);
@@ -380,13 +381,13 @@ namespace NaNiT
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Настройки программы";
             this.Closed += new System.EventHandler(this.FormOptions_Close);
+            this.Deactivate += new System.EventHandler(this.FormOptions_Deactivate);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
-            this.Deactivate += new System.EventHandler(this.FormOptions_Deactivate);
 
         }
 
@@ -419,7 +420,7 @@ namespace NaNiT
         public System.Windows.Forms.Button ButServiceDel;
         private System.Windows.Forms.Button button1;
         public System.ComponentModel.BackgroundWorker backgroundWorker1;
-        private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }

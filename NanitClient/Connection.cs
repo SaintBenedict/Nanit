@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using static NaNiT.GlobalVariable;
+using static NaNiT.LocalGlobals;
 
 namespace NaNiT
 {
@@ -27,6 +28,7 @@ namespace NaNiT
                         NewConnection.Connect(gl_s_servIP, gl_i_servPort); //подключение клиента
                         StreamOfApplication = NewConnection.GetStream(); // получаем поток
                         Connection ThisServerConnection = new Connection(NewConnection, this, StreamOfApplication);
+                        gl_c_current = ThisServerConnection;
                         newConnectThread = new Thread(new ThreadStart(ThisServerConnection.Start));
                         newConnectThread.Name = "Новое соединение";
                         newConnectThread.Start();
@@ -48,6 +50,8 @@ namespace NaNiT
                         NewConnection.Close();
                         NewConnection = null;
                         connections.Clear();
+                        gl_s_serverStatus = "Сервер недоступен";
+                        Program.notifyIcon.Icon = Resources.net1;
                         GC.Collect();
                         GC.WaitForPendingFinalizers();
                         Thread.Sleep(10000);
@@ -194,8 +198,6 @@ namespace NaNiT
         {
             if (gl_b_serverIsConnected)
             {
-                gl_s_serverStatus = "Сервер стал недоступен";
-                Program.notifyIcon.Icon = Resources.net1;
                 gl_b_serverIsConnected = false;
             }
         }

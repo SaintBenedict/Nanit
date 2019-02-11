@@ -1,5 +1,5 @@
-﻿using System.Threading;
-using static NaNiT.GlobalVariable;
+﻿using static NaNiT.GlobalVariable;
+using static NaNiT.LocalGlobals;
 
 namespace NaNiT
 {
@@ -7,10 +7,10 @@ namespace NaNiT
     {
         public static void DoWithServerCommand(string message, Connection current)
         {
-            if (message == "Fu(ck&&DI3-")
+            if (message == "Fu(ck&&DI3-" || message.Length < 11)
             {
-                gl_s_serverStatus = "Сервер стал недоступен";
-                Program.notifyIcon.Icon = Resources.net2;
+                gl_s_serverStatus = "Сервер послал сигнал отключения";
+                Program.notifyIcon.Icon = Resources.net1;
                 gl_b_serverIsConnected = false;
             }
             else
@@ -53,10 +53,7 @@ namespace NaNiT
                             }
                         }
                         break;
-                    default: // Типа если сообщение меньше 11-ти символов?
-                        current.SendMessage("IamStupid-");
-                        gl_i_awaitVarForCom = 0;
-                        gl_b_myMessageNotAwait = true;
+                    default:
                         break;
                 }
         }

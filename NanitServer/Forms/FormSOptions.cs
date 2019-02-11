@@ -5,13 +5,13 @@ using System.Threading;
 using System.Windows.Forms;
 using static NaNiT.GlobalVariable;
 using static NaNiT.GlobalFunctions;
+using static NaNiT.LocalGlobals;
 
 
 namespace NaNiT
 {
     public partial class FormSOptions : Form
     {
-        public static ServerObject server; // сервер
         public static Thread listenThread; // потока для прослушивания
         int state1 = 10;
         int state2 = 20;
@@ -23,7 +23,7 @@ namespace NaNiT
                 InitializeComponent();
                 gl_f_optionsServ = this;
                 ControlBoxPortServ.Text = gl_i_servPort.ToString();
-                backgroundWorker1.WorkerReportsProgress = true;
+                backgroundWorker1.WorkerReportsProgress = true; // Запуск Воркера для обновления листвью (графикой нельзя управлять из других тредов
                 backgroundWorker1.RunWorkerAsync();
             }
             catch (Exception ex)
@@ -37,9 +37,9 @@ namespace NaNiT
             try
             {
                 gl_b_disconnectInProgress = false;
-                server = null;
-                server = new ServerObject();
-                listenThread = new Thread(new ThreadStart(server.Listen));
+                gl_c_server = null;
+                gl_c_server = new ServerObject();
+                listenThread = new Thread(new ThreadStart(gl_c_server.Listen));
                 if (listenThread.Name == null)
                     listenThread.Name = "ServerListen (Start sub-main)";
                 listenThread.Start(); //старт потока
@@ -48,7 +48,7 @@ namespace NaNiT
             catch (Exception ex)
             {
                 if (!gl_b_disconnectInProgress)
-                    server.Disconnect();
+                    gl_c_server.Disconnect();
                 MessageBox.Show("FormsOptions(start) " + ex.Message);
             }
         }
@@ -56,7 +56,7 @@ namespace NaNiT
         public void Stop()
         {
             if (!gl_b_disconnectInProgress)
-                server.Disconnect();
+                gl_c_server.Disconnect();
             ButStart.Text = "Запустить";
         }
 
@@ -97,9 +97,6 @@ namespace NaNiT
                     else
                         backgroundWorker1.ReportProgress(state2);
                     gl_b_tempSwitch = Revers(gl_b_tempSwitch);
-                    Thread BackWork = Thread.CurrentThread;
-                    if (BackWork.Name == null)
-                        BackWork.Name = "BackWorker Options";
                     Thread.Sleep(200);
                 }
                 else

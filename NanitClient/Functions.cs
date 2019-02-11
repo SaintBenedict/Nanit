@@ -4,8 +4,9 @@ using System.IO;
 using System.Net;
 using System.Threading;
 using System.Windows.Forms;
-using static NaNiT.GlobalVariable;
 using static NaNiT.GlobalFunctions;
+using static NaNiT.GlobalVariable;
+using static NaNiT.LocalGlobals;
 
 /*Форматировать фрагмент кода - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + F.
 Форматировать весь код - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + D*/
@@ -40,11 +41,6 @@ namespace NaNiT
             gl_f_soft = new FormSoft();
             gl_s_userName = gl_s_myHostName + gl_s_OSdate;
         }
-
-
-        
-
-        
 
         public static string UrlCorrect(string url)
         {
@@ -155,7 +151,7 @@ namespace NaNiT
 
             mainReg.Exit();
             updateReg.Exit();
-            
+
 
             if (gl_s_md5PortIp != MD5Code(gl_i_servPort + gl_s_servIP + gl_s_OSdate))
             {

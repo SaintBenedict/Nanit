@@ -5,6 +5,7 @@ using System.IO;
 using System.Management;
 using System.Net;
 using static NaNiT.GlobalVariable;
+using static NaNiT.LocalGlobals;
 
 namespace NaNiT
 {

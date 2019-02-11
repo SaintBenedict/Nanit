@@ -92,12 +92,6 @@
     <Compile Include="NanitClient\Forms\FormUpdater.Designer.cs">
       <DependentUpon>FormUpdater.cs</DependentUpon>
     </Compile>
-    <Compile Include="NanitClient\Forms\NotUsable\FormSOptions.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NanitClient\Forms\NotUsable\FormSOptions.Designer.cs">
-      <DependentUpon>FormSOptions.cs</DependentUpon>
-    </Compile>
     <Compile Include="NanitClient\FromServerCommands.cs" />
     <Compile Include="NanitClient\Functions.cs" />
     <Compile Include="NanitClient\Program.cs" />

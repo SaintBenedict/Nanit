@@ -1,12 +1,23 @@
-﻿using System.Net.Sockets;
-using System.Threading;
+﻿using System.Threading;
 using System.Windows.Forms;
 using Timer = System.Threading.Timer;
 using static NaNiT.GlobalVariable;
+using static NaNiT.LocalGlobals;
 
 
 namespace NaNiT
 {
+    class LocalGlobals
+    {
+        //-Forms-//
+        public static FormLogin gl_f_login = null;
+        public static FormOptions gl_f_options = null;
+        public static FormUpdater gl_f_updater = null;
+        public static FormSoft gl_f_soft = null;
+        //-Connections-//
+        public static Connection gl_c_current = null;
+    }
+
     class Program
     {
         public static NotifyIcon notifyIcon = null;

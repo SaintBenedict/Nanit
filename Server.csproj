@@ -64,30 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
-    <Compile Include="NanitServer\Forms\NotUsable\FormLogin.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NanitServer\Forms\NotUsable\FormLogin.Designer.cs">
-      <DependentUpon>FormLogin.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NanitServer\Forms\NotUsable\FormOptions.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NanitServer\Forms\NotUsable\FormOptions.Designer.cs">
-      <DependentUpon>FormOptions.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NanitServer\Forms\NotUsable\FormSoft.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NanitServer\Forms\NotUsable\FormSoft.Designer.cs">
-      <DependentUpon>FormSoft.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NanitServer\Forms\NotUsable\FormUpdater.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NanitServer\Forms\NotUsable\FormUpdater.Designer.cs">
-      <DependentUpon>FormUpdater.cs</DependentUpon>
-    </Compile>
+    <Compile Include="NanitServer\DBWork.cs" />
     <Compile Include="NanitServer\SProgram.cs" />
     <Compile Include="Properties\AssemblyInfoServer.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 using static NaNiT.GlobalVariable;
+using static NaNiT.LocalGlobals;
 
 namespace NaNiT
 {
@@ -10,12 +11,14 @@ namespace NaNiT
 
         public static void CheckCommand(string message, ClientObject client, ServerObject server, NetworkStream Stream)
         {
-            if (message == "IamStupid-")
+            if (message == "IamStupid-" || message.Length < 10)
             {
-                server.BroadcastMessage("@HowdyHu%$-", ServerObject.clients, client, "self");
-                client.AwaitVarForCom = 1;
-                client.myMessageNotAwait = true;
+                client.dateLastSeen = DateTime.Now.ToString();
+                gl_sList_Messages.Add(client.userName + " отправил неверные данные и был отключён [" + client.dateLastSeen + "]");
+                server.BroadcastMessage("Fu(ck&&DI3-", ServerObject.clients, client, "self");
+                server.RemoveConnection(client.Id);
                 client.StupidCheck = true;
+                client.Close();
             }
             else
                 switch (client.AwaitVarForCom)
@@ -27,13 +30,15 @@ namespace NaNiT
                             string textCom = message.Substring(10, message.Length - 10);
                             switch (command)
                             {
-                                default: // Просто рандомное сообщение
-                                    server.BroadcastMessage("@HowdyHu%$-", ServerObject.clients, client, "self");
-                                    client.AwaitVarForCom = 1;
-                                    client.myMessageNotAwait = true;
+                                default: // Пошёл нахуй, жид пархатый
+                                    client.dateLastSeen = DateTime.Now.ToString();
+                                    gl_sList_Messages.Add(client.userName + " отправил неверные данные и был отключён [" + client.dateLastSeen + "]");
+                                    server.BroadcastMessage("Fu(ck&&DI3-", ServerObject.clients, client, "self");
+                                    server.RemoveConnection(client.Id);
                                     client.StupidCheck = true;
+                                    client.Close();
                                     break;
-                                    
+
                                 case "h@@lLloui-": //Приветствие подключившегося клиента
                                     client.cryptoLogin = textCom;
                                     client.userName = textCom.Substring(0, textCom.Length - 14);
@@ -42,18 +47,14 @@ namespace NaNiT
                                     server.BroadcastMessage("@HowdyHu%$-", ServerObject.clients, client, "self");
                                     client.AwaitVarForCom = 1;
                                     client.myMessageNotAwait = true;
+                                    client.StupidCheck = false;
                                     break;
                                     
                                 case "CH@T_AlL_-": // Команда админской рассылки мессейджа
                                     SendChatToAll(textCom);
                                     client.AwaitVarForCom = 0;
                                     client.myMessageNotAwait = false;
-                                    break;
-                                    
-                                case "i_C@N_Y0U-": // Мессага о подключении клиента после обрыва
-                                    ReconnectUser(client);
-                                    client.AwaitVarForCom = 0;
-                                    client.myMessageNotAwait = false;
+                                    client.StupidCheck = false;
                                     break;
                             }
                         }
@@ -66,16 +67,19 @@ namespace NaNiT
                             switch (command)
                             {
                                 default: // Пошёл нахуй, жид пархатый
-                                    server.BroadcastMessage("@HowdyHu%$-", ServerObject.clients, client, "self");
-                                    client.AwaitVarForCom = 1;
-                                    client.myMessageNotAwait = true;
+                                    client.dateLastSeen = DateTime.Now.ToString();
+                                    gl_sList_Messages.Add(client.userName + " отправил неверные данные и был отключён [" + client.dateLastSeen + "]");
+                                    server.BroadcastMessage("Fu(ck&&DI3-", ServerObject.clients, client, "self");
+                                    server.RemoveConnection(client.Id);
                                     client.StupidCheck = true;
+                                    client.Close();
                                     break;
                                     
                                 case "R3GisSsTr-": // Команда регистрации или авторизации
                                     RegistrationOrLogin(textCom);
                                     client.AwaitVarForCom = 0;
                                     client.myMessageNotAwait = false;
+                                    client.StupidCheck = false;
                                     break;
                             }
                         }
@@ -94,7 +98,7 @@ namespace NaNiT
                     if (client.cryptoLogin == name && name == nameOfRegistred)
                     {
                         client.IsRegister = true;
-                        gl_sList_Messages.Add(client.userName + " авторизовался в системе " + DateTime.Now.ToString());
+                        gl_sList_Messages.Add(client.userName + " авторизовался в системе [" + DateTime.Now.ToString() + "]");
                         return;
                     }
                 }
@@ -103,7 +107,7 @@ namespace NaNiT
                     client.IsRegister = true;
                     gl_sList_autorisedRegistredClients.Add(client.cryptoLogin);
                     client.dateOfRegister = DateTime.Now.ToString();
-                    gl_sList_Messages.Add(client.userName + " зарегистрировался в системе " + client.dateOfRegister);
+                    gl_sList_Messages.Add(client.userName + " зарегистрировался в системе [" + client.dateOfRegister + "]");
                 }
             }
             void SendChatToAll(string textChat)
@@ -114,10 +118,6 @@ namespace NaNiT
                     gl_sList_Messages.Add(textChat);
                     server.BroadcastMessage(textChat, ServerObject.clients, client, "all");
                 }
-            }
-            void ReconnectUser(ClientObject ReconClient)
-            {
-                gl_sList_Messages.Add(client.userName + " Подключение восстановлено после разрыва " + DateTime.Now.ToString());
             }
         }
     }

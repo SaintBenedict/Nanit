@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Windows.Forms;
 using static NaNiT.GlobalVariable;
+using static NaNiT.LocalGlobals;
 
 /*Форматировать фрагмент кода - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + F.
 Форматировать весь код - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + D*/
@@ -25,6 +26,9 @@ namespace NaNiT
 
             // Проверка наличия настроек в реестре
             RegCheck();
+
+            // Забиваем данные по XML массивам
+            OptionsXml.ReArrayNodes();
 
             // Узнаём имя треда, для удобства дебага
             Thread MyName = Thread.CurrentThread;

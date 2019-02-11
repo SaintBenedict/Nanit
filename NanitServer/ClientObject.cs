@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using static NaNiT.GlobalVariable;
+using static NaNiT.LocalGlobals;
 
 namespace NaNiT
 {
@@ -117,9 +118,9 @@ namespace NaNiT
                     dateLastSeen = DateTime.Now.ToString();
                     if (Stream != null) { Stream.Close(); Stream = null; }
                     if (client != null) { client.Close(); client = null; }
-                    if (!gl_b_disconnectInProgress)
+                    if (!gl_b_disconnectInProgress && !StupidCheck)
                     {
-                        gl_sList_Messages.Add(userName + " отключился");
+                        gl_sList_Messages.Add(userName + " отключился [" + dateLastSeen + "]");
                         server.RemoveConnection(this.Id);
                     }
                     GC.Collect();
@@ -127,7 +128,8 @@ namespace NaNiT
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("ClientObject(close) " + ex.Message);
+                    if (!StupidCheck)
+                        MessageBox.Show("ClientObject(close) " + ex.Message);
                 }
             }
         }

@@ -1,13 +1,11 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.ComponentModel;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using static NaNiT.GlobalVariable;
 using static NaNiT.GlobalFunctions;
+using static NaNiT.LocalGlobals;
 
 
 namespace NaNiT
@@ -16,7 +14,6 @@ namespace NaNiT
     {
         static object locker = new object();
         static bool workerByte = true;
-        Socket socket;
 
         public FormOptions()
         {
@@ -37,15 +34,14 @@ namespace NaNiT
             ButServiceInstall.Enabled = false;
             button1.Visible = false;
             button2.Visible = false;
-            progressBar1.Visible = false;
-            progressBar1.Step = 1;
             backgroundWorker1.WorkerReportsProgress = true;
             backgroundWorker1.RunWorkerAsync();
+            this.ClientSize = new System.Drawing.Size(485, 287);
             if (gl_b_debug)
             {
                 button1.Visible = true;
                 button2.Visible = true;
-                //progressBar1.Visible = true;
+                this.ClientSize = new System.Drawing.Size(485, 319);
             }
             ServiceInit();
             ServiceWork.ServiceInit();
@@ -290,55 +286,18 @@ namespace NaNiT
 
         private void button1_Click(object sender, EventArgs e)                  // Кнопка для тестирования всякой фигни
         {
-            /*Process cmdInstall = new Process();
-            cmdInstall.StartInfo.FileName = "cmd.exe";
-            cmdInstall.StartInfo.Arguments = "/C " + @"ping google.com";
-            cmdInstall.Start();
-            cmdInstall.WaitForExit();*/
-            IPEndPoint ipPoint = new IPEndPoint(IPAddress.Parse(gl_s_servIP), gl_i_servPort);
-            socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            // подключаемся к удаленному хосту
-            socket.Connect(ipPoint);
-            string message = "----------------";
-            byte[] data = Encoding.Unicode.GetBytes(message);
-            socket.Send(data);
-            MessageBox.Show("Подключились к серверу и отправили сообщение" + Environment.NewLine);
-            // получаем ответ
-            data = new byte[256]; // буфер для ответа
-            StringBuilder builder = new StringBuilder();
-            int bytes = 0; // количество полученных байт
-            bool GetMessage = false;
-            while (GetMessage == false)
-            {
-                if (socket.Available > 0)
-                {
-                    GetMessage = true;
-                    while (socket.Available > 0)
-                    {
-                        bytes = socket.Receive(data, data.Length, 0);
-                        builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
-                    }
-                }
-                Thread.Sleep(300);
-            }
-            MessageBox.Show("Ответ сервера: " + builder.ToString() + Environment.NewLine);
+            gl_c_current.SendMessage(textBox1.Text);
+            textBox1.Text = "";
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            //MessageBox.Show(e.ProgressPercentage.ToString());
-            progressBar1.Value = (int)((progressBar1.Maximum / 100.0) * e.ProgressPercentage);
             ServiceInit();
         }
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
             while (gl_b_isOptOpen)
             {
-                /*for (int i = 0; i <= 20; i++) // Проверка работы воркера
-                {
-                    backgroundWorker1.ReportProgress(i * 100 / 20);
-                    Thread.Sleep(200);
-                }*/
                 if (workerByte)
                 {
                     if (!gl_b_workLock)
