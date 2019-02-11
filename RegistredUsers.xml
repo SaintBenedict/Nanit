@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<users>
+  <user name="default">
+    <RegistredDate>12hf3</RegistredDate>
+    <LastSeenDate>1dff233</LastSeenDate>
+	<HostName>123we123</HostName>
+	<IPadress>333fsd3</IPadress>
+	<CorporateGroup></CorporateGroup>
+	<HardwareFile>23g33</HardwareFile>
+	<SoftwareFile>445</SoftwareFile>
+  </user>
+  <user name="rarar">
+    <RegistredDate></RegistredDate>
+    <LastSeenDate>1dff233</LastSeenDate>
+	<HostName>123we123</HostName>
+	<IPadress>333fsd3</IPadress>
+	<CorporateGroup></CorporateGroup>
+	<HardwareFile>23g33</HardwareFile>
+	<SoftwareFile>445</SoftwareFile>
+  </user>
+  <user name="defaudhfgfdglt">
+    <RegistredDate>12hf3</RegistredDate>
+    <LastSeenDate></LastSeenDate>
+	<HostName>123we123</HostName>
+	<IPadress>333fsd3</IPadress>
+	<CorporateGroup></CorporateGroup>
+	<HardwareFile></HardwareFile>
+	<SoftwareFile>445</SoftwareFile>
+  </user>
+</users>
