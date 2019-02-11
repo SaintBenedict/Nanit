@@ -13,9 +13,6 @@ namespace NaNiT
 			ContextMenuStrip menu = new ContextMenuStrip();
 			ToolStripMenuItem item;
 			ToolStripSeparator sep;
-            Thread Tray = Thread.CurrentThread;
-            if (Tray.Name == null)
-                Tray.Name = "Tray Icon";
 
             /// Создание кнопок
 

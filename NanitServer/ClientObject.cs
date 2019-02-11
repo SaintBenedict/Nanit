@@ -12,11 +12,12 @@ namespace NaNiT
         protected internal string Id { get; private set; }
         protected internal NetworkStream Stream { get; private set; }
         protected internal int AwaitVarForCom;
-        protected internal bool IsRegister, IsActive, StupidCheck, myMessageNotAwait, CloseMePliz;
+        protected internal bool IsRegister, IsActive, StupidCheck, myMessageNotAwait;
         protected internal string cryptoLogin, userName;
         protected internal string dateOfRegister;
         protected internal string dateLastSeen;
         protected internal TcpClient client;
+        protected internal Thread ClientThreadThis;
         ServerObject server;
 
         public ClientObject(TcpClient tcpClient, ServerObject serverObject)
@@ -33,26 +34,32 @@ namespace NaNiT
             {
                 AwaitVarForCom = 0;
                 Stream = client.GetStream();
-                while (this.client != null)
+                while (client != null && !gl_b_disconnectInProgress && IsActive)
                 {
                     string MessageTestNull = GetMessage();
                     if (MessageTestNull == null)
                     {
-                        Close();
-                        return;
+                            Close();
+                            return;
                     }
-                    Thread ClientThread = Thread.CurrentThread;
-                    if (ClientThread.Name == null)
-                        ClientThread.Name = "Client " + userName + "Proc";
+                    Thread ClientThreadThis = Thread.CurrentThread;
+                    if (ClientThreadThis.Name == null)
+                        ClientThreadThis.Name = "Client " + userName + "Proc";
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("ClientObject(proc) " + ex.Message);
+                if (!gl_b_disconnectInProgress && IsActive)
+                {
+                    MessageBox.Show("ClientObject(proc) " + ex.Message);
+                }
             }
             finally
             {
-                Close();
+                if (!gl_b_disconnectInProgress && IsActive)
+                {
+                    Close();
+                }
             }
         }
 
@@ -68,24 +75,26 @@ namespace NaNiT
                     int bytes = 0;
                     do
                     {
-                        if (CloseMePliz)
+                        if (gl_b_disconnectInProgress || !IsActive)
                         {
-                            Close();
                             return null;
                         }
                         myMessageNotAwait = true;
                         bytes = Stream.Read(data, 0, data.Length);
                         if (bytes == 0)
-                            Close();
+                            return null;
                         builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
                     }
-                    while (Stream.DataAvailable && !CloseMePliz);
+                    while (Stream.DataAvailable && IsActive);
                     ServerCommands.CheckCommand(builder.ToString(), this, server, Stream);
                     return builder.ToString();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("ClientObject(get_msg) " + ex.Message);
+                    if (!gl_b_disconnectInProgress && IsActive)
+                    {
+                        Close();
+                    }
                     return null;
                 }
             }
@@ -100,17 +109,26 @@ namespace NaNiT
         // закрытие подключения
         protected internal void Close()
         {
-            try
+            if (IsActive)
             {
-                if (!gl_b_disconnectInProgress)
+                IsActive = false;
+                try
                 {
                     dateLastSeen = DateTime.Now.ToString();
-                    server.RemoveConnection(Id, cryptoLogin, Stream, client);
+                    if (Stream != null) { Stream.Close(); Stream = null; }
+                    if (client != null) { client.Close(); client = null; }
+                    if (!gl_b_disconnectInProgress)
+                    {
+                        gl_i_MessageIn = SFunctions.ChangeMesIn(gl_i_MessageIn, userName + " отключился");
+                        server.RemoveConnection(this.Id);
+                    }
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("ClientObject(close) " + ex.Message);
+                catch (Exception ex)
+                {
+                    MessageBox.Show("ClientObject(close) " + ex.Message);
+                }
             }
         }
     }

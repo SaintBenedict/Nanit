@@ -1,11 +1,7 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Management;
 using System.Net;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using static NaNiT.GlobalVariable;
@@ -16,8 +12,6 @@ using static NaNiT.GlobalFunctions;
 
 namespace NaNiT
 {
-
-
     class Functions
     {
         public static void FirstRunOptionsLoad()
@@ -188,8 +182,6 @@ namespace NaNiT
                 }
             }
         }
-
-        
 
         public static void RefreshOpions()
         {

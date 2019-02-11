@@ -1,8 +1,4 @@
-﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Text;
+﻿using System;
 using System.Threading;
 using System.Windows.Forms;
 using static NaNiT.GlobalVariable;
@@ -42,7 +38,7 @@ namespace NaNiT
 
         public static int ChangeMesIn(int first, string message)
         {
-            gl_s_messageText = message;
+            gl_sList_Messages.Add(message);
             if (first == 500)
                 return 501;
             else

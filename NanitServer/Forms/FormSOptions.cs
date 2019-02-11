@@ -11,7 +11,6 @@ namespace NaNiT
 {
     public partial class FormSOptions : Form
     {
-        bool tempSwitch = true;
         public static ServerObject server; // сервер
         public static Thread listenThread; // потока для прослушивания
         int state1 = 10;
@@ -63,17 +62,22 @@ namespace NaNiT
 
         private void ButStart_Click(object sender, EventArgs e)
         {
-            if (listenThread == null)
+            if (listenThread.ThreadState != 0)
+            {
                 Start();
+            }
             else
+            {
                 Stop();
+            }
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             try
             {
-                listView1.Items.Add(new ListViewItem(gl_s_messageText));
+                listView1.Items.Add(new ListViewItem(gl_sList_Messages[0]));
+                gl_sList_Messages.RemoveAt(0);
                 if (listView1.Items.Count > 1)
                     listView1.EnsureVisible(listView1.Items.Count - 1);
             }
@@ -89,15 +93,15 @@ namespace NaNiT
                 if (gl_i_MessageIn != gl_i_MessageInOld)
                 {
                     gl_i_MessageInOld = gl_i_MessageIn;
-                    if (tempSwitch)
+                    if (gl_b_tempSwitch)
                         backgroundWorker1.ReportProgress(state1);
                     else
                         backgroundWorker1.ReportProgress(state2);
-                    Revers(tempSwitch);
+                    gl_b_tempSwitch = Revers(gl_b_tempSwitch);
+                    Thread BackWork = Thread.CurrentThread;
+                    if (BackWork.Name == null)
+                        BackWork.Name = "BackWorker Options";
                 }
-                Thread BackWork = Thread.CurrentThread;
-                if (BackWork.Name == null)
-                    BackWork.Name = "BackWorker Options";
             }
         }
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

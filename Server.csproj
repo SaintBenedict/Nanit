@@ -95,7 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NanitServer\ClientObject.cs" />
-    <Compile Include="NanitServer\SContextMenus.cs" />
+    <Compile Include="NanitServer\Forms\SContextMenus.cs" />
     <Compile Include="NanitServer\Forms\FormSOptions.cs">
       <SubType>Form</SubType>
     </Compile>

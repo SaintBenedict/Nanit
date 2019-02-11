@@ -14,7 +14,7 @@ namespace NaNiT
         //-Bools-//
         public static bool gl_b_debug = true; // Если "Истина", то включены многие проверочные элементы. Только для дебагинга.
         public static bool gl_b_roleSecurity = false, gl_b_roleMessager = false, gl_b_roleOperate = false, gl_b_roleAdmin = false, gl_b_roleAgent = true; // Доступные клиенту Роли
-        public static bool gl_b_serverIsConnected = false, gl_b_myMessageNotAwait = false, gl_b_disconnectInProgress = false; // Переменные статуса Сервера
+        public static bool gl_b_serverIsConnected = false, gl_b_myMessageNotAwait = false, gl_b_disconnectInProgress = false, gl_b_tempSwitch = true; // Переменные статуса Сервера
         public static bool gl_b_isAboutLoaded = false, gl_b_isUpdOpen = false, gl_b_isOptOpen = false, gl_b_isOptOpenStatic = true, gl_b_isSoftOpen = false; // Проверка открытости форм
         public static bool gl_b_serviceInitLock = false, gl_b_installLock = false, gl_b_updateLock = false, gl_b_workLock = true; // Локеры функций
         ///
@@ -32,12 +32,13 @@ namespace NaNiT
         public static string gl_s_nanitSvcVer = "0", gl_s_updVerAvi = "1.0.0", gl_s_version = Application.ProductVersion; // Версии
         public static string gl_s_optionsPasswordDefault = "478632", gl_s_servIP = "127.0.0.1"; // Стандартный пароль и адресс сервера
         public static string gl_s_md5PortIp, gl_s_md5Clients, gl_s_optionsPasswordReg; // Изменение переменных после их прогона через MD5
-        public static string gl_s_userName, gl_s_serverStatus, gl_s_nameFile, gl_s_messageText = ""; // Переменный для общения с сервером, выгрузки и прочее
+        public static string gl_s_userName, gl_s_serverStatus, gl_s_nameFile; // Переменный для общения с сервером, выгрузки и прочее
         ///
         public static string[,] gl_sMas_programs = null; // Массив со списком программ
         public static string[] gl_sMas_pathUpdate = new string[11]; // Массив со списком адресов обновлений
         ///
         public static List<string> gl_sList_autorisedRegistredClients = new List<string>(); // Лист авторизованных клиентов
+        public static List<string> gl_sList_Messages = new List<string>(); // Лист авторизованных клиентов
         ///
         ///
         //-Integers-//
@@ -85,26 +86,6 @@ namespace NaNiT
                 return false;
             else
                 return true;
-        }
-
-        public static string CheckRegString(string toRegName, RegistryKey toDo, string variant)
-        {
-            string result = variant;
-            if (toDo.GetValue(toRegName) != null)
-                result = toDo.GetValue(toRegName).ToString();
-            else
-                toDo.SetValue(toRegName, variant);
-            return result;
-        }
-
-        public static bool CheckRegBool(string toRegName, RegistryKey toDo, bool variant)
-        {
-            bool result = variant;
-            if (toDo.GetValue(toRegName) != null)
-                result = toDo.GetValue(toRegName).Equals("true");
-            else
-                toDo.SetValue(toRegName, variant.ToString().ToLower());
-            return result;
         }
     }
 

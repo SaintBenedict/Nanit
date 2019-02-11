@@ -74,8 +74,8 @@
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="NanitClient\CatchInfo.cs" />
-    <Compile Include="NanitClient\CFunc.cs" />
-    <Compile Include="NanitClient\ContextMenus.cs" />
+    <Compile Include="NanitClient\Connection.cs" />
+    <Compile Include="NanitClient\Forms\ContextMenus.cs" />
     <Compile Include="NanitClient\Forms\FormLogin.cs">
       <SubType>Form</SubType>
     </Compile>

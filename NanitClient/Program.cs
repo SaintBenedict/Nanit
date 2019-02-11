@@ -10,9 +10,8 @@ namespace NaNiT
     class Program
     {
         public static NotifyIcon notifyIcon = null;
-        public static TcpClient client;
-        public static NetworkStream stream;
         public static TimerCallback Upd = new TimerCallback(CheckServiceUpdate);
+        public static Thread ClientThread;
 
         static void Main()
         {
@@ -23,12 +22,14 @@ namespace NaNiT
             Functions.AutoSelfInstall(false);
 
             // Старт соединения с сервером
-            CFunc.Chat();
+            Client ThisExeStartClient = new Client();
+            ClientThread = new Thread(new ThreadStart(ThisExeStartClient.Listen));
+            if (ClientThread.Name == null)
+                ClientThread.Name = "Новый Клиент (Main)";
+            ClientThread.Start();
 
             // Старт таймеров и тредов
             Timer UpdateTimer = new Timer(Upd, null, 0, 3000000);
-            Thread ServStates = new Thread(new ThreadStart(TempServRun));
-            ServStates.Start();
 
             //
             Application.Run();
@@ -50,30 +51,6 @@ namespace NaNiT
                 {
                     ServiceWork.UpdateService();
                 }
-        }
-
-        public static void TempServRun()
-        {
-            Thread ServRun = Thread.CurrentThread;
-            if (ServRun.Name == null)
-                ServRun.Name = "Server sender and reopener";
-            do
-            {
-                while (!gl_b_serverIsConnected)
-                {
-                    CFunc.Chat();
-                    if (gl_b_serverIsConnected)
-                        break;
-                    else
-                        Thread.Sleep(10000);
-                }
-                while (gl_b_serverIsConnected)
-                {
-                    Thread.Sleep(10000);
-
-                }
-            }
-            while (true);
         }
     }
 }

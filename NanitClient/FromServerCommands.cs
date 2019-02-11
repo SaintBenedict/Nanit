@@ -5,11 +5,13 @@ namespace NaNiT
 {
     class FromServerCommands
     {
-        public static void DoWithServerCommand(string message)
+        public static void DoWithServerCommand(string message, Connection current)
         {
             if (message == "Fu(ck&&DI3-")
             {
-                CFunc.Disconnect();
+                gl_s_serverStatus = "Сервер стал недоступен";
+                Program.notifyIcon.Icon = Resources.net2;
+                gl_b_serverIsConnected = false;
             }
             else
                 switch (gl_i_awaitVarForCom)
@@ -22,12 +24,12 @@ namespace NaNiT
                             switch (command)
                             {
                                 default: // хуйня какая-то
-                                    CFunc.SendMessage("IamStupid-");
+                                    current.SendMessage("IamStupid-");
                                     gl_i_awaitVarForCom = 0;
                                     gl_b_myMessageNotAwait = true;
                                     break;
                                 case "@HowdyHu%$-": // Команда регистрации или авторизации
-                                    CFunc.SendMessage("R3GisSsTr-" + gl_s_userName);
+                                    current.SendMessage("R3GisSsTr-" + gl_s_userName);
                                     gl_i_awaitVarForCom = 0;
                                     gl_b_myMessageNotAwait = false;
                                     break;
@@ -42,7 +44,7 @@ namespace NaNiT
                             switch (command)
                             {
                                 default: // хуйня какая-то
-                                    CFunc.SendMessage("IamStupid-");
+                                    current.SendMessage("IamStupid-");
                                     gl_i_awaitVarForCom = 0;
                                     gl_b_myMessageNotAwait = true;
                                     break;
@@ -52,7 +54,7 @@ namespace NaNiT
                         }
                         break;
                     default: // Типа если сообщение меньше 11-ти символов?
-                        CFunc.SendMessage("IamStupid-");
+                        current.SendMessage("IamStupid-");
                         gl_i_awaitVarForCom = 0;
                         gl_b_myMessageNotAwait = true;
                         break;
