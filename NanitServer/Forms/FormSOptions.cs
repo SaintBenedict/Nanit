@@ -90,9 +90,8 @@ namespace NaNiT
         {
             while (gl_b_isOptOpenStatic)
             {
-                if (gl_i_MessageIn != gl_i_MessageInOld)
+                if (gl_sList_Messages.Count > 0)
                 {
-                    gl_i_MessageInOld = gl_i_MessageIn;
                     if (gl_b_tempSwitch)
                         backgroundWorker1.ReportProgress(state1);
                     else
@@ -101,7 +100,12 @@ namespace NaNiT
                     Thread BackWork = Thread.CurrentThread;
                     if (BackWork.Name == null)
                         BackWork.Name = "BackWorker Options";
+                    Thread.Sleep(200);
                 }
+                else
+                    Thread.Sleep(1000);
+                if(!gl_b_isOptOpen)
+                    Thread.Sleep(10000);
             }
         }
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

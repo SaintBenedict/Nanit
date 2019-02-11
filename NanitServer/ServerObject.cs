@@ -22,7 +22,7 @@ namespace NaNiT
                 tcpListener = new TcpListener(IPAddress.Any, gl_i_servPort);
                 tcpListener.Start();
                 gl_b_disconnectInProgress = false;
-                gl_i_MessageIn = SFunctions.ChangeMesIn(gl_i_MessageIn, "Сервер запущен: " + DateTime.Now.ToString());
+                gl_sList_Messages.Add("Сервер запущен: " + DateTime.Now.ToString());
             }
             catch (Exception ex)
             {
@@ -130,14 +130,14 @@ namespace NaNiT
             {
                 try
                 {
-                    gl_i_MessageIn = SFunctions.ChangeMesIn(gl_i_MessageIn, "Сервер прекратил работу: " + DateTime.Now.ToString());
+                    gl_sList_Messages.Add("Сервер прекратил работу: " + DateTime.Now.ToString());
                     gl_b_disconnectInProgress = true;
                     BroadcastMessage("Fu(ck&&DI3-", ServerObject.clients, null, "all");
                     foreach (ClientObject clTemp in clients)
                     {
                         if (clTemp != null)
                         {
-                            gl_i_MessageIn = SFunctions.ChangeMesIn(gl_i_MessageIn, clTemp.userName + " отключился");
+                            gl_sList_Messages.Add(clTemp.userName + " отключился");
                             clTemp.Close();
                         }
                     }

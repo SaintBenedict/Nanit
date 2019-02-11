@@ -56,7 +56,7 @@
     <StartupObject />
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>net3.ico</ApplicationIcon>
+    <ApplicationIcon>Properties\Resources\net3.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <None Include="Properties\App.config" />
@@ -142,7 +142,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="net3.ico" />
+    <Content Include="Properties\Resources\net3.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

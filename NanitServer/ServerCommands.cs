@@ -37,7 +37,7 @@ namespace NaNiT
                                 case "h@@lLloui-": //Приветствие подключившегося клиента
                                     client.cryptoLogin = textCom;
                                     client.userName = textCom.Substring(0, textCom.Length - 14);
-                                    gl_i_MessageIn = SFunctions.ChangeMesIn(gl_i_MessageIn, client.cryptoLogin + " подключился");
+                                    gl_sList_Messages.Add(client.cryptoLogin + " подключился");
                                     // Проверка регистрации
                                     server.BroadcastMessage("@HowdyHu%$-", ServerObject.clients, client, "self");
                                     client.AwaitVarForCom = 1;
@@ -94,7 +94,7 @@ namespace NaNiT
                     if (client.cryptoLogin == name && name == nameOfRegistred)
                     {
                         client.IsRegister = true;
-                        gl_i_MessageIn = SFunctions.ChangeMesIn(gl_i_MessageIn, client.userName + " авторизовался в системе " + DateTime.Now.ToString());
+                        gl_sList_Messages.Add(client.userName + " авторизовался в системе " + DateTime.Now.ToString());
                         return;
                     }
                 }
@@ -103,7 +103,7 @@ namespace NaNiT
                     client.IsRegister = true;
                     gl_sList_autorisedRegistredClients.Add(client.cryptoLogin);
                     client.dateOfRegister = DateTime.Now.ToString();
-                    gl_i_MessageIn = SFunctions.ChangeMesIn(gl_i_MessageIn, client.userName + " зарегистрировался в системе " + client.dateOfRegister);
+                    gl_sList_Messages.Add(client.userName + " зарегистрировался в системе " + client.dateOfRegister);
                 }
             }
             void SendChatToAll(string textChat)
@@ -111,13 +111,13 @@ namespace NaNiT
                 if (String.Format("{0}: {1}", client.userName, textChat) != String.Format("{0}: {1}", client.userName, null))
                 {
                     textChat = String.Format("{0}: {1}", client.userName, textChat);
-                    gl_i_MessageIn = SFunctions.ChangeMesIn(gl_i_MessageIn, textChat);
+                    gl_sList_Messages.Add(textChat);
                     server.BroadcastMessage(textChat, ServerObject.clients, client, "all");
                 }
             }
             void ReconnectUser(ClientObject ReconClient)
             {
-                gl_i_MessageIn = SFunctions.ChangeMesIn(gl_i_MessageIn, client.userName + " Подключение восстановлено после разрыва " + DateTime.Now.ToString());
+                gl_sList_Messages.Add(client.userName + " Подключение восстановлено после разрыва " + DateTime.Now.ToString());
             }
         }
     }

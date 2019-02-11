@@ -43,7 +43,7 @@ namespace NaNiT
         ///
         //-Integers-//
         public static int gl_i_adrUpdNum = -1, gl_i_itemsInList = 0, gl_i_updateIn = 11, gl_i_timerConnLock = 0; // Переменные для обновлений
-        public static int gl_i_servPort = 51782, gl_i_MessageIn = 0, gl_i_MessageInOld = 0, gl_i_awaitVarForCom = 0; // Связь с сервером
+        public static int gl_i_servPort = 51782, gl_i_awaitVarForCom = 0; // Связь с сервером
         ///
         ///
         //-Bytes-//

@@ -119,7 +119,7 @@ namespace NaNiT
                     if (client != null) { client.Close(); client = null; }
                     if (!gl_b_disconnectInProgress)
                     {
-                        gl_i_MessageIn = SFunctions.ChangeMesIn(gl_i_MessageIn, userName + " отключился");
+                        gl_sList_Messages.Add(userName + " отключился");
                         server.RemoveConnection(this.Id);
                     }
                     GC.Collect();

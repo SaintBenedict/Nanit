@@ -34,16 +34,6 @@ namespace NaNiT
 
             gl_f_optionsServ = new FormSOptions();
         }
-       
-
-        public static int ChangeMesIn(int first, string message)
-        {
-            gl_sList_Messages.Add(message);
-            if (first == 500)
-                return 501;
-            else
-                return 500;
-        }
 
         public static void RegCheck()
         {
