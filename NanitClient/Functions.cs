@@ -21,7 +21,7 @@ namespace NaNiT
 
             // Установка трей иконки
             Program.notifyIcon = new NotifyIcon();
-            Program.notifyIcon.Icon = Resources.net2;
+            Program.notifyIcon.Icon = Resources.net1;
             Program.notifyIcon.Visible = true;
             Program.notifyIcon.ContextMenuStrip = new ContextMenus().Create();
             Program.notifyIcon.Text = "Сетевой агент НИИ Телевидения";

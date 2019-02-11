@@ -55,6 +55,9 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>net3.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="Properties\App.config" />
     <None Include="Properties\app.manifest" />
@@ -137,6 +140,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="net3.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

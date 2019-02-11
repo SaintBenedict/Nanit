@@ -18,7 +18,7 @@ namespace NaNiT
 
             // Установка трей иконки
             SProgram.notifyIcon = new NotifyIcon();
-            SProgram.notifyIcon.Icon = Resources.net2;
+            SProgram.notifyIcon.Icon = Resources.net3;
             SProgram.notifyIcon.Visible = true;
             SProgram.notifyIcon.ContextMenuStrip = new SContextMenus().Create();
             SProgram.notifyIcon.Text = "Сетевой сервер НИИ Телевидения";

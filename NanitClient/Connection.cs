@@ -100,7 +100,7 @@ namespace NaNiT
                 StreamOfClient.Write(data, 0, data.Length);
                 // запускаем новый поток для получения данных
                 gl_i_awaitVarForCom = 0;
-                Program.notifyIcon.Icon = Resources.net3;
+                Program.notifyIcon.Icon = Resources.net2;
                 gl_s_serverStatus = "Подключение установлено";
                 while (Tcp != null)
                 {
@@ -195,7 +195,7 @@ namespace NaNiT
             if (gl_b_serverIsConnected)
             {
                 gl_s_serverStatus = "Сервер стал недоступен";
-                Program.notifyIcon.Icon = Resources.net2;
+                Program.notifyIcon.Icon = Resources.net1;
                 gl_b_serverIsConnected = false;
             }
         }
