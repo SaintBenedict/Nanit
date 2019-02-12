@@ -27,7 +27,9 @@ namespace NaNiT
             Program.notifyIcon.ContextMenuStrip = new ContextMenus().Create();
             Program.notifyIcon.Text = "Сетевой агент НИИ Телевидения";
 
-            // Проверка наличия настроек в реестре
+
+            gl_s_OSdate = GetOSDate();
+            // Проверка наличия настроек в реестре // Обязательно после ГетОСДаты, она там используется
             RegCheck();
 
             // Узнаём имя треда, для удобства дебага
@@ -37,7 +39,7 @@ namespace NaNiT
 
 
             gl_s_myHostName = Dns.GetHostName();
-
+            
             gl_f_soft = new FormSoft();
             gl_s_userName = gl_s_myHostName + gl_s_OSdate;
         }

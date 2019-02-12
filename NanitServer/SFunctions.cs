@@ -24,6 +24,10 @@ namespace NaNiT
             SProgram.notifyIcon.ContextMenuStrip = new SContextMenus().Create();
             SProgram.notifyIcon.Text = "Сетевой сервер НИИ Телевидения";
 
+            // Задание нулячего массива
+            gl_xml_users = new MyXml("RegistredUsers.xml");
+            System.IO.Directory.CreateDirectory("ClientsBase");
+
             // Проверка наличия настроек в реестре
             RegCheck();
 

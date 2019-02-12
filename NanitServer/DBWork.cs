@@ -237,6 +237,9 @@ namespace NaNiT
             tempApp.AppendChild(tempInDate);
             tempApp.AppendChild(tempInLoc);
             ThisXmlRoot.AppendChild(tempApp);
+        }
+        public void SaveThis()
+        {
             ThisXmlFile.Save(NameThisXmlFile);
         }
     }

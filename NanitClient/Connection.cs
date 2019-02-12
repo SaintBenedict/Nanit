@@ -56,6 +56,7 @@ namespace NaNiT
                         GC.WaitForPendingFinalizers();
                         Thread.Sleep(10000);
                     }
+                    Thread.Sleep(2);
                 }
             }
         }

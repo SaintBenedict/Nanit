@@ -20,7 +20,7 @@ namespace NaNiT
         ///
         ///
         //-Strings-//
-        public static string gl_s_OSdate = GlobalFunctions.GetOSDate(), gl_s_myHostName; // Получение даты установки ОС и имени компьютера
+        public static string gl_s_OSdate, gl_s_myHostName; // Получение даты установки ОС и имени компьютера
         public static string gl_s_nanitSvcVer = "0", gl_s_updVerAvi = "1.0.0", gl_s_version = Application.ProductVersion; // Версии
         public static string gl_s_optionsPasswordDefault = "478632", gl_s_servIP = "127.0.0.1"; // Стандартный пароль и адресс сервера
         public static string gl_s_md5PortIp, gl_s_md5Clients, gl_s_optionsPasswordReg; // Изменение переменных после их прогона через MD5

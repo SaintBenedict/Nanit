@@ -24,8 +24,11 @@ namespace NaNiT
         {
             // Первоначальная настройка. Загрузка из реестра и прописывание некоторых параметров
             SFunctions.FirstRunOptionsLoad();
-            gl_xml_users = new MyXml("RegistredUsers.xml");
-            System.IO.Directory.CreateDirectory("ClientsBase");
+            
+            // Старт таймеров и тредов
+            /*Timer UpdateTimer = new Timer(Upd, null, 0, 3000000);
+            Thread ServStates = new Thread(new ThreadStart(TempServRun));
+            ServStates.Start();*/
 
             // Упрощённая версия загрузки, где окно сразу вылетает с логом
             gl_f_optionsServ.Show();
@@ -33,15 +36,10 @@ namespace NaNiT
 
             // Старт сервера
             FormSOptions.Start();
-
-            // Старт таймеров и тредов
-            /*Timer UpdateTimer = new Timer(Upd, null, 0, 3000000);
-            Thread ServStates = new Thread(new ThreadStart(TempServRun));
-            ServStates.Start();*/
-            
             //
             Application.Run();
 
+            
         }
     }
 }
