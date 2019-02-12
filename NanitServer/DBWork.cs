@@ -32,6 +32,11 @@ namespace NaNiT
                     CreateXML(NameThisXmlFile, "users");
                     ReopenXml();
                 }
+                if (NameThisXmlFile.Substring(NameThisXmlFile.Length - 12, 12) == "Software.xml")
+                {
+                    CreateXML(NameThisXmlFile, "softwares");
+                    ReopenXml();
+                }
             }
         }
 
@@ -56,7 +61,7 @@ namespace NaNiT
                     NameNode = "application";
                     NameNodes = new string[] { "name" };
                     NameItems = NameNodes.Length;
-                    SubNodes = new string[] { "name", "Version", "Publisher" }; // applications
+                    SubNodes = new string[] { "name", "Version", "Publisher", "InstallDate", "InstallLocation" }; // applications
                     SubItems = SubNodes.Length;
                     SubSubNodes = null;
                     SubSubItems = 0;
@@ -203,7 +208,7 @@ namespace NaNiT
         }
 
         // Добавление софта
-        public void AddApplication(string Item, string Version, string Publisher)
+        public void AddApplication(string Item, string Version, string Publisher, string Date, string Location)
         {
             // создаем новый элемент user
             XmlElement tempApp = ThisXmlFile.CreateElement("application");
@@ -212,17 +217,25 @@ namespace NaNiT
             // создаем элементы необходимые файлу
             XmlElement tempVer = ThisXmlFile.CreateElement("Version");
             XmlElement tempPublish = ThisXmlFile.CreateElement("Publisher");
+            XmlElement tempInDate = ThisXmlFile.CreateElement("InstallDate");
+            XmlElement tempInLoc = ThisXmlFile.CreateElement("InstallLocation");
 
             XmlText itemText = ThisXmlFile.CreateTextNode(Item);
             XmlText versText = ThisXmlFile.CreateTextNode(Version);
             XmlText publText = ThisXmlFile.CreateTextNode(Publisher);
+            XmlText inDateText = ThisXmlFile.CreateTextNode(Date);
+            XmlText inLocaText = ThisXmlFile.CreateTextNode(Location);
             tempName.AppendChild(itemText);
             tempVer.AppendChild(versText);
             tempPublish.AppendChild(publText);
+            tempInDate.AppendChild(inDateText);
+            tempInLoc.AppendChild(inLocaText);
 
             tempApp.Attributes.Append(tempName);
             tempApp.AppendChild(tempVer);
             tempApp.AppendChild(tempPublish);
+            tempApp.AppendChild(tempInDate);
+            tempApp.AppendChild(tempInLoc);
             ThisXmlRoot.AppendChild(tempApp);
             ThisXmlFile.Save(NameThisXmlFile);
         }

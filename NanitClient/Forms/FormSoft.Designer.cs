@@ -36,6 +36,8 @@ namespace NaNiT
             this.ColumName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ColumVers = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ColumPublish = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.instDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.instLoc = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
             // listView1
@@ -43,7 +45,9 @@ namespace NaNiT
             this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.ColumName,
             this.ColumVers,
-            this.ColumPublish});
+            this.ColumPublish,
+            this.instDate,
+            this.instLoc});
             this.listView1.Location = new System.Drawing.Point(32, 23);
             this.listView1.Name = "listView1";
             this.listView1.Size = new System.Drawing.Size(733, 562);
@@ -63,6 +67,14 @@ namespace NaNiT
             // 
             this.ColumPublish.Text = "Производитель";
             // 
+            // instDate
+            // 
+            this.instDate.Text = "InstallDate";
+            // 
+            // instLoc
+            // 
+            this.instLoc.Text = "InstallLocation";
+            // 
             // FormSoft
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -70,9 +82,9 @@ namespace NaNiT
             this.ClientSize = new System.Drawing.Size(800, 614);
             this.Controls.Add(this.listView1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Closed += new System.EventHandler(this.FormSoft_Close);
             this.Name = "FormSoft";
             this.Text = "Soft";
+            this.Closed += new System.EventHandler(this.FormSoft_Close);
             this.ResumeLayout(false);
 
         }
@@ -83,5 +95,7 @@ namespace NaNiT
         private System.Windows.Forms.ColumnHeader ColumName;
         private System.Windows.Forms.ColumnHeader ColumVers;
         private System.Windows.Forms.ColumnHeader ColumPublish;
+        private System.Windows.Forms.ColumnHeader instDate;
+        private System.Windows.Forms.ColumnHeader instLoc;
     }
 }

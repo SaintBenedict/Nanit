@@ -39,6 +39,8 @@ namespace NaNiT
                                 items.Add(sk.GetValue("DisplayName").ToString());
                                 items.Add(CheckValue(sk.GetValue("DisplayVersion")));
                                 items.Add(CheckValue(sk.GetValue("Publisher")));
+                                items.Add(CheckValue(sk.GetValue("InstallDate")));
+                                items.Add(CheckValue(sk.GetValue("InstallLocation")));
                                 listView1.Items.Add(new ListViewItem(items.ToArray()));
                             }
                         }
@@ -64,6 +66,8 @@ namespace NaNiT
                                 items.Add(sk.GetValue("DisplayName").ToString());
                                 items.Add(CheckValue(sk.GetValue("DisplayVersion")));
                                 items.Add(CheckValue(sk.GetValue("Publisher")));
+                                items.Add(CheckValue(sk.GetValue("InstallDate")));
+                                items.Add(CheckValue(sk.GetValue("InstallLocation")));
                                 listView1.Items.Add(new ListViewItem(items.ToArray()));
                             }
                         }
@@ -79,13 +83,15 @@ namespace NaNiT
             listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
             listView1.ListViewItemSorter = new ListViewColumnComparer(0);
             int progs = listView1.Items.Count;
-            gl_sMas_programs = new string[progs + 1, 3];
-            gl_i_numbOfSoft = progs;
-            for (int i = 0; i < progs; i++)
+            gl_sMas_programs = new string[progs, 5];
+            gl_i_numbOfSoft = progs-1;
+            for (int i = 0; i < progs-1; i++)
             {
                 gl_sMas_programs[i, 0] = listView1.Items[i].SubItems[0].Text;
                 gl_sMas_programs[i, 1] = listView1.Items[i].SubItems[1].Text;
                 gl_sMas_programs[i, 2] = listView1.Items[i].SubItems[2].Text;
+                gl_sMas_programs[i, 3] = listView1.Items[i].SubItems[3].Text;
+                gl_sMas_programs[i, 4] = listView1.Items[i].SubItems[4].Text;
             }
         }
 

@@ -76,10 +76,13 @@ namespace NaNiT
         {
             try
             {
-                listView1.Items.Add(new ListViewItem(gl_sList_Messages[0]));
-                gl_sList_Messages.RemoveAt(0);
-                if (listView1.Items.Count > 1)
-                    listView1.EnsureVisible(listView1.Items.Count - 1);
+                if (gl_sList_Messages[0] != null)
+                {
+                    listView1.Items.Add(new ListViewItem(gl_sList_Messages[0]));
+                    gl_sList_Messages.RemoveAt(0);
+                    if (listView1.Items.Count > 1)
+                        listView1.EnsureVisible(listView1.Items.Count - 1);
+                }
             }
             catch (Exception ex)
             {

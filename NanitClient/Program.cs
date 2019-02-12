@@ -18,6 +18,8 @@ namespace NaNiT
         public static Connection gl_c_current = null;
         //-Integers-//
         public static int gl_i_numbOfSoft;
+        //-Strings-//
+        public static string gl_s_dateTimeOfSoftTransfere;
     }
 
     class Program
