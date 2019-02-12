@@ -12,8 +12,8 @@ namespace NaNiT
         public static FormSOptions gl_f_optionsServ = null;
         //-Connections-//
         public static ServerObject gl_c_server = null;
-        //-Strings-//
-        public static string[] gl_sMas_nameNodes;
+        //-XML-//
+        public static MyXml gl_xml_users = null;
     }
 
     class SProgram
@@ -24,6 +24,8 @@ namespace NaNiT
         {
             // Первоначальная настройка. Загрузка из реестра и прописывание некоторых параметров
             SFunctions.FirstRunOptionsLoad();
+            gl_xml_users = new MyXml("RegistredUsers.xml");
+            System.IO.Directory.CreateDirectory("ClientsBase");
 
             // Упрощённая версия загрузки, где окно сразу вылетает с логом
             gl_f_optionsServ.Show();
@@ -36,7 +38,7 @@ namespace NaNiT
             /*Timer UpdateTimer = new Timer(Upd, null, 0, 3000000);
             Thread ServStates = new Thread(new ThreadStart(TempServRun));
             ServStates.Start();*/
-            MyXml ServerSaveUsers = new MyXml("RegistredUsers");
+            
             //
             Application.Run();
 

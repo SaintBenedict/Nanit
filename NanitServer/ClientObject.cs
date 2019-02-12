@@ -17,8 +17,10 @@ namespace NaNiT
         protected internal string cryptoLogin, userName;
         protected internal string dateOfRegister;
         protected internal string dateLastSeen;
+        protected internal string IP;
         protected internal TcpClient client;
         protected internal Thread ClientThreadThis;
+        protected internal int idInDatabase;
         ServerObject server;
 
         public ClientObject(TcpClient tcpClient, ServerObject serverObject)
@@ -27,6 +29,7 @@ namespace NaNiT
             client = tcpClient;
             server = serverObject;
             serverObject.AddConnection(this);
+            IP = Convert.ToString(((System.Net.IPEndPoint)client.Client.RemoteEndPoint).Address);
         }
 
         public void Process()

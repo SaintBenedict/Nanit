@@ -27,9 +27,6 @@ namespace NaNiT
             // Проверка наличия настроек в реестре
             RegCheck();
 
-            // Забиваем данные по XML массивам
-            OptionsXml.ReArrayNodes();
-
             // Узнаём имя треда, для удобства дебага
             Thread MyName = Thread.CurrentThread;
             if (MyName.Name == null)

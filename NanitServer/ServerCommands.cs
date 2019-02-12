@@ -42,7 +42,7 @@ namespace NaNiT
                                 case "h@@lLloui-": //Приветствие подключившегося клиента
                                     client.cryptoLogin = textCom;
                                     client.userName = textCom.Substring(0, textCom.Length - 14);
-                                    gl_sList_Messages.Add(client.cryptoLogin + " подключился");
+                                    gl_sList_Messages.Add(client.cryptoLogin + " --- подключился");
                                     // Проверка регистрации
                                     server.BroadcastMessage("@HowdyHu%$-", ServerObject.clients, client, "self");
                                     client.AwaitVarForCom = 1;
@@ -68,7 +68,7 @@ namespace NaNiT
                             {
                                 default: // Пошёл нахуй, жид пархатый
                                     client.dateLastSeen = DateTime.Now.ToString();
-                                    gl_sList_Messages.Add(client.userName + " отправил неверные данные и был отключён [" + client.dateLastSeen + "]");
+                                    gl_sList_Messages.Add(client.userName + " --- отправил неверные данные и был отключён [" + client.dateLastSeen + "]");
                                     server.BroadcastMessage("Fu(ck&&DI3-", ServerObject.clients, client, "self");
                                     server.RemoveConnection(client.Id);
                                     client.StupidCheck = true;
@@ -93,23 +93,32 @@ namespace NaNiT
 
             void RegistrationOrLogin(string name)
             {
-                foreach (string nameOfRegistred in gl_sList_autorisedRegistredClients)
+                for(int q = 0; q < gl_xml_users.NameValue; q++)
                 {
-                    if (client.cryptoLogin == name && name == nameOfRegistred)
+                    if (client.cryptoLogin == gl_xml_users.Value[0,q,0,0])
                     {
                         client.IsRegister = true;
-                        gl_sList_Messages.Add(client.userName + " авторизовался в системе [" + DateTime.Now.ToString() + "]");
+                        client.idInDatabase = q;
+                        gl_sList_Messages.Add(client.userName + " (" + client.IP + ") --- авторизовался в системе [" + DateTime.Now.ToString() + "]");
+                        gl_xml_users.WriteTo("LastSeenDate", DateTime.Now.ToString(), client.idInDatabase);
+                        gl_xml_users.WriteTo("IPaddress", client.IP, client.idInDatabase);
                         return;
                     }
                 }
                 if (client.cryptoLogin == name)
                 {
                     client.IsRegister = true;
-                    gl_sList_autorisedRegistredClients.Add(client.cryptoLogin);
                     client.dateOfRegister = DateTime.Now.ToString();
-                    gl_sList_Messages.Add(client.userName + " зарегистрировался в системе [" + client.dateOfRegister + "]");
+                    //if (client.IP != "127.0.0.1")
+                    {
+                        client.idInDatabase = gl_xml_users.NameValue + 1;
+                        gl_xml_users.AddUser(client);
+                        gl_xml_users.ReopenXml();
+                    }
+                    gl_sList_Messages.Add(client.userName + " --- зарегистрировался в системе [" + client.dateOfRegister + "]");
                 }
             }
+
             void SendChatToAll(string textChat)
             {
                 if (String.Format("{0}: {1}", client.userName, textChat) != String.Format("{0}: {1}", client.userName, null))
