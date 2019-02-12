@@ -1,22 +1,21 @@
 ﻿using System.Xml;
-using static NaNiT.LocalGlobals;
 
 namespace NaNiT
 {
     class MyXml
     {
-        protected internal string NameThisXmlFile;
-        protected internal XmlDocument ThisXmlFile;
-        protected internal XmlElement ThisXmlRoot;
-        protected internal string[,,,] Value;
-        protected internal string[] NameNodes;
-        protected internal string[] SubNodes;
-        protected internal string[] SubSubNodes;
-        protected internal int NameItems;
-        protected internal int NameValue;
-        protected internal int SubItems;
-        protected internal int SubSubItems;
-        protected internal string NameNode;
+        public string NameThisXmlFile;
+        public XmlDocument ThisXmlFile;
+        public XmlElement ThisXmlRoot;
+        public string[,,,] Value;
+        public string[] NameNodes;
+        public string[] SubNodes;
+        public string[] SubSubNodes;
+        public int NameItems;
+        public int NameValue;
+        public int SubItems;
+        public int SubSubItems;
+        public string NameNode;
 
         /*Если у нас XML с юзерами, то [ 0, x , 0 , 0 ] это имя пользователя, метод .NameValue это их количество
          [ 0 , x , y , 0 ] тут Y передаёт параметр, 1 - РегДата, 2 - ЛастСин, 3 - ХостНэйм, 4 - IP, 5 - Группа, 6 - файл с железом, 7 - файл с софтом. */
@@ -28,7 +27,7 @@ namespace NaNiT
                 ReopenXml();
             else
             {
-                if(NameThisXmlFile.Substring(NameThisXmlFile.Length-18, 18) == "RegistredUsers.xml")
+                if (NameThisXmlFile.Substring(NameThisXmlFile.Length - 18, 18) == "RegistredUsers.xml")
                 {
                     CreateXML(NameThisXmlFile, "users");
                     ReopenXml();
@@ -45,13 +44,22 @@ namespace NaNiT
             switch (ThisXmlRoot.Name)
             {
                 case "users":
+                    NameNode = "user";
                     NameNodes = new string[] { "name" };
                     NameItems = NameNodes.Length;
                     SubNodes = new string[] { "name", "RegistredDate", "LastSeenDate", "HostName", "IPaddress", "CorporateGroup", "HardwareFile", "SoftwareFile" }; // users
                     SubItems = SubNodes.Length;
                     SubSubNodes = null;
                     SubSubItems = 0;
-                    NameNode = "user";
+                    break;
+                case "softwares":
+                    NameNode = "application";
+                    NameNodes = new string[] { "name" };
+                    NameItems = NameNodes.Length;
+                    SubNodes = new string[] { "name", "Version", "Publisher" }; // applications
+                    SubItems = SubNodes.Length;
+                    SubSubNodes = null;
+                    SubSubItems = 0;
                     break;
             }
             XmlNodeList NameList = ThisXmlRoot.SelectNodes("*");
@@ -129,7 +137,7 @@ namespace NaNiT
             XmlText ipAdressText = ThisXmlFile.CreateTextNode(client.IP);
             XmlText hardwareFileText = ThisXmlFile.CreateTextNode(@"ClientsBase\" + client.cryptoLogin + @"_Hardware.xml");
             XmlText softwareFileText = ThisXmlFile.CreateTextNode(@"ClientsBase\" + client.cryptoLogin + @"_Software.xml");
-            
+
             //добавляем узлы
             nameAttr.AppendChild(nameText);
             regDateElem.AppendChild(regDateText);
@@ -175,7 +183,7 @@ namespace NaNiT
         {
             string[] tempToNode = SubNodes;
             int x = 0;
-            for(int n=0; n< SubNodes.Length; n++)
+            for (int n = 0; n < SubNodes.Length; n++)
             {
                 if (SubNodes[n] == NodeName)
                 {
@@ -188,10 +196,36 @@ namespace NaNiT
             // получим корневой элемент
             ThisXmlRoot = ThisXmlFile.DocumentElement;
             XmlNode temp1 = ThisXmlFile.DocumentElement.ChildNodes.Item(idUser);
-            XmlNode nodeToChange = temp1.ChildNodes.Item(x-1);
+            XmlNode nodeToChange = temp1.ChildNodes.Item(x - 1);
             nodeToChange.InnerText = NewVar;
             Value[0, idUser, x, 0] = NewVar;
             ThisXmlFile.Save(NameThisXmlFile);
         }
+
+        // Добавление софта
+        public void AddApplication(string Item, string Version, string Publisher)
+        {
+            // создаем новый элемент user
+            XmlElement tempApp = ThisXmlFile.CreateElement("application");
+            // создаем атрибут name
+            XmlAttribute tempName = ThisXmlFile.CreateAttribute("name");
+            // создаем элементы необходимые файлу
+            XmlElement tempVer = ThisXmlFile.CreateElement("Version");
+            XmlElement tempPublish = ThisXmlFile.CreateElement("Publisher");
+
+            XmlText itemText = ThisXmlFile.CreateTextNode(Item);
+            XmlText versText = ThisXmlFile.CreateTextNode(Version);
+            XmlText publText = ThisXmlFile.CreateTextNode(Publisher);
+            tempName.AppendChild(itemText);
+            tempVer.AppendChild(versText);
+            tempPublish.AppendChild(publText);
+
+            tempApp.Attributes.Append(tempName);
+            tempApp.AppendChild(tempVer);
+            tempApp.AppendChild(tempPublish);
+            ThisXmlRoot.AppendChild(tempApp);
+            ThisXmlFile.Save(NameThisXmlFile);
+        }
     }
 }
+

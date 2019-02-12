@@ -16,6 +16,8 @@ namespace NaNiT
         public static FormSoft gl_f_soft = null;
         //-Connections-//
         public static Connection gl_c_current = null;
+        //-Integers-//
+        public static int gl_i_numbOfSoft;
     }
 
     class Program

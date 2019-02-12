@@ -21,6 +21,7 @@ namespace NaNiT
         protected internal TcpClient client;
         protected internal Thread ClientThreadThis;
         protected internal int idInDatabase;
+        internal MyXml softXmlBase = null;
         ServerObject server;
 
         public ClientObject(TcpClient tcpClient, ServerObject serverObject)

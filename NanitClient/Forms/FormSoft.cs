@@ -80,6 +80,7 @@ namespace NaNiT
             listView1.ListViewItemSorter = new ListViewColumnComparer(0);
             int progs = listView1.Items.Count;
             gl_sMas_programs = new string[progs + 1, 3];
+            gl_i_numbOfSoft = progs;
             for (int i = 0; i < progs; i++)
             {
                 gl_sMas_programs[i, 0] = listView1.Items[i].SubItems[0].Text;
