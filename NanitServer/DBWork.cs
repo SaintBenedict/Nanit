@@ -174,10 +174,6 @@ namespace NaNiT
             XmlDocument xmldoc = new XmlDocument();
             xmldoc.RemoveAll();
             xmldoc.AppendChild(xmldoc.CreateXmlDeclaration("1.0", "utf-8", null));
-            /*var piNode = xmldoc.CreateProcessingInstruction("Version", "=\"2\"");
-            xmldoc.AppendChild(pi);
-
-            xmldoc.AppendChild(xmldoc.CreateProcessingInstruction("xml", "version='1.0'"));*/
             XmlElement ElmntRoot = xmldoc.CreateElement(sampleClass);
             xmldoc.AppendChild(ElmntRoot);
             xmldoc.Save(newName);
