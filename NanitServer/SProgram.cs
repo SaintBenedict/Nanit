@@ -36,6 +36,11 @@ namespace NaNiT
 
             // Старт сервера
             FormSOptions.Start();
+
+            _XmlFile first = new _XmlFile("last.xml");
+            first.CreateXml("123", first.xRoot.Name);
+            UsersXML second = new UsersXML(@"third.xml");
+            second.CreateXml("123123");
             //
             Application.Run();
 

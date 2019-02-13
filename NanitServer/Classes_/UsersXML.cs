@@ -4,16 +4,14 @@ namespace NaNiT
 {
     class UsersXML : _XmlFile
     {
-        public string xUsersFile;
-        public XmlDocument xUsersDoc;
-        public XmlElement xUsersRoot;
+        private const string NameRoot = "users";
 
-        public UsersXML(string NameFile, string NameRoot = null)
+        public UsersXML(string _nameFile, params string[] _root) :base(_nameFile, NameRoot)
         {
-            xUsersFile = NameFile;
-            xUsersDoc = new XmlDocument();
-            Open(xUsersFile, NameRoot);
-            xUsersRoot = xUsersDoc.DocumentElement;
+            /*xFilename = _nameFile;
+            xDoc = new XmlDocument();
+            Open(xFilename, NameRoot);
+            xRoot = xDoc.DocumentElement;*/
         }
     }
 }
