@@ -65,7 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
-    <Compile Include="NanitServer\Classes_\UsersXML.cs" />
+    <Compile Include="NanitServer\Classes_\_XmlWorker.cs" />
     <Compile Include="NanitServer\DBWork.cs" />
     <Compile Include="NanitServer\SProgram.cs" />
     <Compile Include="Properties\AssemblyInfoServer.cs" />

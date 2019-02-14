@@ -24,7 +24,7 @@ namespace NaNiT
                 Open(xFilename);
             xRoot = xDoc.DocumentElement;
         }
-
+         
         /// <summary>
         /// Разбиваем файл на части, если он был составным
         /// Создаём дерикторию из левой части файла
@@ -97,7 +97,7 @@ namespace NaNiT
         /// </summary>
         public void Save()
         {
-            if(xDoc != null && xFilename != null)
+            if (xDoc != null && xFilename != null)
                 xDoc.Save(xFilename);
         }
     }
