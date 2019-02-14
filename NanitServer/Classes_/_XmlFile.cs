@@ -69,7 +69,7 @@ namespace NaNiT
         /// Создание чистого XML файла с Рут элементом
         /// </summary>
         /// <param name="_name">Путь к файлу с полным именем</param>
-        /// <param name="_xroot">Рут элемент файла</param>
+        /// <param name="_xroot">Рут элемент файла (прим. "users")</param>
         public void CreateXml(string _name, string _xroot = "BLANK")
         {
             xFilename = _name;
@@ -79,6 +79,33 @@ namespace NaNiT
             xRoot = xDoc.CreateElement(_xroot);
             xDoc.AppendChild(xRoot);
             xDoc.Save(_name);
+        }
+
+        /// <summary>
+        /// Добавляет одну основную ветку с детьми (без аттрибутов)
+        /// </summary>
+        /// <param name="_nodeName">Название главной ноды (прим. "user")</param>
+        /// <param name="_chilNodes">Массив детей</param>
+        /// <param name="_chilValues">Массив детских значений</param>
+        public void AddMain(string _nodeName, string _attrName, string[] _chilNodes, string[] _chilValues)
+        {
+            XmlElement newElem = xDoc.CreateElement(_nodeName);
+            XmlAttribute nameAttr = xDoc.CreateAttribute("name");
+            XmlText nameText = xDoc.CreateTextNode(_attrName);
+            nameAttr.AppendChild(nameText);
+            for (int i = 0; i < _chilNodes.Length; i++)
+            {
+                XmlElement newChild = xDoc.CreateElement(_chilNodes[i]);
+                if (_chilValues.Length > i)
+                {
+                    XmlText childText = xDoc.CreateTextNode(_chilValues[i]);
+                    newChild.AppendChild(childText);
+                }
+                newElem.AppendChild(newChild);
+            }
+            newElem.Attributes.Append(nameAttr);
+            xRoot.AppendChild(newElem);
+            xDoc.Save(xFilename);
         }
 
         /// <summary>
@@ -101,5 +128,4 @@ namespace NaNiT
                 xDoc.Save(xFilename);
         }
     }
-
 }

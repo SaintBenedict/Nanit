@@ -25,8 +25,7 @@ namespace NaNiT
             SProgram.notifyIcon.Text = "Сетевой сервер НИИ Телевидения";
 
             // Задание нулячего массива
-            gl_xml_users = new MyXml("RegistredUsers.xml");
-            System.IO.Directory.CreateDirectory("ClientsBase");
+            gl_xml = new _XmlUser();
 
             // Проверка наличия настроек в реестре
             RegCheck();

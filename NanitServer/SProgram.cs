@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Windows.Forms;
+using System.Xml;
 using static NaNiT.GlobalVariable;
 using static NaNiT.LocalGlobals;
 
@@ -13,7 +14,7 @@ namespace NaNiT
         //-Connections-//
         public static ServerObject gl_c_server = null;
         //-XML-//
-        public static MyXml gl_xml_users = null;
+        public static _XmlUser gl_xml = null;
     }
 
     class SProgram
@@ -36,11 +37,8 @@ namespace NaNiT
 
             // Старт сервера
             FormSOptions.Start();
-
-            _XmlFile first = new _XmlFile("last.xml");
-            first.CreateXml("123", first.xRoot.Name);
-            UsersXML second = new UsersXML(@"third.xml");
-            second.CreateXml("123123");
+            
+            
             //
             Application.Run();
 

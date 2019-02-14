@@ -147,27 +147,31 @@ namespace NaNiT
 
             void RegistrationOrLogin(string name)
             {
-                for (int q = 0; q < gl_xml_users.NameValue; q++)
-                {
-                    if (client.cryptoLogin == gl_xml_users.Value[0, q, 0, 0])
-                    {
-                        client.IsRegister = true;
-                        client.idInDatabase = q;
-                        gl_sList_Messages.Add(client.userName + " (" + client.IP + ") --- авторизовался в системе [" + DateTime.Now.ToString() + "]");
-                        gl_xml_users.WriteTo("LastSeenDate", DateTime.Now.ToString(), client.idInDatabase);
-                        gl_xml_users.WriteTo("IPaddress", client.IP, client.idInDatabase);
-                        return;
-                    }
-                }
-                if (client.cryptoLogin == name)
-                {
-                    client.IsRegister = true;
-                    client.dateOfRegister = DateTime.Now.ToString();
-                    client.idInDatabase = gl_xml_users.NameValue + 1;
-                    gl_xml_users.AddUser(client);
-                    gl_xml_users.ReopenXml();
+                //for (int q = 0; q < gl_xml.Records; q++)
+                //{
+                //    if (client.cryptoLogin == gl_xml.Value[q, 0])
+                //    {
+                //        client.IsRegister = true;
+                //        client.idInDatabase = q;
+                //        gl_sList_Messages.Add(client.userName + " (" + client.IP + ") --- авторизовался в системе [" + DateTime.Now.ToString() + "]");
+                //        gl_xml_users.WriteTo("LastSeenDate", DateTime.Now.ToString(), client.idInDatabase);
+                //        gl_xml_users.WriteTo("IPaddress", client.IP, client.idInDatabase);
+                //        return;
+                //    }
+                //}
+                //if (client.cryptoLogin == name)
+                //{
+                //    client.IsRegister = true;
+                //    client.dateOfRegister = DateTime.Now.ToString();
+                //    client.idInDatabase = gl_xml_users.NameValue + 1;
+                //    gl_xml.Registration(client)
+                //    gl_xml_users.ReopenXml();
+                //    gl_sList_Messages.Add(client.userName + " --- зарегистрировался в системе [" + client.dateOfRegister + "]");
+                //}
+                if (gl_xml.isRegistred(client))
+                    gl_sList_Messages.Add(client.userName + " (" + client.IP + ") --- авторизовался в системе [" + DateTime.Now.ToString() + "]");
+                else
                     gl_sList_Messages.Add(client.userName + " --- зарегистрировался в системе [" + client.dateOfRegister + "]");
-                }
             }
 
             void SendChatToAll(string textChat)
