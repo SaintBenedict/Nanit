@@ -8,29 +8,26 @@ using static NaNiT.LocalGlobals;
 
 namespace NaNiT
 {
-    public class ClientObject
+    public class ClientObject : _ClientValues, IServer
     {
-        protected internal string Id { get; private set; }
+        internal ServerObject Server { get; set; }
+        internal XmlSoft ClientXSofts { get; set; }
+        public TcpClient ThisTcpClient { get; set; }
         protected internal NetworkStream Stream { get; private set; }
+
+
         protected internal int AwaitVarForCom;
         protected internal bool IsRegister, IsActive, StupidCheck, myMessageNotAwait;
-        protected internal string cryptoLogin, userName;
-        protected internal string dateOfRegister;
-        protected internal string dateLastSeen;
-        protected internal string IP;
-        protected internal TcpClient client;
         protected internal Thread ClientThreadThis;
-        protected internal int idInDatabase;
-        internal MyXml softXmlBase = null;
-        ServerObject server;
+        
+        
 
-        public ClientObject(TcpClient tcpClient, ServerObject serverObject)
+        public ClientObject(TcpClient tcpClient, ServerObject serverObject) :base(tcpClient, serverObject)
         {
-            Id = Guid.NewGuid().ToString();
-            client = tcpClient;
-            server = serverObject;
+            ThisTcpClient = tcpClient;
+            Server = serverObject;
             serverObject.AddConnection(this);
-            IP = Convert.ToString(((System.Net.IPEndPoint)client.Client.RemoteEndPoint).Address);
+            UserIpAdress = Convert.ToString(((System.Net.IPEndPoint)ThisTcpClient.Client.RemoteEndPoint).Address);
         }
 
         public void Process()
@@ -38,18 +35,18 @@ namespace NaNiT
             try // в бесконечном цикле получаем сообщения от клиента
             {
                 AwaitVarForCom = 0;
-                Stream = client.GetStream();
-                while (client != null && !gl_b_disconnectInProgress && IsActive)
+                Stream = ThisTcpClient.GetStream();
+                while (ThisTcpClient != null && !gl_b_disconnectInProgress && IsActive)
                 {
                     string MessageTestNull = GetMessage();
                     if (MessageTestNull == null)
                     {
-                            Close();
-                            return;
+                        Disconnect();
+                        return;
                     }
                     Thread ClientThreadThis = Thread.CurrentThread;
                     if (ClientThreadThis.Name == null)
-                        ClientThreadThis.Name = "Client " + userName + "Proc";
+                        ClientThreadThis.Name = "Client " + UserHostName + "Proc";
                 }
             }
             catch (Exception ex)
@@ -63,7 +60,7 @@ namespace NaNiT
             {
                 if (!gl_b_disconnectInProgress && IsActive)
                 {
-                    Close();
+                    Disconnect();
                 }
             }
         }
@@ -91,14 +88,14 @@ namespace NaNiT
                         builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
                     }
                     while (Stream.DataAvailable && IsActive);
-                    ServerCommands.CheckCommand(builder.ToString(), this, server, Stream);
+                    ServerCommands.CheckCommand(builder.ToString(), this, Server, Stream);
                     return builder.ToString();
                 }
                 catch
                 {
                     if (!gl_b_disconnectInProgress && IsActive)
                     {
-                        Close();
+                        Disconnect();
                     }
                     return null;
                 }
@@ -112,20 +109,20 @@ namespace NaNiT
 
 
         // закрытие подключения
-        protected internal void Close()
+        public void Disconnect()
         {
             if (IsActive)
             {
                 IsActive = false;
                 try
                 {
-                    dateLastSeen = DateTime.Now.ToString();
+                    DateLastOnline = DateTime.Now.ToString();
                     if (Stream != null) { Stream.Close(); Stream = null; }
-                    if (client != null) { client.Close(); client = null; }
+                    if (ThisTcpClient != null) { ThisTcpClient.Close(); ThisTcpClient = null; }
                     if (!gl_b_disconnectInProgress && !StupidCheck)
                     {
-                        gl_sList_Messages.Add(userName + " отключился [" + dateLastSeen + "]");
-                        server.RemoveConnection(this.Id);
+                        gl_sList_Messages.Add(UserHostName + " отключился [" + DateLastOnline + "]");
+                        Server.RemoveConnection(this.Guid_id);
                     }
                     GC.Collect();
                     GC.WaitForPendingFinalizers();

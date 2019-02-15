@@ -55,7 +55,7 @@ namespace NaNiT
 		{
             gl_f_optionsServ.Stop();
             gl_f_optionsServ.Dispose();
-            SProgram.notifyIcon.Dispose();
+            ServerProgram.Tray.Dispose();
             Application.Exit();
             Process.GetCurrentProcess().Kill();
         }

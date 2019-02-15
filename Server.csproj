@@ -38,6 +38,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -60,14 +62,26 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="NanitServer\Classes_\_Diag_Xml.cd" />
-    <None Include="Properties\App.config" />
+    <None Include="Properties\NanServer.exe.config">
+      <CustomToolNamespace>NaNiT</CustomToolNamespace>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Properties\app.manifest" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
-    <Compile Include="NanitServer\Classes_\_XmlUser.cs" />
+    <Compile Include="NanitServer\Classes_\IApplications.cs" />
+    <Compile Include="NanitServer\Classes_\IServer.cs" />
+    <Compile Include="NanitServer\Classes_\_ClientValues.cs" />
+    <Compile Include="NanitServer\Classes_\XmlSoft.cs" />
+    <Compile Include="NanitServer\Classes_\XmlUser.cs" />
+    <Compile Include="NanitServer\Classes_\_Loading.cs" />
     <Compile Include="NanitServer\DBWork.cs" />
-    <Compile Include="NanitServer\SProgram.cs" />
+    <Compile Include="NanitServer\ServerProgram.cs" />
     <Compile Include="Properties\AssemblyInfoServer.cs" />
     <Compile Include="Properties\Errors.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -76,6 +90,13 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="NanitServer\Classes_\_XmlFile.cs" />
+    <Compile Include="NanitServer\Classes_\_xApplication.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Settings.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NanitServer\ClientObject.cs" />
@@ -92,7 +113,6 @@
   <ItemGroup>
     <Compile Include="NanitServer\ServerCommands.cs" />
     <Compile Include="NanitServer\ServerObject.cs" />
-    <Compile Include="NanitServer\SFunctions.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="NanitServer\Forms\FormSOptions.resx">

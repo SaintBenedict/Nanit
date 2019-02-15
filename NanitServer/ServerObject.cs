@@ -6,22 +6,51 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using static NaNiT.GlobalVariable;
-using static NaNiT.LocalGlobals;
 
 namespace NaNiT
 {
-    public class ServerObject
+    public class ServerObject : IServer
     {
-        static TcpListener tcpListener; // сервер для прослушивания
-        public static List<ClientObject> clients = new List<ClientObject>(); // все подключения
+        /// <summary>
+        /// Сервер для прослушивания
+        /// </summary>
+        internal TcpListener TcpListener { get; set; }
+        /// <summary>
+        /// Список подключённых клиентов
+        /// </summary>
+        internal List<ClientObject> ClientsList { get; set; }
+        /// <summary>
+        /// Оператор пользовательских параметров
+        /// </summary>
+        internal XmlUser ServXUsers { get; set; }
+        public TcpClient ThisTcpClient { get; set; }
+
+        public ServerObject()
+        {
+            ClientsList = new List<ClientObject>();
+            ServXUsers = new XmlUser();
+        }
+
+        public ClientObject Client(TcpClient _tcpclient, ServerObject _server)
+        {
+            return new ClientObject(_tcpclient, _server)
+            {
+                myMessageNotAwait = false,
+                IsRegister = false,
+                DateOfRegistration = null,
+                DateLastOnline = null,
+                IsActive = true,
+                StupidCheck = false
+            };
+        }
 
         // прослушивание входящих подключений
         protected internal void Listen()
         {
             try
             {
-                tcpListener = new TcpListener(IPAddress.Any, gl_i_servPort);
-                tcpListener.Start();
+                TcpListener = new TcpListener(IPAddress.Any, gl_i_servPort);
+                TcpListener.Start();
                 gl_b_disconnectInProgress = false;
                 gl_sList_Messages.Add("Сервер запущен: " + DateTime.Now.ToString());
             }
@@ -40,20 +69,13 @@ namespace NaNiT
                 try
                 {
 
-                    TcpClient tcpClient = tcpListener.AcceptTcpClient();
+                    TcpClient tcpClient = TcpListener.AcceptTcpClient();
                     // Вот тут кончается то, что относится напрямую к серверной части и начинается генерация клиента
                     // Продолжение серверной части видимо будет уже в Процессе у клиента
                     if (!gl_b_disconnectInProgress)
                     {
-                        ClientObject clientObject = new ClientObject(tcpClient, this)
-                        {
-                            myMessageNotAwait = false,
-                            IsRegister = false,
-                            dateOfRegister = null,
-                            dateLastSeen = null,
-                            IsActive = true,
-                            StupidCheck = false
-                        };
+                        ClientObject clientObject = Client(tcpClient, this);
+
                         Thread clientThread = new Thread(new ThreadStart(clientObject.Process));
                         clientThread.Start();
                     }
@@ -75,7 +97,7 @@ namespace NaNiT
         {
             try
             {
-                clients.Add(clientObject);
+                ClientsList.Add(clientObject);
             }
             catch (Exception ex) { MessageBox.Show("ServerObject(Add_cli) " + ex.Message); }
         }
@@ -85,11 +107,11 @@ namespace NaNiT
         {
             try
             {
-                foreach (ClientObject ClTemp in clients)
+                foreach (ClientObject ClTemp in ClientsList)
                 {
-                    if (ClTemp.Id == id)
+                    if (ClTemp.Guid_id == id)
                     {
-                        clients.Remove(ClTemp);
+                        ClientsList.Remove(ClTemp);
                         return;
                     }
                 }
@@ -110,7 +132,7 @@ namespace NaNiT
                         {
                             for (int i = 0; i < clientsTemp.Count; i++)
                             {
-                                clients[i].Stream.Write(data, 0, data.Length); //передача данных
+                                ClientsList[i].Stream.Write(data, 0, data.Length); //передача данных
                             }
                             break;
                         }
@@ -125,7 +147,7 @@ namespace NaNiT
         }
 
         // отключение всех клиентов
-        protected internal void Disconnect()
+        public void Disconnect()
         {
             if (!gl_b_disconnectInProgress)
             {
@@ -133,20 +155,20 @@ namespace NaNiT
                 {
                     gl_sList_Messages.Add("Сервер прекратил работу: " + DateTime.Now.ToString());
                     gl_b_disconnectInProgress = true;
-                    BroadcastMessage("Fu(ck&&DI3-", ServerObject.clients, null, "all");
-                    foreach (ClientObject clTemp in clients)
+                    BroadcastMessage("Fu(ck&&DI3-", ClientsList, null, "all");
+                    foreach (ClientObject clTemp in ClientsList)
                     {
                         if (clTemp != null)
                         {
-                            gl_sList_Messages.Add(clTemp.userName + " отключился");
-                            clTemp.Close();
+                            gl_sList_Messages.Add(clTemp.UserHostName + " отключился");
+                            clTemp.Disconnect();
                         }
                     }
-                    tcpListener.Stop();
-                    tcpListener = null;
+                    TcpListener.Stop();
+                    TcpListener = null;
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
-                    clients.Clear();
+                    ClientsList.Clear();
                 }
                 catch (Exception ex) { MessageBox.Show("ServerObject(DCon_main) " + ex.Message); }
             }

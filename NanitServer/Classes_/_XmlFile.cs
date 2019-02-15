@@ -8,22 +8,22 @@ namespace NaNiT
         /// <summary>
         /// Имя /путь к файлу
         /// </summary>
-        public string xFilename { get; private set; }
+        public string xFilename { get; protected set; }
         /// <summary>
         /// XmlDocument весь, загруженный в память
         /// </summary>
-        public XmlDocument xDoc { get; private set; }
+        public XmlDocument xDoc { get; protected set; }
         /// <summary>
         /// XmlElement - загруженный базовый рут с элементами для работы
         /// </summary>
-        public XmlElement xRoot { get; private set; }
+        public XmlElement xRoot { get; protected set; }
 
         /// <summary>
         /// Базовый XML конструктор, являющийся родительским объектом и позволяющий проводить общие операции с xml файлами
         /// </summary>
         /// <param name="_nameFile">Имя открываемого файла</param>
         /// <param name="_root">Рут Нода (если есть, иначе будет "Blank")</param>
-        public _XmlFile(string _nameFile, params string[] _root)
+        protected _XmlFile(string _nameFile, params string[] _root)
         {
             xFilename = _nameFile;
             xDoc = new XmlDocument();
@@ -33,13 +33,13 @@ namespace NaNiT
                 Open(xFilename);
             xRoot = xDoc.DocumentElement;
         }
-         
+
         /// <summary>
         /// Разбиваем файл на части, если он был составным
         /// Создаём дерикторию из левой части файла
         /// </summary>
         /// <param name="_name">Путь к файлу с полным именем</param>
-        public void CreateDir(string _name)
+        protected void CreateDir(string _name)
         {
             string[] _shorts = Regex.Split(_name, @"(\\)");
             if (_shorts.Length > 1)
@@ -55,7 +55,7 @@ namespace NaNiT
         /// </summary>
         /// <param name="_name">Путь к файлу с полным именем</param>
         /// <param name="_root">Необходимый рут элемент для создания при невозможности открыть.</param>
-        public void Open(string _name, params string[] _root)
+        protected void Open(string _name, params string[] _root)
         {
             xFilename = _name;
             if (System.IO.File.Exists(_name))
@@ -79,7 +79,7 @@ namespace NaNiT
         /// </summary>
         /// <param name="_name">Путь к файлу с полным именем</param>
         /// <param name="_xroot">Рут элемент файла (прим. "users")</param>
-        public void CreateXml(string _name, string _xroot = "BLANK")
+        protected void CreateXml(string _name, string _xroot = "BLANK")
         {
             xFilename = _name;
             xDoc = new XmlDocument();
@@ -97,7 +97,7 @@ namespace NaNiT
         /// <param name="_attrName">Значение имени для базового аттрибута "name"</param>
         /// <param name="_chilNodes">Массив детей</param>
         /// <param name="_chilValues">Массив детских значений</param>
-        public void AddMain(string _nodeName, string _attrName, string[] _chilNodes, string[] _chilValues)
+        protected void AddMain(string _nodeName, string _attrName, string[] _chilNodes, string[] _chilValues)
         {
             XmlElement newElem = xDoc.CreateElement(_nodeName);
             XmlAttribute nameAttr = xDoc.CreateAttribute("name");
@@ -121,7 +121,7 @@ namespace NaNiT
         /// <summary>
         /// Сохраняем текущий файл и зануляем переменные
         /// </summary>
-        public void Close()
+        internal void Close()
         {
             xDoc.Save(xFilename);
             xDoc = null;
@@ -132,7 +132,7 @@ namespace NaNiT
         /// <summary>
         /// Сохраняет активный документ
         /// </summary>
-        public void Save()
+        protected void Save()
         {
             if (xDoc != null && xFilename != null)
                 xDoc.Save(xFilename);

@@ -135,13 +135,13 @@ namespace NaNiT
             XmlElement softwareFileElem = ThisXmlFile.CreateElement("SoftwareFile");
 
             // создаем текстовые значения для элементов и атрибута
-            XmlText nameText = ThisXmlFile.CreateTextNode(client.cryptoLogin);
-            XmlText regDateText = ThisXmlFile.CreateTextNode(client.dateOfRegister);
-            XmlText lastSeenText = ThisXmlFile.CreateTextNode(client.dateOfRegister);
-            XmlText hostNameText = ThisXmlFile.CreateTextNode(client.userName);
-            XmlText ipAdressText = ThisXmlFile.CreateTextNode(client.IP);
-            XmlText hardwareFileText = ThisXmlFile.CreateTextNode(@"ClientsBase\" + client.cryptoLogin + @"_Hardware.xml");
-            XmlText softwareFileText = ThisXmlFile.CreateTextNode(@"ClientsBase\" + client.cryptoLogin + @"_Software.xml");
+            XmlText nameText = ThisXmlFile.CreateTextNode(client.CryptedName);
+            XmlText regDateText = ThisXmlFile.CreateTextNode(client.DateOfRegistration);
+            XmlText lastSeenText = ThisXmlFile.CreateTextNode(client.DateOfRegistration);
+            XmlText hostNameText = ThisXmlFile.CreateTextNode(client.UserHostName);
+            XmlText ipAdressText = ThisXmlFile.CreateTextNode(client.UserIpAdress);
+            XmlText hardwareFileText = ThisXmlFile.CreateTextNode(@"ClientsBase\" + client.CryptedName + @"_Hardware.xml");
+            XmlText softwareFileText = ThisXmlFile.CreateTextNode(@"ClientsBase\" + client.CryptedName + @"_Software.xml");
 
             //добавляем узлы
             nameAttr.AppendChild(nameText);
@@ -164,8 +164,8 @@ namespace NaNiT
             ThisXmlRoot.AppendChild(userElem);
             ThisXmlFile.Save(NameThisXmlFile);
 
-            CreateXML(@"ClientsBase\" + client.cryptoLogin + @"_Hardware.xml", "hardwares");
-            CreateXML(@"ClientsBase\" + client.cryptoLogin + @"_Software.xml", "softwares");
+            CreateXML(@"ClientsBase\" + client.CryptedName + @"_Hardware.xml", "hardwares");
+            CreateXML(@"ClientsBase\" + client.CryptedName + @"_Software.xml", "softwares");
         }
 
         // Создание нового XML файла

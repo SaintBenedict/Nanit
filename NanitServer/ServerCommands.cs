@@ -18,12 +18,12 @@ namespace NaNiT
         {
             if (message == @"IamStupid-" || message.Length < 10)
             {
-                client.dateLastSeen = DateTime.Now.ToString();
-                gl_sList_Messages.Add(client.userName + " отправил неверные данные и был отключён [" + client.dateLastSeen + "]");
-                server.BroadcastMessage(@"Fu(ck&&DI3-", ServerObject.clients, client, "self");
-                server.RemoveConnection(client.Id);
+                client.DateLastOnline = DateTime.Now.ToString();
+                gl_sList_Messages.Add(client.UserHostName + " отправил неверные данные и был отключён [" + client.DateLastOnline + "]");
+                server.BroadcastMessage(@"Fu(ck&&DI3-", ServerObject.ClientsList, client, "self");
+                server.RemoveConnection(client.Guid_id);
                 client.myMessageNotAwait = false;
-                client.Close();
+                client.Disconnect();
             }
             else
             {
@@ -36,19 +36,19 @@ namespace NaNiT
                         switch (command)
                         {
                             default: // Дисконект из-за неверного сообщения
-                                client.dateLastSeen = DateTime.Now.ToString();
-                                gl_sList_Messages.Add(client.userName + " отправил неверные данные и был отключён [" + client.dateLastSeen + "]");
-                                server.BroadcastMessage(@"Fu(ck&&DI3-", ServerObject.clients, client, "self");
-                                server.RemoveConnection(client.Id);
+                                client.DateLastOnline = DateTime.Now.ToString();
+                                gl_sList_Messages.Add(client.UserHostName + " отправил неверные данные и был отключён [" + client.DateLastOnline + "]");
+                                server.BroadcastMessage(@"Fu(ck&&DI3-", ServerObject.ClientsList, client, "self");
+                                server.RemoveConnection(client.Guid_id);
                                 client.myMessageNotAwait = false;
-                                client.Close();
+                                client.Disconnect();
                                 break;
 
                             case @"h@@lLloui-": // Клиент говорит Хэллоу, подключившись, мы спрашиваем кто он и ждём реги
-                                client.userName = textCom;
-                                gl_sList_Messages.Add(client.userName + " --- подключился");
+                                client.UserHostName = textCom;
+                                gl_sList_Messages.Add(client.UserHostName + " --- подключился");
                                 // Проверка регистрации
-                                server.BroadcastMessage("@HowdyHu%$-", ServerObject.clients, client, "self"); // спрашиваем кто он такой блин
+                                server.BroadcastMessage("@HowdyHu%$-", ServerObject.ClientsList, client, "self"); // спрашиваем кто он такой блин
                                 client.AwaitVarForCom = 1;
                                 client.myMessageNotAwait = true;
                                 client.StupidCheck = false;
@@ -67,11 +67,11 @@ namespace NaNiT
                                 client.StupidCheck = false;
                                 checkMuss = 0;
                                 checkMass = 0;
-                                gl_sList_Messages.Add(client.userName + " --- Начал передачу софт-массива [" + DateTime.Now.ToString() + "]");
+                                gl_sList_Messages.Add(client.UserHostName + " --- Начал передачу софт-массива [" + DateTime.Now.ToString() + "]");
                                 SoftwareMassive = Convert.ToInt32(textCom);
-                                File.Delete(@"ClientsBase\" + client.cryptoLogin + @"_Software.xml");
-                                client.softXmlBase = new MyXml(@"ClientsBase\" + client.cryptoLogin + @"_Software.xml");
-                                server.BroadcastMessage(@"OKb@@b1_g0-"+ checkMuss + @"%" + checkMass, ServerObject.clients, client, "self"); // говорим, что готовы въёбывать и отправляем по базе нулевой чекмас, намекая, что хотим его
+                                File.Delete(@"ClientsBase\" + client.CryptedName + @"_Software.xml");
+                                client.ClientXSofts = new MyXml(@"ClientsBase\" + client.CryptedName + @"_Software.xml");
+                                server.BroadcastMessage(@"OKb@@b1_g0-"+ checkMuss + @"%" + checkMass, ServerObject.ClientsList, client, "self"); // говорим, что готовы въёбывать и отправляем по базе нулевой чекмас, намекая, что хотим его
                                 break;
                         }
                         break;
@@ -80,18 +80,18 @@ namespace NaNiT
                         switch (command)
                         {
                             default: // Дисконект из-за неверного сообщения
-                                client.dateLastSeen = DateTime.Now.ToString();
-                                gl_sList_Messages.Add(client.userName + " --- отправил неверные данные и был отключён [" + client.dateLastSeen + "]");
-                                server.BroadcastMessage(@"Fu(ck&&DI3-", ServerObject.clients, client, "self");
-                                server.RemoveConnection(client.Id);
+                                client.DateLastOnline = DateTime.Now.ToString();
+                                gl_sList_Messages.Add(client.UserHostName + " --- отправил неверные данные и был отключён [" + client.DateLastOnline + "]");
+                                server.BroadcastMessage(@"Fu(ck&&DI3-", ServerObject.ClientsList, client, "self");
+                                server.RemoveConnection(client.Guid_id);
                                 client.myMessageNotAwait = false;
-                                client.Close();
+                                client.Disconnect();
                                 break;
 
                             case @"R3GisSsTr-": // получаем регу и отвечаем, что она успешно прошла
-                                client.cryptoLogin = textCom;
+                                client.CryptedName = textCom;
                                 RegistrationOrLogin(textCom);
-                                server.BroadcastMessage(@"1t$OKb@@b1-", ServerObject.clients, client, "self"); // успешная регистрация
+                                server.BroadcastMessage(@"1t$OKb@@b1-", ServerObject.ClientsList, client, "self"); // успешная регистрация
                                 client.AwaitVarForCom = 0;
                                 client.myMessageNotAwait = true;
                                 client.StupidCheck = false;
@@ -103,12 +103,12 @@ namespace NaNiT
                         switch (command)
                         {
                             default: // Дисконект из-за неверного сообщения
-                                client.dateLastSeen = DateTime.Now.ToString();
-                                gl_sList_Messages.Add(client.userName + " --- отправил неверные данные и был отключён [" + client.dateLastSeen + "]");
-                                server.BroadcastMessage(@"Fu(ck&&DI3-", ServerObject.clients, client, "self");
-                                server.RemoveConnection(client.Id);
+                                client.DateLastOnline = DateTime.Now.ToString();
+                                gl_sList_Messages.Add(client.UserHostName + " --- отправил неверные данные и был отключён [" + client.DateLastOnline + "]");
+                                server.BroadcastMessage(@"Fu(ck&&DI3-", ServerObject.ClientsList, client, "self");
+                                server.RemoveConnection(client.Guid_id);
                                 client.myMessageNotAwait = false;
-                                client.Close();
+                                client.Disconnect();
                                 break;
 
                             case @"SenD=Bi4h-": // Получаем софт-массив
@@ -116,12 +116,12 @@ namespace NaNiT
                                 checkMass++;
                                 if (checkMass == 5)
                                 {
-                                    client.softXmlBase.AddApplication(tempMass[0], tempMass[1], tempMass[2], tempMass[3], tempMass[4]);
+                                    client.ClientXSofts.AddApplication(tempMass[0], tempMass[1], tempMass[2], tempMass[3], tempMass[4]);
                                     checkMass = 0;
                                     checkMuss++;
                                     
                                 }
-                                server.BroadcastMessage(@"OKb@@b1_g0-" + checkMuss + @"%" + checkMass, ServerObject.clients, client, "self"); // Говорим, что получили и просим на этот раз уже первый чекмас
+                                server.BroadcastMessage(@"OKb@@b1_g0-" + checkMuss + @"%" + checkMass, ServerObject.ClientsList, client, "self"); // Говорим, что получили и просим на этот раз уже первый чекмас
                                 client.AwaitVarForCom = 2;
                                 client.myMessageNotAwait = true;
                                 client.StupidCheck = false;
@@ -129,11 +129,11 @@ namespace NaNiT
 
                             case @"SenD=LAST-": // "Это должен быть последний элемент. В противном случае "что-то пошло не так"
                                 tempMass[4] = textCom;
-                                client.softXmlBase.AddApplication(tempMass[0], tempMass[1], tempMass[2], tempMass[3], tempMass[4]);
-                                client.softXmlBase.SaveThis();
-                                server.BroadcastMessage(@"it$MaHBi4!-" + DateTime.Now.ToString(), ServerObject.clients, client, "self"); // Благодарим клиента за то, что он няшка и передаём время связи
-                                gl_sList_Messages.Add(client.userName + " --- Закончил передачу софт-массива [" + DateTime.Now.ToString() + "]");
-                                gl_xml.SoftUp(client, DateTime.Now, checkMuss);
+                                client.ClientXSofts.AddApplication(tempMass[0], tempMass[1], tempMass[2], tempMass[3], tempMass[4]);
+                                client.ClientXSofts.SaveThis();
+                                server.BroadcastMessage(@"it$MaHBi4!-" + DateTime.Now.ToString(), ServerObject.ClientsList, client, "self"); // Благодарим клиента за то, что он няшка и передаём время связи
+                                gl_sList_Messages.Add(client.UserHostName + " --- Закончил передачу софт-массива [" + DateTime.Now.ToString() + "]");
+                                gl_xml.SoftUp(client.CryptedName, DateTime.Now, checkMuss, @"WhoKnows?");
                                 client.AwaitVarForCom = 0;
                                 client.myMessageNotAwait = true;
                                 client.StupidCheck = false;
@@ -149,18 +149,18 @@ namespace NaNiT
             void RegistrationOrLogin(string name)
             {
                 if (gl_xml.isRegistred(client))
-                    gl_sList_Messages.Add(client.userName + " (" + client.IP + ") --- авторизовался в системе [" + DateTime.Now.ToString() + "]");
+                    gl_sList_Messages.Add(client.UserHostName + " (" + client.UserIpAdress + ") --- авторизовался в системе [" + DateTime.Now.ToString() + "]");
                 else
-                    gl_sList_Messages.Add(client.userName + " --- зарегистрировался в системе [" + client.dateOfRegister + "]");
+                    gl_sList_Messages.Add(client.UserHostName + " --- зарегистрировался в системе [" + client.DateOfRegistration + "]");
             }
 
             void SendChatToAll(string textChat)
             {
-                if (String.Format("{0}: {1}", client.userName, textChat) != String.Format("{0}: {1}", client.userName, null))
+                if (String.Format("{0}: {1}", client.UserHostName, textChat) != String.Format("{0}: {1}", client.UserHostName, null))
                 {
-                    textChat = String.Format("{0}: {1}", client.userName, textChat);
+                    textChat = String.Format("{0}: {1}", client.UserHostName, textChat);
                     gl_sList_Messages.Add(textChat);
-                    server.BroadcastMessage(textChat, ServerObject.clients, client, "all");
+                    server.BroadcastMessage(textChat, ServerObject.ClientsList, client, "all");
                 }
             }
         }

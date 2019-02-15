@@ -3,7 +3,7 @@ using System.Xml;
 
 namespace NaNiT
 {
-    class _XmlUser : _XmlFile
+    class XmlUser : _XmlFile
     {
         /// <summary>
         /// Массив/перечень под-свойств юзера
@@ -17,7 +17,7 @@ namespace NaNiT
         /// <summary>
         /// XML юзер, работает с пользователями
         /// </summary>
-        public _XmlUser() : base("RegistredUsers.xml", "users", "user")
+        public XmlUser() : base("RegistredUsers.xml", "users", "user")
         {
             ReCheck(true);
             Sorting();
@@ -27,7 +27,7 @@ namespace NaNiT
         /// Перерасчёт количества юзеров
         /// </summary>
         /// <param name="deep">И всего массива значений Value</param>
-        public void ReCheck(bool deep = false)
+        protected void ReCheck(bool deep = false)
         {
             Value = new string[xRoot.SelectNodes("*").Count, childs.Length + 1];
             int n = 0, p = 0;
@@ -60,7 +60,7 @@ namespace NaNiT
         /// </summary>
         /// <param name="_name">Имя в аттрибутах ноды</param>
         /// <returns></returns>
-        public XmlNode Node(string _name)
+        protected XmlNode Node(string _name)
         {
             XmlNode temp1 = xRoot.SelectSingleNode("user" + @"[@name='" + _name + @"']");
             return temp1;
@@ -71,7 +71,7 @@ namespace NaNiT
         /// </summary>
         /// <param name="ID">id конкретной ноды</param>
         /// <returns></returns>
-        public XmlNode Node(int ID)
+        protected XmlNode Node(int ID)
         {
             XmlNode temp2 = xRoot.ChildNodes.Item(ID);
             return temp2;
@@ -84,28 +84,28 @@ namespace NaNiT
         public bool isRegistred(ClientObject client)
         {
             // Забиваем массив данными, который пойдут в файл при регистрации, либо после авторизации для проверки
-            string[] _client = new string[] { DateTime.Now.ToString(), DateTime.Now.ToString(), client.userName, client.IP,
-                                            @"ClientsBase\" + client.cryptoLogin + @"_Hardware.xml", @"ClientsBase\" + client.cryptoLogin + @"_Software.xml" };
+            string[] _client = new string[] { DateTime.Now.ToString(), DateTime.Now.ToString(), client.UserHostName, client.UserIpAdress,
+                                            @"ClientsBase\" + client.CryptedName + @"_Hardware.xml", @"ClientsBase\" + client.CryptedName + @"_Software.xml" };
             ReCheck(true);
             for (int i = 0; i < xRoot.SelectNodes("*").Count; i++)
             {
-                if (Value[i, 0] == client.cryptoLogin)
+                if (Value[i, 0] == client.CryptedName)
                 {
-                    client.idInDatabase = i;
+                    client.Database_id = i;
                     // Тут мы проверяем текущие ноды в файле на соответствие с параметрами программы, чтобы добавить новые (после обновления версии если появятся)
                     // Или сообщить администратору о задвоении
                     if (Node(i).ChildNodes.Count != childs.Length)
                         Repair(i);
                     Edit(i, 1, DateTime.Now.ToString());
-                    if (Value[i, 3] != client.IP)
+                    if (Value[i, 3] != client.UserIpAdress)
                     {
-                        Error.Msg("ES2Xm3.2", i.ToString(), Value[i,0], client.IP, Value[i,3]);
-                        Edit(i, 3, client.IP);
+                        Error.Msg("ES2Xm3.2", i.ToString(), Value[i, 0], client.UserIpAdress, Value[i, 3]);
+                        Edit(i, 3, client.UserIpAdress);
                     }
-                    if (Value[i, 2] != client.userName)
+                    if (Value[i, 2] != client.UserHostName)
                     {
-                        Error.Msg("ED3Xm3.3", i.ToString(), Value[i, 0], client.userName);
-                        Edit(i, 2, client.userName);
+                        Error.Msg("ED3Xm3.3", i.ToString(), Value[i, 0], client.UserHostName);
+                        Edit(i, 2, client.UserHostName);
                     }
                     client.IsRegister = true;
                     return true;
@@ -113,10 +113,10 @@ namespace NaNiT
             }
             ReCheck();
             // Если клиент не зарегистрирован, то забиваем новый массив данными, которые пойдут в его потомков (параметры)
-            client.dateOfRegister = DateTime.Now.ToString();
-            client.idInDatabase = xRoot.SelectNodes("*").Count;
+            client.DateOfRegistration = DateTime.Now.ToString();
+            client.Database_id = xRoot.SelectNodes("*").Count;
             // И добавляем его в xml файл (сохранение файла идёт в конце AddMain метода)
-            AddMain("user", client.cryptoLogin, childs, _client);
+            AddMain("user", client.CryptedName, childs, _client);
             client.IsRegister = true;
             ReCheck(true);
             return false;
@@ -144,7 +144,7 @@ namespace NaNiT
                         // добавить юзеру {id} чилда [z]
                         Restore(z);
                     if (temp[z] > 1)
-                        Error.Msg("ED4Xm2.1", id.ToString(), client.userName, childs[z], temp[z].ToString());
+                        Error.Msg("ED4Xm2.1", id.ToString(), client.UserHostName, childs[z], temp[z].ToString());
                 }
 
                 /// <summary>
@@ -170,7 +170,7 @@ namespace NaNiT
         /// <param name="id">id клиента в базе xml</param>
         /// <param name="child">Порядковый номер изменяемого ребёнка</param>
         /// <param name="_value">Новое значение</param>
-        public void Edit(int id, int child, string _value)
+        internal void Edit(int id, int child, string _value)
         {
             foreach (XmlNode tempChild in Node(id))
             {
@@ -187,7 +187,7 @@ namespace NaNiT
         /// Сортировка параметров конкретного элемента в рамках одной ноды
         /// </summary>
         /// <param name="_userSort">Нода, детей которой сортируем</param>
-        public void Sorting(XmlNode _userSort)
+        protected void Sorting(XmlNode _userSort)
         {
             XmlNode firstChild = _userSort.SelectSingleNode(childs[0]);
             _userSort.PrependChild(firstChild);
@@ -204,10 +204,11 @@ namespace NaNiT
             }
             Save();
         }
+
         /// <summary>
         /// Сортировка параметров всех элементов всего документа
         /// </summary>
-        public void Sorting()
+        protected void Sorting()
         {
             XmlNodeList _users = xRoot.SelectNodes("*");
             foreach (XmlNode sort in _users)
@@ -215,9 +216,16 @@ namespace NaNiT
             Save();
         }
 
-        public void SoftUp(ClientObject client, DateTime _last, int _elems, string isChanged)
+        /// <summary>
+        /// Добавление дочернего нода с информацией о свежей загрузке софт-массива
+        /// </summary>
+        /// <param name="_cryptologin">Идентификатор пользователя</param>
+        /// <param name="_last">Дата добавления (текущая)</param>
+        /// <param name="_elems">Кол-во элементов в массиве</param>
+        /// <param name="isChanged">Изменился ли массив с прошлого обновления</param>
+        internal void SoftUp(string _cryptologin, DateTime _last, int _elems, string isChanged)
         {
-            foreach (XmlNode tempChild in Node(client.cryptoLogin))
+            foreach (XmlNode tempChild in Node(_cryptologin))
             {
                 if (tempChild.Name == "SoftwareFile")
                 {
@@ -225,22 +233,22 @@ namespace NaNiT
                     XmlAttribute md5 = xDoc.CreateAttribute("md5_soft");
                     XmlAttribute number = xDoc.CreateAttribute("soft_count");
                     XmlAttribute change = xDoc.CreateAttribute("soft_changed");
-                    XmlAttribute newSoftUp = xDoc.CreateAttribute("soft_uppload");
+                    XmlAttribute uppDate = xDoc.CreateAttribute("soft_uppload");
                     XmlText md5Text = xDoc.CreateTextNode("Тут будет МД5 выборка по текущему софту");
                     XmlText numberText = xDoc.CreateTextNode(_elems.ToString());
                     XmlText changeText = xDoc.CreateTextNode("no");
-                    XmlText upploadText = xDoc.CreateTextNode(_last.ToString());
+                    XmlText upploadDateText = xDoc.CreateTextNode(_last.ToString());
                     md5.AppendChild(md5Text);
                     number.AppendChild(numberText);
                     change.AppendChild(changeText);
-                    newSoftUp.AppendChild(newSoftUp);
+                    uppDate.AppendChild(upploadDateText);
                     SoftUp.Attributes.Append(md5);
                     SoftUp.Attributes.Append(number);
                     SoftUp.Attributes.Append(change);
-                    SoftUp.Attributes.Append(change);
-                    tempChild.AppendChild(newSoftUp);
-                    tempChild.PrependChild(newSoftUp);
-                        
+                    SoftUp.Attributes.Append(uppDate);
+                    tempChild.AppendChild(SoftUp);
+                    tempChild.PrependChild(SoftUp);
+
                 Clean:
                     if (tempChild.ChildNodes.Count > 3)
                     {
@@ -252,27 +260,33 @@ namespace NaNiT
             }
         }
 
-        public void HardUp(ClientObject client, DateTime _last, string isChanged)
+        /// <summary>
+        /// Добавление дочернего нода с информацией о свежей загрузке хард-массива
+        /// </summary>
+        /// <param name="_cryptologin">Идентификатор пользователя</param>
+        /// <param name="_last">Дата добавления (текущая)</param>
+        /// <param name="isChanged">Изменился ли массив с прошлого обновления</param>
+        internal void HardUp(string _cryptologin, DateTime _last, string isChanged)
         {
-            foreach (XmlNode tempChild in Node(client.cryptoLogin))
+            foreach (XmlNode tempChild in Node(_cryptologin))
             {
                 if (tempChild.Name == "HardwareFile")
                 {
                     XmlElement HardUp = xDoc.CreateElement("Uppload");
                     XmlAttribute md5 = xDoc.CreateAttribute("md5_hard");
                     XmlAttribute change = xDoc.CreateAttribute("soft_changed");
-                    XmlAttribute newHardUp = xDoc.CreateAttribute("hard_uppload");
+                    XmlAttribute uppDate = xDoc.CreateAttribute("hard_uppload");
                     XmlText md5Text = xDoc.CreateTextNode("Тут будет МД5 выборка по текущему софту");
                     XmlText changeText = xDoc.CreateTextNode("no");
-                    XmlText upploadText = xDoc.CreateTextNode(_last.ToString());
+                    XmlText uppDateText = xDoc.CreateTextNode(_last.ToString());
                     md5.AppendChild(md5Text);
                     change.AppendChild(changeText);
-                    newHardUp.AppendChild(upploadText);
+                    uppDate.AppendChild(uppDateText);
                     HardUp.Attributes.Append(md5);
                     HardUp.Attributes.Append(change);
-                    HardUp.Attributes.Append(newHardUp);
-                    tempChild.AppendChild(newHardUp);
-                    tempChild.PrependChild(newHardUp);
+                    HardUp.Attributes.Append(uppDate);
+                    tempChild.AppendChild(HardUp);
+                    tempChild.PrependChild(HardUp);
 
                 Clean:
                     if (tempChild.ChildNodes.Count > 3)
