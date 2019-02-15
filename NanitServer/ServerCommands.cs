@@ -133,6 +133,7 @@ namespace NaNiT
                                 client.softXmlBase.SaveThis();
                                 server.BroadcastMessage(@"it$MaHBi4!-" + DateTime.Now.ToString(), ServerObject.clients, client, "self"); // Благодарим клиента за то, что он няшка и передаём время связи
                                 gl_sList_Messages.Add(client.userName + " --- Закончил передачу софт-массива [" + DateTime.Now.ToString() + "]");
+                                gl_xml.SoftUp(client, DateTime.Now, checkMuss);
                                 client.AwaitVarForCom = 0;
                                 client.myMessageNotAwait = true;
                                 client.StupidCheck = false;

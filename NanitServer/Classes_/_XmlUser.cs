@@ -56,6 +56,17 @@ namespace NaNiT
         }
 
         /// <summary>
+        /// Выбор конкретной ноды по названию итема
+        /// </summary>
+        /// <param name="_name">Имя в аттрибутах ноды</param>
+        /// <returns></returns>
+        public XmlNode Node(string _name)
+        {
+            XmlNode temp1 = xRoot.SelectSingleNode("user" + @"[@name='" + _name + @"']");
+            return temp1;
+        }
+
+        /// <summary>
         /// Выбор конкретной ноды по её id
         /// </summary>
         /// <param name="ID">id конкретной ноды</param>
@@ -202,6 +213,76 @@ namespace NaNiT
             foreach (XmlNode sort in _users)
                 Sorting(sort);
             Save();
+        }
+
+        public void SoftUp(ClientObject client, DateTime _last, int _elems, string isChanged)
+        {
+            foreach (XmlNode tempChild in Node(client.cryptoLogin))
+            {
+                if (tempChild.Name == "SoftwareFile")
+                {
+                    XmlElement SoftUp = xDoc.CreateElement("Uppload");
+                    XmlAttribute md5 = xDoc.CreateAttribute("md5_soft");
+                    XmlAttribute number = xDoc.CreateAttribute("soft_count");
+                    XmlAttribute change = xDoc.CreateAttribute("soft_changed");
+                    XmlAttribute newSoftUp = xDoc.CreateAttribute("soft_uppload");
+                    XmlText md5Text = xDoc.CreateTextNode("Тут будет МД5 выборка по текущему софту");
+                    XmlText numberText = xDoc.CreateTextNode(_elems.ToString());
+                    XmlText changeText = xDoc.CreateTextNode("no");
+                    XmlText upploadText = xDoc.CreateTextNode(_last.ToString());
+                    md5.AppendChild(md5Text);
+                    number.AppendChild(numberText);
+                    change.AppendChild(changeText);
+                    newSoftUp.AppendChild(newSoftUp);
+                    SoftUp.Attributes.Append(md5);
+                    SoftUp.Attributes.Append(number);
+                    SoftUp.Attributes.Append(change);
+                    SoftUp.Attributes.Append(change);
+                    tempChild.AppendChild(newSoftUp);
+                    tempChild.PrependChild(newSoftUp);
+                        
+                Clean:
+                    if (tempChild.ChildNodes.Count > 3)
+                    {
+                        tempChild.RemoveChild(tempChild.LastChild);
+                        goto Clean;
+                    }
+                    Save();
+                }
+            }
+        }
+
+        public void HardUp(ClientObject client, DateTime _last, string isChanged)
+        {
+            foreach (XmlNode tempChild in Node(client.cryptoLogin))
+            {
+                if (tempChild.Name == "HardwareFile")
+                {
+                    XmlElement HardUp = xDoc.CreateElement("Uppload");
+                    XmlAttribute md5 = xDoc.CreateAttribute("md5_hard");
+                    XmlAttribute change = xDoc.CreateAttribute("soft_changed");
+                    XmlAttribute newHardUp = xDoc.CreateAttribute("hard_uppload");
+                    XmlText md5Text = xDoc.CreateTextNode("Тут будет МД5 выборка по текущему софту");
+                    XmlText changeText = xDoc.CreateTextNode("no");
+                    XmlText upploadText = xDoc.CreateTextNode(_last.ToString());
+                    md5.AppendChild(md5Text);
+                    change.AppendChild(changeText);
+                    newHardUp.AppendChild(upploadText);
+                    HardUp.Attributes.Append(md5);
+                    HardUp.Attributes.Append(change);
+                    HardUp.Attributes.Append(newHardUp);
+                    tempChild.AppendChild(newHardUp);
+                    tempChild.PrependChild(newHardUp);
+
+                Clean:
+                    if (tempChild.ChildNodes.Count > 3)
+                    {
+                        tempChild.RemoveChild(tempChild.LastChild);
+                        goto Clean;
+                    }
+                    Save();
+                }
+            }
         }
     }
 }
