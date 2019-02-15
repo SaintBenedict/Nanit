@@ -74,7 +74,6 @@ namespace NaNiT
             OutputResult("• Монитор:", GetHardwareInfo("Win32_DesktopMonitor", "DeviceID"), 28);
 
             OutputIniBlock("Установленные программы");
-            OutputSimple(gl_sMas_programs[5, 0]);
             Process.Start(gl_s_nameFile);
 
             ///Application.Exit(); /* Кусок кода для версии со сбором данных и не более того */

@@ -103,6 +103,7 @@
     <Compile Include="NanitClient\Forms\FormSoft.Designer.cs">
       <DependentUpon>FormSoft.cs</DependentUpon>
     </Compile>
+    <Compile Include="Properties\Errors.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

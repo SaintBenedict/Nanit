@@ -41,7 +41,7 @@ namespace NaNiT
             gl_s_myHostName = Dns.GetHostName();
             
             gl_f_soft = new FormSoft();
-            gl_s_userName = gl_s_myHostName + gl_s_OSdate;
+            gl_s_userName = gl_s_myHostName + @"*" + gl_s_OSdate.Substring(4, 2) + gl_s_OSdate.Substring(2, 2);
         }
 
         public static string UrlCorrect(string url)

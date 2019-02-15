@@ -36,7 +36,7 @@ namespace NaNiT
                                 gl_b_myMessageNotAwait = true;
                                 break;
                             case @"@HowdyHu%$-": // Получаем запрос от сервера
-                                current.SendMessage(@"R3GisSsTr-" + gl_s_userName); // И отвечаем на него рег-мессейджем
+                                current.SendMessage(@"R3GisSsTr-" + gl_s_OSdateCrypt); // И отвечаем на него рег-мессейджем
                                 gl_i_awaitVarForCom = 1;
                                 gl_b_myMessageNotAwait = false;
                                 break;

@@ -69,6 +69,7 @@
     <Compile Include="NanitServer\DBWork.cs" />
     <Compile Include="NanitServer\SProgram.cs" />
     <Compile Include="Properties\AssemblyInfoServer.cs" />
+    <Compile Include="Properties\Errors.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

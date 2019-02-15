@@ -5,6 +5,7 @@ using System.Management;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
+using static NaNiT.GlobalVariable;
 
 namespace NaNiT
 {
@@ -20,7 +21,7 @@ namespace NaNiT
         ///
         ///
         //-Strings-//
-        public static string gl_s_OSdate, gl_s_myHostName; // Получение даты установки ОС и имени компьютера
+        public static string gl_s_OSdate, gl_s_OSdateCrypt, gl_s_myHostName; // Получение даты установки ОС и имени компьютера
         public static string gl_s_nanitSvcVer = "0", gl_s_updVerAvi = "1.0.0", gl_s_version = Application.ProductVersion; // Версии
         public static string gl_s_optionsPasswordDefault = "478632", gl_s_servIP = "127.0.0.1"; // Стандартный пароль и адресс сервера
         public static string gl_s_md5PortIp, gl_s_md5Clients, gl_s_optionsPasswordReg; // Изменение переменных после их прогона через MD5
@@ -47,7 +48,7 @@ namespace NaNiT
     {
         public static string GetOSDate()
         {
-            string result = null;
+            string result = null, result1 = null, result2 = null, result3 = null;
             ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM " + "Win32_OperatingSystem");
             {
                 foreach (ManagementObject obj in searcher.Get())
@@ -56,7 +57,12 @@ namespace NaNiT
                         result = obj["InstallDate"].ToString().Trim();
                 }
             }
-            return result.Substring(0, 14);
+            result = result.Substring(0, 14);
+            result1 = (MD5Code(result)).Substring(0, 6);
+            result2 = (MD5Code(result)).Substring(9, 5);
+            result3 = result1 + @"#" + result.Substring(2, 2) + @"_" + result.Substring(4, 4) + @"#" + result2 + "-" + (MD5Code(result)).Substring(16, 2);
+            gl_s_OSdateCrypt = result3;
+            return result;
         }
 
         public static string MD5Code(string getCode)

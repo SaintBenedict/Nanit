@@ -94,7 +94,7 @@ namespace NaNiT
                     ServerCommands.CheckCommand(builder.ToString(), this, server, Stream);
                     return builder.ToString();
                 }
-                catch (Exception ex)
+                catch
                 {
                     if (!gl_b_disconnectInProgress && IsActive)
                     {

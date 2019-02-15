@@ -45,9 +45,8 @@ namespace NaNiT
                                 break;
 
                             case @"h@@lLloui-": // Клиент говорит Хэллоу, подключившись, мы спрашиваем кто он и ждём реги
-                                client.cryptoLogin = textCom;
-                                client.userName = textCom.Substring(0, textCom.Length - 14);
-                                gl_sList_Messages.Add(client.cryptoLogin + " --- подключился");
+                                client.userName = textCom;
+                                gl_sList_Messages.Add(client.userName + " --- подключился");
                                 // Проверка регистрации
                                 server.BroadcastMessage("@HowdyHu%$-", ServerObject.clients, client, "self"); // спрашиваем кто он такой блин
                                 client.AwaitVarForCom = 1;
@@ -90,6 +89,7 @@ namespace NaNiT
                                 break;
 
                             case @"R3GisSsTr-": // получаем регу и отвечаем, что она успешно прошла
+                                client.cryptoLogin = textCom;
                                 RegistrationOrLogin(textCom);
                                 server.BroadcastMessage(@"1t$OKb@@b1-", ServerObject.clients, client, "self"); // успешная регистрация
                                 client.AwaitVarForCom = 0;
@@ -147,27 +147,6 @@ namespace NaNiT
 
             void RegistrationOrLogin(string name)
             {
-                //for (int q = 0; q < gl_xml.Records; q++)
-                //{
-                //    if (client.cryptoLogin == gl_xml.Value[q, 0])
-                //    {
-                //        client.IsRegister = true;
-                //        client.idInDatabase = q;
-                //        gl_sList_Messages.Add(client.userName + " (" + client.IP + ") --- авторизовался в системе [" + DateTime.Now.ToString() + "]");
-                //        gl_xml_users.WriteTo("LastSeenDate", DateTime.Now.ToString(), client.idInDatabase);
-                //        gl_xml_users.WriteTo("IPaddress", client.IP, client.idInDatabase);
-                //        return;
-                //    }
-                //}
-                //if (client.cryptoLogin == name)
-                //{
-                //    client.IsRegister = true;
-                //    client.dateOfRegister = DateTime.Now.ToString();
-                //    client.idInDatabase = gl_xml_users.NameValue + 1;
-                //    gl_xml.Registration(client)
-                //    gl_xml_users.ReopenXml();
-                //    gl_sList_Messages.Add(client.userName + " --- зарегистрировался в системе [" + client.dateOfRegister + "]");
-                //}
                 if (gl_xml.isRegistred(client))
                     gl_sList_Messages.Add(client.userName + " (" + client.IP + ") --- авторизовался в системе [" + DateTime.Now.ToString() + "]");
                 else

@@ -5,15 +5,24 @@ namespace NaNiT
 {
     class _XmlFile
     {
-        public string xFilename { get; set; }
-        public XmlDocument xDoc;
-        public XmlElement xRoot;
+        /// <summary>
+        /// Имя /путь к файлу
+        /// </summary>
+        public string xFilename { get; private set; }
+        /// <summary>
+        /// XmlDocument весь, загруженный в память
+        /// </summary>
+        public XmlDocument xDoc { get; private set; }
+        /// <summary>
+        /// XmlElement - загруженный базовый рут с элементами для работы
+        /// </summary>
+        public XmlElement xRoot { get; private set; }
 
         /// <summary>
         /// Базовый XML конструктор, являющийся родительским объектом и позволяющий проводить общие операции с xml файлами
         /// </summary>
         /// <param name="_nameFile">Имя открываемого файла</param>
-        /// <param name="_root">Рут Нода (если есть, иначе будет "Blank"</param>
+        /// <param name="_root">Рут Нода (если есть, иначе будет "Blank")</param>
         public _XmlFile(string _nameFile, params string[] _root)
         {
             xFilename = _nameFile;
@@ -45,7 +54,7 @@ namespace NaNiT
         /// и либо загружает его, либо создаёт
         /// </summary>
         /// <param name="_name">Путь к файлу с полным именем</param>
-        /// <param name="_xroot">Рут элемент файла</param>
+        /// <param name="_root">Необходимый рут элемент для создания при невозможности открыть.</param>
         public void Open(string _name, params string[] _root)
         {
             xFilename = _name;
@@ -85,6 +94,7 @@ namespace NaNiT
         /// Добавляет одну основную ветку с детьми (без аттрибутов)
         /// </summary>
         /// <param name="_nodeName">Название главной ноды (прим. "user")</param>
+        /// <param name="_attrName">Значение имени для базового аттрибута "name"</param>
         /// <param name="_chilNodes">Массив детей</param>
         /// <param name="_chilValues">Массив детских значений</param>
         public void AddMain(string _nodeName, string _attrName, string[] _chilNodes, string[] _chilValues)

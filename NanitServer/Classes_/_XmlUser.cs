@@ -1,18 +1,18 @@
 ﻿using System;
-using System.IO;
-using System.Windows.Forms;
 using System.Xml;
 
 namespace NaNiT
 {
     class _XmlUser : _XmlFile
     {
-        public string workRoot = "users";
-        public string workSingle = "user";
-        public int Records;
-        public string[] childs = new string[] { "RegistredDate", "LastSeenDate", "HostName", "IPaddress", "HardwareFile", "SoftwareFile" };
-        public int Childs;
-        public string[,] Value;
+        /// <summary>
+        /// Массив/перечень под-свойств юзера
+        /// </summary>
+        public string[] childs { get; } = new string[] { "RegistredDate", "LastSeenDate", "HostName", "IPaddress", "HardwareFile", "SoftwareFile" };
+        /// <summary>
+        /// Массив со всеми значениями юзеров
+        /// </summary>
+        public string[,] Value { get; set; }
 
         /// <summary>
         /// XML юзер, работает с пользователями
@@ -20,54 +20,39 @@ namespace NaNiT
         public _XmlUser() : base("RegistredUsers.xml", "users", "user")
         {
             ReCheck(true);
+            Sorting();
         }
 
         /// <summary>
-        /// Перерасчёт юзер-массива
+        /// Перерасчёт количества юзеров
         /// </summary>
+        /// <param name="deep">И всего массива значений Value</param>
         public void ReCheck(bool deep = false)
         {
-            XmlNodeList _users = xRoot.SelectNodes("*");
-            Records = _users.Count;
-            Childs = childs.Length;
-            if (deep)
+            Value = new string[xRoot.SelectNodes("*").Count, childs.Length + 1];
+            int n = 0, p = 0;
+            foreach (XmlNode _user in xRoot.SelectNodes("*"))
             {
-                Value = new string[Records, Childs + 1];
-                int n = 0, p = 0;
-                foreach (XmlNode _user in _users)
+                XmlNode _attr = _user.Attributes.GetNamedItem("name");
+                if (_attr != null)
                 {
-                    XmlNode _attr = _user.Attributes.GetNamedItem("name");
-                    if (_attr != null)
+                    Value[n, 0] = _attr.Value;
+                    if (_user.HasChildNodes)
                     {
-                        Value[n, 0] = _attr.Value;
-                        if (_user.HasChildNodes)
+                        foreach (XmlNode _params in _user.ChildNodes)
                         {
-                            foreach (XmlNode _params in _user.ChildNodes)
+                            for (p = 0; p < childs.Length; p++)
                             {
-                                for (p = 0; p < Childs; p++)
+                                if (_params.Name == childs[p])
                                 {
-                                    if (_params.Name == childs[p])
-                                    {
-                                        Value[n, p + 1] = _params.InnerText;
-                                    }
+                                    Value[n, p + 1] = _params.InnerText;
                                 }
                             }
                         }
-                        n++;
                     }
+                    n++;
                 }
             }
-        }
-
-        /// <summary>
-        /// Выбор конкретной ноды по названию итема
-        /// </summary>
-        /// <param name="_name">Имя в аттрибутах ноды</param>
-        /// <returns></returns>
-        public XmlNode Node(string _name)
-        {
-            XmlNode temp1 = xRoot.SelectSingleNode(workSingle + @"[@name='" + _name + @"']");
-            return temp1;
         }
 
         /// <summary>
@@ -81,56 +66,142 @@ namespace NaNiT
             return temp2;
         }
 
+        /// <summary>
+        /// Проверяет наличие Клиента в базе и регистрирует его если нет.
+        /// </summary>
+        /// <param name="client">Клиент подключившийся к серверу</param>
         public bool isRegistred(ClientObject client)
         {
+            // Забиваем массив данными, который пойдут в файл при регистрации, либо после авторизации для проверки
+            string[] _client = new string[] { DateTime.Now.ToString(), DateTime.Now.ToString(), client.userName, client.IP,
+                                            @"ClientsBase\" + client.cryptoLogin + @"_Hardware.xml", @"ClientsBase\" + client.cryptoLogin + @"_Software.xml" };
             ReCheck(true);
-            for(int i =0; i< Records; i++)
+            for (int i = 0; i < xRoot.SelectNodes("*").Count; i++)
             {
-                if(Value[i,0] == client.cryptoLogin)
+                if (Value[i, 0] == client.cryptoLogin)
                 {
                     client.idInDatabase = i;
+                    // Тут мы проверяем текущие ноды в файле на соответствие с параметрами программы, чтобы добавить новые (после обновления версии если появятся)
+                    // Или сообщить администратору о задвоении
                     if (Node(i).ChildNodes.Count != childs.Length)
-                        Repair(i, childs, client.userName);
+                        Repair(i);
+                    Edit(i, 1, DateTime.Now.ToString());
+                    if (Value[i, 3] != client.IP)
+                    {
+                        Error.Msg("ES2Xm3.2", i.ToString(), Value[i,0], client.IP, Value[i,3]);
+                        Edit(i, 3, client.IP);
+                    }
+                    if (Value[i, 2] != client.userName)
+                    {
+                        Error.Msg("ED3Xm3.3", i.ToString(), Value[i, 0], client.userName);
+                        Edit(i, 2, client.userName);
+                    }
                     client.IsRegister = true;
                     return true;
                 }
             }
             ReCheck();
+            // Если клиент не зарегистрирован, то забиваем новый массив данными, которые пойдут в его потомков (параметры)
             client.dateOfRegister = DateTime.Now.ToString();
-            client.idInDatabase = Records;
-            string[] _client = new string[] { client.dateOfRegister, client.dateOfRegister, client.userName, client.IP,
-                                            @"ClientsBase\" + client.cryptoLogin + @"_Hardware.xml", @"ClientsBase\" + client.cryptoLogin + @"_Software.xml" };
-            AddMain(workSingle, client.cryptoLogin, childs, _client);
+            client.idInDatabase = xRoot.SelectNodes("*").Count;
+            // И добавляем его в xml файл (сохранение файла идёт в конце AddMain метода)
+            AddMain("user", client.cryptoLogin, childs, _client);
             client.IsRegister = true;
             ReCheck(true);
             return false;
-        }
 
-        public void Repair(int id, string[] _childs, string _name)
-        {
-            int[] temp = new int[_childs.Length];
-            foreach(XmlNode tempChild in Node(id))
+            /// <summary>
+            /// Исправляет у клиента отсутствующие чилд.ноды
+            /// </summary>
+            /// <param name="id">id клиента в базе xml</param>
+            void Repair(int id)
             {
-                
-                for(int k=0; k<_childs.Length; k++)
+                int[] temp = new int[childs.Length];
+                foreach (XmlNode tempChild in Node(id))
                 {
-                    if(tempChild.Name == _childs[k])
-                        temp[k]++;
+                    // Пересчитываем количество совпадений имени ноды и параметра
+                    for (int k = 0; k < childs.Length; k++)
+                    {
+                        if (tempChild.Name == childs[k])
+                            temp[k]++;
+                    }
+                }
+                for (int z = 0; z < childs.Length; z++)
+                {
+                    // И выполняем одно из двух действий, если какая-то нода отсутствует или задваивается
+                    if (temp[z] == 0)
+                        // добавить юзеру {id} чилда [z]
+                        Restore(z);
+                    if (temp[z] > 1)
+                        Error.Msg("ED4Xm2.1", id.ToString(), client.userName, childs[z], temp[z].ToString());
+                }
+
+                /// <summary>
+                /// Добавляем отсутствующего потомка в конец списка (затем отдельным методом сортировка)
+                /// </summary>
+                /// <param name="z">Порядковый номер отсутствующего потомка</param>
+                void Restore(int z)
+                {
+                    XmlNode pure = Node(id);
+                    XmlElement pureChild = xDoc.CreateElement(childs[z]);
+                    XmlText pureText = xDoc.CreateTextNode(_client[z]);
+                    pureChild.AppendChild(pureText);
+                    pure.AppendChild(pureChild);
+                    Sorting(pure);
+                    Save();
                 }
             }
-            for (int z = 0; z < _childs.Length; z++)
-            {
-                if (temp[z] == 0)
-                    // добавить юзеру {id} чилда [z]
-                    temp[z] = 0;
-                if (temp[z] > 1)
-                    // Сообщить на сервер / записать в логи об ошибке.
-                    using (StreamWriter file = new StreamWriter("Users_log.txt", true))
-                        {
-                            file.WriteLine(DateTime.Now.ToString() + " [Er3.1] ** Зафиксированно задвоение дочернего элемента у пользователя ** [" + id + "] " + _name + @" ||| в элементе " + _childs[z] + " = " + temp[z]);
-                        }
+        }
 
+        /// <summary>
+        /// Изменяет в текущем файле Xml определённые значение параметров пользователя
+        /// </summary>
+        /// <param name="id">id клиента в базе xml</param>
+        /// <param name="child">Порядковый номер изменяемого ребёнка</param>
+        /// <param name="_value">Новое значение</param>
+        public void Edit(int id, int child, string _value)
+        {
+            foreach (XmlNode tempChild in Node(id))
+            {
+                if (tempChild.Name == childs[child])
+                {
+                    tempChild.InnerText = _value;
+                    Value[id, child] = _value;
+                    Save();
+                }
             }
+        }
+
+        /// <summary>
+        /// Сортировка параметров конкретного элемента в рамках одной ноды
+        /// </summary>
+        /// <param name="_userSort">Нода, детей которой сортируем</param>
+        public void Sorting(XmlNode _userSort)
+        {
+            XmlNode firstChild = _userSort.SelectSingleNode(childs[0]);
+            _userSort.PrependChild(firstChild);
+            for (int i = 1; i < childs.Length; i++)
+            {
+                XmlNode childToMove = _userSort.SelectSingleNode(childs[i]);
+                if (childToMove == null)
+                {
+                    XmlElement newEl = xDoc.CreateElement(childs[i]);
+                    _userSort.AppendChild(newEl);
+                    childToMove = newEl;
+                }
+                _userSort.InsertAfter(childToMove, _userSort.ChildNodes[i]);
+            }
+            Save();
+        }
+        /// <summary>
+        /// Сортировка параметров всех элементов всего документа
+        /// </summary>
+        public void Sorting()
+        {
+            XmlNodeList _users = xRoot.SelectNodes("*");
+            foreach (XmlNode sort in _users)
+                Sorting(sort);
+            Save();
         }
     }
 }
