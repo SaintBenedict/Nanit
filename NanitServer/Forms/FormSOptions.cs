@@ -1,200 +1,128 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Threading;
 using System.Windows.Forms;
-using static NaNiT.GlobalVariable;
-using static NaNiT.GlobalFunctions;
-using static NaNiT.LocalGlobals;
 
 
 namespace NaNiT
 {
     public partial class FormSOptions : Form
     {
-        public static Thread listenThread; // потока для прослушивания
-        int state1 = 10;
-        int state2 = 20;
-
         public FormSOptions()
         {
-            try
-            {
-                InitializeComponent();
-                gl_f_optionsServ = this;
-                ControlBoxPortServ.Text = gl_i_servPort.ToString();
-                backgroundWorker1.WorkerReportsProgress = true; // Запуск Воркера для обновления листвью (графикой нельзя управлять из других тредов
-                backgroundWorker1.RunWorkerAsync();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("FormsOptions(init) " + ex.Message);
-            }
-        }
-
-        public static void Start()
-        {
-            try
-            {
-                gl_b_disconnectInProgress = false;
-                gl_c_server = null;
-                gl_c_server = new ServerObject();
-                listenThread = new Thread(new ThreadStart(gl_c_server.Listen));
-                if (listenThread.Name == null)
-                    listenThread.Name = "ServerListen (Start sub-main)";
-                listenThread.Start(); //старт потока
-                gl_f_optionsServ.ButStart.Text = "Остановить";
-            }
-            catch (Exception ex)
-            {
-                if (!gl_b_disconnectInProgress)
-                    gl_c_server.Disconnect();
-                MessageBox.Show("FormsOptions(start) " + ex.Message);
-            }
-        }
-
-        public void Stop()
-        {
-            if (!gl_b_disconnectInProgress)
-                gl_c_server.Disconnect();
-            ButStart.Text = "Запустить";
+            InitializeComponent();
+            ServerApplication.ServerForm = this;
+            ServerApplication.ServerFormIsOpen = true;
         }
 
         private void ButStart_Click(object sender, EventArgs e)
         {
-            if (listenThread.ThreadState != 0)
+            if (ServerApplication.ListenThread.ThreadState != 0)
             {
-                Start();
+                ServerApplication.StartServer();
+                ButStart.Text = "Остановить";
             }
             else
             {
-                Stop();
+                if (!ServerApplication.ServerIsDisconnecting)
+                {
+                    ServerApplication.StopServer();
+                    ButStart.Text = "Запустить";
+                }
+                else
+                    ButStart.Text = "Остановить";
+
             }
         }
 
-        private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void ListWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             try
             {
-                if (gl_sList_Messages[0] != null)
+                if (ServerApplication.LogMessageList[0] != null)
                 {
-                    listView1.Items.Add(new ListViewItem(gl_sList_Messages[0]));
-                    gl_sList_Messages.RemoveAt(0);
+                    listView1.Items.Add(new ListViewItem(ServerApplication.LogMessageList[0]));
+                    ServerApplication.LogMessageList.RemoveAt(0);
                     if (listView1.Items.Count > 1)
                         listView1.EnsureVisible(listView1.Items.Count - 1);
+                    if (ServerApplication.ListenThread.ThreadState != 0)
+                        ButStart.Text = "Запустить";
+                    else
+                        ButStart.Text = "Остановить";
                 }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show("FormsOptions(bwc_change) " + ex.Message);
-            }
+            catch (Exception ex) { Error.Msg("EP1Fm0.1", ex.ToString()); }
         }
-        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+
+        private void ListWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            while (gl_b_isOptOpenStatic)
+            bool SwitchWork = true;
+            while (true)
             {
-                if (gl_sList_Messages.Count > 0)
+                if (ServerApplication.LogMessageList.Count > 0)
                 {
-                    if (gl_b_tempSwitch)
-                        backgroundWorker1.ReportProgress(state1);
+                    if (SwitchWork)
+                        ListWorker.ReportProgress(10);
                     else
-                        backgroundWorker1.ReportProgress(state2);
-                    gl_b_tempSwitch = Revers(gl_b_tempSwitch);
+                        ListWorker.ReportProgress(20);
+                    SwitchWork = Revers(SwitchWork);
                     Thread.Sleep(200);
                 }
                 else
+                {
                     Thread.Sleep(1000);
-                if(!gl_b_isOptOpen)
+                }
+                if (!ServerApplication.ServerFormIsOpen)
                     Thread.Sleep(10000);
             }
-        }
-        private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (e.Cancelled == true)
+
+            bool Revers(bool first)
             {
-                MessageBox.Show("FormsOptions(bwc_canc)");
-            }
-            else if (e.Error != null)
-            {
-                MessageBox.Show("FormsOptions(bwc_comp) " + e.Error.Message);
-            }
-            else
-            {
-                //if (gl_b_isOptOpen)
-                MessageBox.Show("FormsOptions(bwc_??)");
+                if (first == true)
+                    return false;
+                else
+                    return true;
             }
         }
-
-        public void FormOptions_Close(object sender, EventArgs e)
-        {
-            gl_b_isOptOpen = false;
-            gl_b_isAboutLoaded = false;
-        }
-
-        private void FormSOptions_Deactivate(object sender, EventArgs e)
-        {
-            TopMost = true;
-        }
-
+        
         private void ButOptSave_Click(object sender, EventArgs e)
         {
-            try
-            {
-                gl_i_servPort = Convert.ToInt32(ControlBoxPortServ.Text);
-                RegistryKey localMachineKey = Registry.LocalMachine;
-                RegistryKey localMachineSoftKey = localMachineKey.OpenSubKey("SOFTWARE", true);
-                RegistryKey regNanit = localMachineSoftKey.CreateSubKey(@"N.A.N.I.T");
-                RegistryKey servKey = regNanit.CreateSubKey("Update");
-                servKey.SetValue("port_server", gl_i_servPort);
-                servKey.Close();
-                servKey = null;
-                regNanit.Close();
-                regNanit = null;
-                localMachineSoftKey.Close();
-                localMachineSoftKey = null;
-                localMachineKey.Close();
-                localMachineKey = null;
-                gl_b_isOptOpen = false;
-                gl_b_isAboutLoaded = false;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("FormsOptions(save_reg) " + ex.Message);
-            }
-            Stop();
-            Start();
+            RegistryWork servReg = new RegistryWork("Server");
+            ServerApplication.ServerConnectionPort = Convert.ToInt32(ControlBoxPortServ.Text);
+            servReg.Write("port_server", ServerApplication.ServerConnectionPort);
+            servReg.Exit();
+            ServerApplication.RestartServer();
         }
 
         private void ButOptClose_Click(object sender, EventArgs e)
         {
-            try
+            if (ServerApplication.ServerConnectionPort != Convert.ToInt32(ControlBoxPortServ.Text))
             {
-                if (gl_i_servPort != Convert.ToInt32(ControlBoxPortServ.Text))
-                {
-                    const string message = "Закрыть настройки? Все несохранённые изменения будут потеряны";
-                    const string caption = "";
-                    var result = MessageBox.Show(message, caption, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
-
-                    if (result == DialogResult.Yes)
-                    {
-                        this.Hide();
-                        gl_b_isAboutLoaded = false;
-                        gl_b_isOptOpen = false;
-                    }
-                }
-                else
-                {
-                    this.Hide();
-                    gl_b_isAboutLoaded = false;
-                    gl_b_isOptOpen = false;
-                }
+                const string message = "Закрыть настройки? Все несохранённые изменения будут потеряны";
+                const string caption = "";
+                var result = MessageBox.Show(message, caption, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+                if (result == DialogResult.Yes)
+                    CloseForm();
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show("FormsOptions(close_click) " + ex.Message);
-            }
+            else
+                CloseForm();
         }
 
+        public void CloseForm(object sender, EventArgs e)
+        {
+            CloseForm();
+        }
 
+        private void CloseForm()
+        {
+            Hide();
+            ServerApplication.TrayMenuIsOpen = false;
+            ServerApplication.ServerFormIsOpen = false;
+        }
+
+        private void ListWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            Error.Msg("EP1Fm0.1", e.ToString());
+        }
     }
 }

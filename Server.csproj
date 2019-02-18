@@ -62,27 +62,47 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="NanitServer\Classes_\_Diag_Xml.cd" />
-    <None Include="Properties\NanServer.exe.config">
+    <None Include="Properties\App.config">
       <CustomToolNamespace>NaNiT</CustomToolNamespace>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Properties\app.manifest" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Main.cs" />
-    <Compile Include="NanitServer\Classes_\IApplications.cs" />
-    <Compile Include="NanitServer\Classes_\IServer.cs" />
-    <Compile Include="NanitServer\Classes_\_ClientValues.cs" />
+    <Compile Include="Client.cs" />
+    <Compile Include="ClientThread.cs" />
+    <Compile Include="Commands\AdminChat.cs" />
+    <Compile Include="Commands\Broadcast.cs" />
+    <Compile Include="Commands\CommandBase.cs" />
+    <Compile Include="Commands\Home.cs" />
+    <Compile Include="Commands\Item.cs" />
+    <Compile Include="Commands\Kick.cs" />
+    <Compile Include="Commands\Planet.cs" />
+    <Compile Include="Commands\Players.cs" />
+    <Compile Include="Commands\Shutdown.cs" />
+    <Compile Include="Commands\Uptime.cs" />
+    <Compile Include="Commands\WarpShip.cs" />
+    <Compile Include="Commands\WhosThereCommand.cs" />
+    <Compile Include="Config.cs" />
+    <Compile Include="Extensions\BinaryReaderEx.cs" />
+    <Compile Include="Extensions\BinaryWriterEx.cs" />
+    <Compile Include="ForwardThread.cs" />
+    <Compile Include="NanitServer\Classes_\_IVariablesInfo.cs" />
     <Compile Include="NanitServer\Classes_\XmlSoft.cs" />
     <Compile Include="NanitServer\Classes_\XmlUser.cs" />
-    <Compile Include="NanitServer\Classes_\_Loading.cs" />
-    <Compile Include="NanitServer\DBWork.cs" />
+    <Compile Include="NanitServer\CommandManager.cs" />
+    <Compile Include="MainProgam.cs" />
+    <Compile Include="NanitServer\RegistryWork.cs" />
     <Compile Include="NanitServer\ServerProgram.cs" />
-    <Compile Include="Properties\AssemblyInfoServer.cs" />
+    <Compile Include="NanitServer\UserInfo.cs" />
+    <Compile Include="Packets\Packet11ChatSend.cs" />
+    <Compile Include="Packets\Packet2ConnectResponse.cs" />
+    <Compile Include="Packets\Packet5ChatReceive.cs" />
+    <Compile Include="Packets\Packet7ClientConnect.cs" />
+    <Compile Include="Packets\PacketBase.cs" />
+    <Compile Include="ServerThread.cs" />
+    <Compile Include="Permissions\Users.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Errors.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -91,12 +111,9 @@
     </Compile>
     <Compile Include="NanitServer\Classes_\_XmlFile.cs" />
     <Compile Include="NanitServer\Classes_\_xApplication.cs" />
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-    <Compile Include="Settings.cs" />
+    <Compile Include="ServerConfig.cs" />
+    <Compile Include="Utils\Enums.cs" />
+    <Compile Include="Utils\Functions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NanitServer\ClientObject.cs" />
@@ -111,7 +128,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NanitServer\ServerCommands.cs" />
     <Compile Include="NanitServer\ServerObject.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -120,9 +136,16 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\Test\StarryboundServer-master\bin\Debug\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Core">
+      <HintPath>.\System.Core.dll</HintPath>
+    </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Data" />
@@ -144,6 +167,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Properties\Resources\net3.ico" />
+    <None Include="Properties\Resources\net4.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

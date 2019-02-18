@@ -31,7 +31,7 @@ namespace NaNiT
         public static string[] gl_sMas_pathUpdate = new string[11]; // Массив со списком адресов обновлений
         ///
         public static List<string> gl_sList_autorisedRegistredClients = new List<string>(); // Лист авторизованных клиентов
-        public static List<string> gl_sList_Messages = new List<string>(); // Лист авторизованных клиентов
+        public static List<string> LogMessageList = new List<string>(); // Лист авторизованных клиентов
         ///
         ///
         //-Integers-//
@@ -122,7 +122,7 @@ namespace NaNiT
             regWorkLocal.Close();
             regWorkLocal = null;
         }
-        
+
         public string ReadString(string From, string VarTo)
         {
             string resultStr = VarTo;
@@ -155,7 +155,7 @@ namespace NaNiT
         {
             Type TypeTo = From.GetType();
             string type = TypeTo.Name;
-            switch(type)
+            switch (type)
             {
                 case "String":
                     SubKey.SetValue(RegTo, From);
@@ -168,6 +168,6 @@ namespace NaNiT
                     break;
             }
         }
-        
+
     }
 }

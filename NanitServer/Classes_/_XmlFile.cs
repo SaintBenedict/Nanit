@@ -3,7 +3,7 @@ using System.Xml;
 
 namespace NaNiT
 {
-    class _XmlFile
+    abstract class _XmlFile
     {
         /// <summary>
         /// Имя /путь к файлу
@@ -132,7 +132,7 @@ namespace NaNiT
         /// <summary>
         /// Сохраняет активный документ
         /// </summary>
-        protected void Save()
+        internal void Save()
         {
             if (xDoc != null && xFilename != null)
                 xDoc.Save(xFilename);

@@ -1,63 +1,53 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
 using System.Windows.Forms;
-using static NaNiT.GlobalVariable;
-using static NaNiT.LocalGlobals;
 
 namespace NaNiT
 {
-	class SContextMenus
-	{
+    class SContextMenus : ServerApplication
+    {
         public ContextMenuStrip Create()
-		{
-			ContextMenuStrip menu = new ContextMenuStrip();
-			ToolStripMenuItem item;
-			ToolStripSeparator sep;
+        {
+            ContextMenuStrip Menu = new ContextMenuStrip();
+            ToolStripMenuItem item;
+            ToolStripSeparator sep;
 
             /// Создание кнопок
+            /// Они могут иметь иконки (item.Image = Resources.***;)
+            item = new ToolStripMenuItem();
+            item.Text = "Настройки";
+            item.Click += new EventHandler(Options_Click);
+            Menu.Items.Add(item);
+
+            // Separator.
+            sep = new ToolStripSeparator();
+            Menu.Items.Add(sep);
 
             item = new ToolStripMenuItem();
-			item.Text = "Настройки";
-			item.Click += new EventHandler(Options_Click);
-			///item.Image = Resources.About;
-			menu.Items.Add(item);
-			
-            // Separator.
-			sep = new ToolStripSeparator();
-			menu.Items.Add(sep);
+            item.Text = "Exit";
+            item.Click += new EventHandler(Exit_Click);
+            Menu.Items.Add(item);
 
-			item = new ToolStripMenuItem();
-			item.Text = "Exit";
-			item.Click += new System.EventHandler(Exit_Click);
-			///item.Image = Resources.Exit;
-			menu.Items.Add(item);
+            return Menu;
+        }
 
-			return menu;
-		}
-
-        
         void Options_Click(object sender, EventArgs e)
-		{
-            if (!gl_b_isAboutLoaded)
-			{
-                    if (!gl_b_isOptOpen)
-                    {
-                        //gl_f_optionsServ = new FormSOptions();
-                        gl_f_optionsServ.Text = (@"N.A.N.I.T Server");
-                        gl_f_optionsServ.Show();
-                        gl_b_isOptOpen = true;
-                    }
+        {
+            if (!TrayMenuIsOpen && !ServerFormIsOpen)
+            {
+                ServerForm.Show();
+                ServerFormIsOpen = true;
+                TrayMenuIsOpen = true;
             }
-		}
+        }
 
-		void Exit_Click(object sender, EventArgs e)
-		{
-            gl_f_optionsServ.Stop();
-            gl_f_optionsServ.Dispose();
-            ServerProgram.Tray.Dispose();
+        void Exit_Click(object sender, EventArgs e)
+        {
+            StopServer();
+            ServerForm.Dispose();
+            TrayNotify.Icon.Dispose();
             Application.Exit();
             Process.GetCurrentProcess().Kill();
         }
-	}
+    }
 }

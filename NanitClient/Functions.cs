@@ -183,7 +183,7 @@ namespace NaNiT
 
         public static void RefreshOpions()
         {
-            if (gl_b_isOptOpen)
+            if (ServerFormIsOpen)
                 gl_b_workLock = Revers(gl_b_workLock);
         }
 

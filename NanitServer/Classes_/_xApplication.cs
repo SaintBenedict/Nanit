@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace NaNiT
+﻿namespace NaNiT
 {
     public class _xApplication : IApplication
     {
@@ -28,12 +26,5 @@ namespace NaNiT
         {
             return new string[] { Name, Version, Publisher, InstallDate, InstallLocation };
         }
-
-        public _xApplication AppObj(string[] mass)
-        {
-            return this;
-        }
     }
-
-
 }

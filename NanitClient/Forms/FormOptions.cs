@@ -19,7 +19,7 @@ namespace NaNiT
         {
             InitializeComponent();
             gl_f_options = this;
-            gl_b_isOptOpen = true;
+            ServerFormIsOpen = true;
             ControlBoxIpServ.Text = gl_s_servIP;
             ControlBoxPortServ.Text = gl_i_servPort.ToString();
             CheckRoleAdmin.Checked = gl_b_roleAdmin;
@@ -49,7 +49,7 @@ namespace NaNiT
 
         public void FormOptions_Close(object sender, EventArgs e)
         {
-            gl_b_isOptOpen = false;
+            ServerFormIsOpen = false;
             gl_b_isAboutLoaded = false;
         }
         
@@ -98,7 +98,7 @@ namespace NaNiT
             regNanit.Close();
 
             this.Close();
-            gl_b_isOptOpen = false;
+            ServerFormIsOpen = false;
             gl_b_isAboutLoaded = false;
         }
 
@@ -114,14 +114,14 @@ namespace NaNiT
                 {
                     this.Close();
                     gl_b_isAboutLoaded = false;
-                    gl_b_isOptOpen = false;
+                    ServerFormIsOpen = false;
                 }
             }
             else
             {
                 this.Close();
                 gl_b_isAboutLoaded = false;
-                gl_b_isOptOpen = false;
+                ServerFormIsOpen = false;
             }
         }
 
@@ -296,7 +296,7 @@ namespace NaNiT
         }
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
-            while (gl_b_isOptOpen)
+            while (ServerFormIsOpen)
             {
                 if (workerByte)
                 {
@@ -332,7 +332,7 @@ namespace NaNiT
             }
             else
             {
-                if (gl_b_isOptOpen)
+                if (ServerFormIsOpen)
                     MessageBox.Show("Что-то пошло не так. Я закончил работать");
             }
         }

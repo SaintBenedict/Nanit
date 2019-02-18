@@ -1,105 +1,254 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
   <Class Name="NaNiT._XmlFile">
-    <Position X="3.5" Y="0.5" Width="2.25" />
+    <Position X="34.5" Y="19.75" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAgIIAAAAgAIAACAgAAAAAAAAAAAAAAAAAAAgCAAAA=</HashCode>
       <FileName>NanitServer\Classes_\_XmlFile.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="NaNiT.XmlUser">
-    <Position X="0.5" Y="0.5" Width="2.75" />
+    <Position X="31.25" Y="17.5" Width="2.75" />
+    <InheritanceLine Type="NaNiT._XmlFile" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="35.562" Y="19.75" />
+        <Point X="35.562" Y="18.25" />
+        <Point X="34" Y="18.25" />
+      </Path>
+    </InheritanceLine>
+    <AssociationLine Name="MainServer" Type="NaNiT.ServerObject" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="32.812" Y="17.5" />
+        <Point X="32.812" Y="14.991" />
+        <Point X="34.5" Y="14.991" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="1.883" Y="-2.304" Height="0.182" Width="1.187" />
+      </MemberNameLabel>
+    </AssociationLine>
     <TypeIdentifier>
-      <HashCode>ACAAAAAAACAAAAAABACAAAAQABAAAAACAAAgAAEAAAA=</HashCode>
+      <HashCode>ACAAAAAAACAAAKAABAAAAAAQAAAAAAASAAAgAAEAAAA=</HashCode>
       <FileName>NanitServer\Classes_\XmlUser.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="MainServer" />
+    </ShowAsAssociation>
   </Class>
   <Class Name="NaNiT.XmlSoft">
-    <Position X="6" Y="0.5" Width="2.5" />
+    <Position X="37.75" Y="17.5" Width="2.75" />
+    <InheritanceLine Type="NaNiT._XmlFile" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="36.312" Y="19.75" />
+        <Point X="36.312" Y="18.25" />
+        <Point X="37.75" Y="18.25" />
+      </Path>
+    </InheritanceLine>
+    <AssociationLine Name="MainServer" Type="NaNiT.ServerObject" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="38" Y="17.5" />
+        <Point X="38" Y="16.039" />
+        <Point X="37.25" Y="16.039" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.882" Y="-1.212" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="ThisClient" Type="NaNiT.ClientObject" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="40.25" Y="17.5" />
+        <Point X="40.25" Y="16.188" />
+        <Point X="41" Y="16.188" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.891" Y="-1.184" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="List" Type="NaNiT._xApplication" FixedFromPoint="true">
+      <Path>
+        <Point X="40.5" Y="19" />
+        <Point X="42.5" Y="19" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="_xApplication" Type="NaNiT._xApplication" FixedFromPoint="true">
+      <Path>
+        <Point X="40.5" Y="18.5" />
+        <Point X="42.5" Y="18.5" />
+      </Path>
+    </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAIAAAAAAAAAAAABAQCAAAQAAAAAAAAABAAAAAQAAAI=</HashCode>
+      <HashCode>AAIAAACAQAAAAKABEQAAAAAAAAAAAAAABAAAAAQAAAI=</HashCode>
       <FileName>NanitServer\Classes_\XmlSoft.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Orientation="Right" Position="0.162" />
+    <ShowAsAssociation>
+      <Property Name="MainServer" />
+      <Property Name="ThisClient" />
+      <Property Name="_xApplication" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="List" />
+    </ShowAsCollectionAssociation>
   </Class>
   <Class Name="NaNiT._xApplication">
-    <Position X="12.75" Y="2.25" Width="2.25" />
+    <Position X="42.5" Y="17.5" Width="2.75" />
+    <AssociationLine Name="XmlSoft" Type="NaNiT.XmlSoft" FixedFromPoint="true">
+      <Path>
+        <Point X="42.5" Y="19.438" />
+        <Point X="40.5" Y="19.438" />
+      </Path>
+    </AssociationLine>
     <TypeIdentifier>
-      <HashCode>IAAAAAAAAAAAAAAACAAAAAQAAAQAAAAABAIAIASAAAA=</HashCode>
+      <HashCode>IAAAAAAAAAAAAAAACAAAAAQAAAQAAAAAAAIAIASAAAA=</HashCode>
       <FileName>NanitServer\Classes_\_xApplication.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Orientation="Left" Position="2.894" />
+    <ShowAsAssociation>
+      <Property Name="XmlSoft" />
+    </ShowAsAssociation>
+    <Lollipop Orientation="Bottom" Position="0.1" />
   </Class>
   <Class Name="NaNiT.ClientObject">
-    <Position X="3.5" Y="5.75" Width="2.5" />
+    <Position X="41" Y="14" Width="2.75" />
+    <AssociationLine Name="FatherServer" Type="NaNiT.ServerObject" FixedFromPoint="true">
+      <Path>
+        <Point X="41" Y="15.563" />
+        <Point X="37.25" Y="15.563" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="2.444" Y="-0.254" Height="0.182" Width="1.123" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="CaptainTransport" Type="NaNiT.CommandManager">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-1.432" Y="0.31" />
+      </MemberNameLabel>
+    </AssociationLine>
     <TypeIdentifier>
-      <HashCode>ACQAAAAAAIAIAAAAEiBAAAgAAEAIAAAAAAAIAgAAAAA=</HashCode>
+      <HashCode>AAQAAAAgAAEAAIBAAAAACAAAAAEAAAAAgAAQAAAAAAA=</HashCode>
       <FileName>NanitServer\ClientObject.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.167" />
+    <ShowAsAssociation>
+      <Property Name="FatherServer" />
+      <Property Name="MyInfo" />
+      <Property Name="CaptainTransport" />
+    </ShowAsAssociation>
   </Class>
   <Class Name="NaNiT.ServerObject">
-    <Position X="7" Y="3.75" Width="2.75" />
+    <Position X="34.5" Y="14" Width="2.75" />
+    <AssociationLine Name="ClientsList" Type="NaNiT.ClientObject" FixedFromPoint="true">
+      <Path>
+        <Point X="37.25" Y="15.864" />
+        <Point X="41" Y="15.864" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="1.476" Y="0.089" Height="0.182" Width="2.175" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="MyXmlUser" Type="NaNiT.XmlUser" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="34.5" Y="15.224" />
+        <Point X="33.062" Y="15.224" />
+        <Point X="33.062" Y="17.5" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="-1.431" Y="1.859" Height="0.182" Width="1.155" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="TransportMessager" Type="NaNiT.CommandManager">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.082" Y="0.379" />
+      </MemberNameLabel>
+    </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAQAIAAAABAAAEAAAABAAAAAAQAAAABAAIAAAAABAAQ=</HashCode>
+      <HashCode>AAQAAAAAEBAAAAAAAAgAAAAAIEAAAABAAAAAgAAAAAA=</HashCode>
       <FileName>NanitServer\ServerObject.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Orientation="Left" Position="0.213" />
+    <ShowAsAssociation>
+      <Property Name="MyXmlUser" />
+      <Property Name="TransportMessager" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="ClientsList" />
+    </ShowAsCollectionAssociation>
   </Class>
-  <Class Name="NaNiT._ClientValues">
-    <Position X="0.5" Y="5.75" Width="2" />
+  <Class Name="NaNiT.FormSOptions" BaseTypeListCollapsed="true">
+    <Position X="43.5" Y="6" Width="3.25" />
     <TypeIdentifier>
-      <HashCode>AQAAAAAAAAAAIAAAAAAAAAgAAAIIAAAAACAAAABAAAA=</HashCode>
-      <FileName>NanitServer\Classes_\_ClientValues.cs</FileName>
+      <HashCode>AAQQACAAASYAAAAAACCIICACAKAAAABAAAAAAIAAAIA=</HashCode>
+      <FileName>NanitServer\Forms\FormSOptions.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="NaNiT.ServerProgram">
-    <Position X="11.5" Y="8" Width="2.25" />
+  <Class Name="NaNiT.SContextMenus">
+    <Position X="40" Y="6" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAQAAAAEAAAAAIAAAAAAA=</HashCode>
+      <FileName>NanitServer\Forms\SContextMenus.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NaNiT.ServerApplication">
+    <Position X="36.25" Y="6" Width="2.75" />
+    <AssociationLine Name="ServerForm" Type="NaNiT.FormSOptions" FixedFromPoint="true">
+      <Path>
+        <Point X="39" Y="7.938" />
+        <Point X="43.5" Y="7.938" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAIAAAEAAIAABCAgAIAAAAAAYAQAEAAgAAAABAAIAAA=</HashCode>
       <FileName>NanitServer\ServerProgram.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="ServerForm" />
+    </ShowAsAssociation>
   </Class>
-  <Class Name="NaNiT._Loading">
-    <Position X="14.25" Y="8" Width="2.5" />
+  <Class Name="NaNiT.UserInfo">
+    <Position X="45.5" Y="14" Width="2.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAgAAAAAAEAAAAAAAAQAAIAAAAAAAAEIAAA=</HashCode>
-      <FileName>NanitServer\Classes_\_Loading.cs</FileName>
+      <HashCode>AQAAAAAAAAAAIACAAAAAAAgAAAIIAAAAACAAAABAAAA=</HashCode>
+      <FileName>NanitServer\UserInfo.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Master" />
+    </ShowAsAssociation>
+    <Lollipop Orientation="Bottom" Position="0.1" />
   </Class>
-  <Class Name="NaNiT.GlobalFunctions">
-    <Position X="9.25" Y="9.75" Width="1.75" />
+  <Class Name="NaNiT.CommandManager">
+    <Position X="37.75" Y="11.5" Width="2.75" />
+    <AssociationLine Name="President" Type="NaNiT.ClientObject" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="40.5" Y="13.24" />
+        <Point X="41.312" Y="13.24" />
+        <Point X="41.312" Y="14" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0.974" Y="0.133" />
+      </MemberNameLabel>
+    </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAQAAAQAAA=</HashCode>
-      <FileName>Main.cs</FileName>
+      <HashCode>AAAAAAAQAAAAGAAAAEAAAAAgAAAAAAAAAQYAAAAAABA=</HashCode>
+      <FileName>NanitServer\CommandManager.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="President" />
+    </ShowAsAssociation>
   </Class>
   <Class Name="NaNiT.RegistryWork">
-    <Position X="11.5" Y="9.75" Width="2.25" />
+    <Position X="32.5" Y="6" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAQAAAAAAAAAAEAQAAAAAAQAAQAAIAAIAAEAAAA=</HashCode>
-      <FileName>Main.cs</FileName>
+      <FileName>NanitServer\RegistryWork.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Interface Name="NaNiT.IServer">
-    <Position X="3.5" Y="3.75" Width="2.75" />
-    <TypeIdentifier>
-      <HashCode>AAQAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>NanitServer\Classes_\IServer.cs</FileName>
-    </TypeIdentifier>
-  </Interface>
   <Interface Name="NaNiT.IApplication">
-    <Position X="10.25" Y="3.25" Width="1.5" />
+    <Position X="42.5" Y="20.75" Width="2.75" />
     <TypeIdentifier>
       <HashCode>IAAAAAAAAAAAAAAACAAAAAQAAAQAAAAAAAIAAAAAAAA=</HashCode>
-      <FileName>NanitServer\Classes_\IApplications.cs</FileName>
+      <FileName>NanitServer\Classes_\_IVariablesInfo.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="NaNiT.IApplicationTransport">
-    <Position X="10.25" Y="0.5" Width="1.5" />
+  <Interface Name="NaNiT.IInformation">
+    <Position X="45.5" Y="17.25" Width="2.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAQAAAA=</HashCode>
-      <FileName>NanitServer\Classes_\IApplications.cs</FileName>
+      <HashCode>AQAAAAAAAAAAIAAAAAAAAAgAAAIIAAAAACAAAABAAAA=</HashCode>
+      <FileName>NanitServer\Classes_\_IVariablesInfo.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Font Name="Segoe UI" Size="9" />

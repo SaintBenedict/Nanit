@@ -2,14 +2,11 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
-using System.Windows.Forms;
-using static NaNiT.GlobalVariable;
 
 namespace NaNiT
 {
-    public class ServerObject : IServer
+    public class ServerObject : ServerApplication
     {
         /// <summary>
         /// Сервер для прослушивания
@@ -20,147 +17,100 @@ namespace NaNiT
         /// </summary>
         internal List<ClientObject> ClientsList { get; set; }
         /// <summary>
-        /// Оператор пользовательских параметров
+        /// Рабочий собирающий информацию о подключающихся пользователях
         /// </summary>
-        internal XmlUser ServXUsers { get; set; }
-        public TcpClient ThisTcpClient { get; set; }
+        internal XmlUser MyXmlUser { get; set; }
+        public CommandManager TransportMessager { get; set; }
+
 
         public ServerObject()
         {
+            MainServer = this;
             ClientsList = new List<ClientObject>();
-            ServXUsers = new XmlUser();
+            MyXmlUser = new XmlUser(this);            
         }
 
-        public ClientObject Client(TcpClient _tcpclient, ServerObject _server)
-        {
-            return new ClientObject(_tcpclient, _server)
-            {
-                myMessageNotAwait = false,
-                IsRegister = false,
-                DateOfRegistration = null,
-                DateLastOnline = null,
-                IsActive = true,
-                StupidCheck = false
-            };
-        }
 
         // прослушивание входящих подключений
-        protected internal void Listen()
+        public void Starting()
         {
             try
             {
-                TcpListener = new TcpListener(IPAddress.Any, gl_i_servPort);
+                ServerIsDisconnecting = false;
+                TcpListener = new TcpListener(IPAddress.Any, ServerConnectionPort);
                 TcpListener.Start();
-                gl_b_disconnectInProgress = false;
-                gl_sList_Messages.Add("Сервер запущен: " + DateTime.Now.ToString());
+                TrayNotify.Icon = Resources.net3;
+                LogMessageList.Add("Сервер запущен: " + DateTime.Now.ToString());
+                NewConnection();
             }
             catch (Exception ex)
             {
-                if (!gl_b_disconnectInProgress)
-                {
-                    MessageBox.Show("ServerObject(Listen) " + ex.Message);
-                    Disconnect();
-                }
-                return;
+                Error.Msg("EP0Li0.1", ex.ToString());
             }
+        }
 
+        public void NewConnection()
+        {
             while (true)
             {
                 try
                 {
-
-                    TcpClient tcpClient = TcpListener.AcceptTcpClient();
-                    // Вот тут кончается то, что относится напрямую к серверной части и начинается генерация клиента
-                    // Продолжение серверной части видимо будет уже в Процессе у клиента
-                    if (!gl_b_disconnectInProgress)
-                    {
-                        ClientObject clientObject = Client(tcpClient, this);
-
-                        Thread clientThread = new Thread(new ThreadStart(clientObject.Process));
-                        clientThread.Start();
-                    }
+                    TcpClient thisTcpSocket = TcpListener.AcceptTcpClient();
+                    ClientObject newClient = new ClientObject(thisTcpSocket, this);
+                    Thread thisClientThread = new Thread(new ThreadStart(newClient.ClientWork));
+                    thisClientThread.Start();
                 }
                 catch (Exception ex)
                 {
-                    if (!gl_b_disconnectInProgress)
-                    {
-                        MessageBox.Show("ServerObject(Lis_Tcp_cli) " + ex.Message);
-                    }
+                    if (!ServerIsDisconnecting)
+                        Error.Msg("EP0Li1.1", ex.ToString());
                     break;
                 }
             }
-
         }
-
-        // добавление клиента
-        protected internal void AddConnection(ClientObject clientObject)
+        
+        protected internal void ClientListing(ClientObject clientObject)
         {
             try
             {
                 ClientsList.Add(clientObject);
             }
-            catch (Exception ex) { MessageBox.Show("ServerObject(Add_cli) " + ex.Message); }
+            catch (Exception ex) { Error.Msg("ED1Cl1.1", ex.ToString()); }
         }
-
-        // удаление одного клиента
-        protected internal void RemoveConnection(string id)
+        
+        protected internal void ClientDeListing(string id)
         {
             try
             {
-                foreach (ClientObject ClTemp in ClientsList)
+                foreach (ClientObject ClientTemp in ClientsList)
                 {
-                    if (ClTemp.Guid_id == id)
+                    if (ClientTemp.MyInfo.Guid_id == id)
                     {
-                        ClientsList.Remove(ClTemp);
+                        ClientsList.Remove(ClientTemp);
                         return;
                     }
                 }
             }
-            catch (Exception ex) { MessageBox.Show("ServerObject(Rem_cli) " + ex.Message); }
+            catch (Exception ex) { Error.Msg("ED1Cl2.1", ex.ToString()); }
         }
-
-        // трансляция сообщения подключенным клиентам
-        protected internal void BroadcastMessage(string message, List<ClientObject> clientsTemp, ClientObject clientOne, string whos)
-        {
-            try
-            {
-                byte[] data = Encoding.Unicode.GetBytes(message);
-                switch (whos)
-                {
-                    case "all":
-                        if (clientsTemp.Count >= 1)
-                        {
-                            for (int i = 0; i < clientsTemp.Count; i++)
-                            {
-                                ClientsList[i].Stream.Write(data, 0, data.Length); //передача данных
-                            }
-                            break;
-                        }
-                        else
-                            break;
-                    case "self":
-                        clientOne.Stream.Write(data, 0, data.Length);
-                        break;
-                }
-            }
-            catch (Exception ex) { MessageBox.Show("ServerObject(Brodc) " + ex.Message); }
-        }
+        
 
         // отключение всех клиентов
         public void Disconnect()
         {
-            if (!gl_b_disconnectInProgress)
+            if (!ServerIsDisconnecting)
             {
                 try
                 {
-                    gl_sList_Messages.Add("Сервер прекратил работу: " + DateTime.Now.ToString());
-                    gl_b_disconnectInProgress = true;
-                    BroadcastMessage("Fu(ck&&DI3-", ClientsList, null, "all");
+                    LogMessageList.Add("Сервер прекратил работу: " + DateTime.Now.ToString());
+                    ServerIsDisconnecting = true;
+                    TrayNotify.Icon = Resources.net4;
+                    TransportMessager.Send("Fu(ck&&DI3-");
                     foreach (ClientObject clTemp in ClientsList)
                     {
                         if (clTemp != null)
                         {
-                            gl_sList_Messages.Add(clTemp.UserHostName + " отключился");
+                            LogMessageList.Add(clTemp.MyInfo.UserHostName + " отключился");
                             clTemp.Disconnect();
                         }
                     }
@@ -170,7 +120,7 @@ namespace NaNiT
                     GC.WaitForPendingFinalizers();
                     ClientsList.Clear();
                 }
-                catch (Exception ex) { MessageBox.Show("ServerObject(DCon_main) " + ex.Message); }
+                catch (Exception ex) { Error.Msg("EP0Dc1.1", ex.ToString()); }
             }
         }
     }

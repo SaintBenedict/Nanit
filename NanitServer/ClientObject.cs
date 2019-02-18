@@ -1,136 +1,88 @@
 ﻿using System;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
-using System.Windows.Forms;
-using static NaNiT.GlobalVariable;
-using static NaNiT.LocalGlobals;
 
 namespace NaNiT
 {
-    public class ClientObject : _ClientValues, IServer
+    public class ClientObject
     {
-        internal ServerObject Server { get; set; }
-        internal XmlSoft ClientXSofts { get; set; }
-        public TcpClient ThisTcpClient { get; set; }
-        protected internal NetworkStream Stream { get; private set; }
+        protected internal NetworkStream MyStream { get; set; }
+        public ServerObject FatherServer { get; set; }
+        public TcpClient TcpSocket { get; private set; }
+        public UserInfo MyInfo { get; set; }
+        public CommandManager CaptainTransport { get; set; }
+        public bool IsConnected { get; set; }
+        internal XmlSoft MyXmlSoft { get; set; }
 
 
-        protected internal int AwaitVarForCom;
-        protected internal bool IsRegister, IsActive, StupidCheck, myMessageNotAwait;
-        protected internal Thread ClientThreadThis;
-        
-        
-
-        public ClientObject(TcpClient tcpClient, ServerObject serverObject) :base(tcpClient, serverObject)
+        public ClientObject(TcpClient tcpClient, ServerObject currentServer)
         {
-            ThisTcpClient = tcpClient;
-            Server = serverObject;
-            serverObject.AddConnection(this);
-            UserIpAdress = Convert.ToString(((System.Net.IPEndPoint)ThisTcpClient.Client.RemoteEndPoint).Address);
+            TcpSocket = tcpClient;
+            FatherServer = currentServer;
+            MyInfo = new UserInfo(this);
+            CaptainTransport = new CommandManager(this);
+            MyInfo.UserIpAdress = Convert.ToString(((System.Net.IPEndPoint)TcpSocket.Client.RemoteEndPoint).Address);
+            FatherServer.ClientListing(this);
         }
 
-        public void Process()
+        public void ClientWork()
         {
-            try // в бесконечном цикле получаем сообщения от клиента
+            try
             {
-                AwaitVarForCom = 0;
-                Stream = ThisTcpClient.GetStream();
-                while (ThisTcpClient != null && !gl_b_disconnectInProgress && IsActive)
+                CaptainTransport.WaitCommandInCase = 0;
+                MyStream = TcpSocket.GetStream();
+                IsConnected = true;
+                while (TcpSocket != null && !ServerApplication.ServerIsDisconnecting && IsConnected)
                 {
-                    string MessageTestNull = GetMessage();
+                    string MessageTestNull = CaptainTransport.MessageAccepting();
                     if (MessageTestNull == null)
                     {
                         Disconnect();
                         return;
                     }
-                    Thread ClientThreadThis = Thread.CurrentThread;
-                    if (ClientThreadThis.Name == null)
-                        ClientThreadThis.Name = "Client " + UserHostName + "Proc";
+                    ServerApplication.ThreadName("Client " + MyInfo.UserHostName, Thread.CurrentThread);
                 }
             }
             catch (Exception ex)
             {
-                if (!gl_b_disconnectInProgress && IsActive)
+                if (!ServerApplication.ServerIsDisconnecting && IsConnected)
                 {
-                    MessageBox.Show("ClientObject(proc) " + ex.Message);
+                    Error.Msg("EP1Cl1.1", ex.ToString());
                 }
             }
             finally
             {
-                if (!gl_b_disconnectInProgress && IsActive)
+                if (!ServerApplication.ServerIsDisconnecting && IsConnected)
                 {
                     Disconnect();
                 }
             }
         }
 
-        // чтение входящего сообщения и преобразование в строку
-        private string GetMessage()
-        {
-            if (Stream.CanRead)
-            {
-                try
-                {
-                    byte[] data = new byte[64]; // буфер для получаемых данных
-                    StringBuilder builder = new StringBuilder();
-                    int bytes = 0;
-                    do
-                    {
-                        if (gl_b_disconnectInProgress || !IsActive)
-                        {
-                            return null;
-                        }
-                        myMessageNotAwait = true;
-                        bytes = Stream.Read(data, 0, data.Length);
-                        if (bytes == 0)
-                            return null;
-                        builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
-                    }
-                    while (Stream.DataAvailable && IsActive);
-                    ServerCommands.CheckCommand(builder.ToString(), this, Server, Stream);
-                    return builder.ToString();
-                }
-                catch
-                {
-                    if (!gl_b_disconnectInProgress && IsActive)
-                    {
-                        Disconnect();
-                    }
-                    return null;
-                }
-            }
-            else
-            {
-                return null;
-            }
-
-        }
-
-
         // закрытие подключения
         public void Disconnect()
         {
-            if (IsActive)
+            if (IsConnected)
             {
-                IsActive = false;
+                IsConnected = false;
                 try
                 {
-                    DateLastOnline = DateTime.Now.ToString();
-                    if (Stream != null) { Stream.Close(); Stream = null; }
-                    if (ThisTcpClient != null) { ThisTcpClient.Close(); ThisTcpClient = null; }
-                    if (!gl_b_disconnectInProgress && !StupidCheck)
+                    MyInfo.DateLastOnline = DateTime.Now.ToString();
+
+                    if (MyStream != null) { MyStream.Close(); MyStream = null; }
+                    if (TcpSocket != null) { TcpSocket.Close(); TcpSocket = null; }
+                    if (!ServerApplication.ServerIsDisconnecting && !CaptainTransport.TransportProblem)
                     {
-                        gl_sList_Messages.Add(UserHostName + " отключился [" + DateLastOnline + "]");
-                        Server.RemoveConnection(this.Guid_id);
+                        ServerApplication.LogMessageList.Add(MyInfo.UserHostName + " отключился [" + MyInfo.DateLastOnline + "]");
+                        FatherServer.ClientDeListing(MyInfo.Guid_id);
                     }
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
                 }
                 catch (Exception ex)
                 {
-                    if (!StupidCheck)
-                        MessageBox.Show("ClientObject(close) " + ex.Message);
+                    if (!CaptainTransport.TransportProblem)
+                        Error.Msg("EP1Cl2.1", ex.ToString());
                 }
             }
         }

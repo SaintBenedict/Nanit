@@ -1,7 +1,4 @@
-﻿using static NaNiT.GlobalVariable;
-using static NaNiT.LocalGlobals;
-
-namespace NaNiT
+﻿namespace NaNiT
 {
     partial class FormSOptions
     {
@@ -11,8 +8,8 @@ namespace NaNiT
             if (disposing && (components != null))
             {
                 components.Dispose();
-                gl_b_isAboutLoaded = false;
-                gl_b_isOptOpen = false;
+                ServerApplication.TrayMenuIsOpen = false;
+                ServerApplication.ServerFormIsOpen = false;
             }
             base.Dispose(disposing);
         }
@@ -25,10 +22,11 @@ namespace NaNiT
             this.ButOptClose = new System.Windows.Forms.Button();
             this.LabelPortServ = new System.Windows.Forms.Label();
             this.ControlBoxPortServ = new System.Windows.Forms.TextBox();
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.ListWorker = new System.ComponentModel.BackgroundWorker();
             this.ButStart = new System.Windows.Forms.Button();
             this.listView1 = new System.Windows.Forms.ListView();
             this.Messaging = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.ControlBoxPortServ.Text = ServerApplication.ServerConnectionPort.ToString();
             this.SuspendLayout();
             // 
             // ButOptSave
@@ -72,9 +70,11 @@ namespace NaNiT
             // 
             // backgroundWorker1
             // 
-            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
-            this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
-            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
+            this.ListWorker.WorkerReportsProgress = true;
+            this.ListWorker.RunWorkerAsync();
+            this.ListWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.ListWorker_DoWork);
+            this.ListWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.ListWorker_ProgressChanged);
+            this.ListWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.ListWorker_RunWorkerCompleted);
             // 
             // ButStart
             // 
@@ -88,8 +88,7 @@ namespace NaNiT
             // 
             // listView1
             // 
-            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.Messaging});
+            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {this.Messaging});
             this.listView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.listView1.Location = new System.Drawing.Point(12, 80);
             this.listView1.Name = "listView1";
@@ -122,10 +121,9 @@ namespace NaNiT
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Настройки программы";
+            this.Text = @"[N.A.N.I.T Server]";
             this.TopMost = true;
-            this.Closed += new System.EventHandler(this.FormOptions_Close);
-            this.Deactivate += new System.EventHandler(this.FormSOptions_Deactivate);
+            this.Closed += new System.EventHandler(this.CloseForm);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -137,7 +135,7 @@ namespace NaNiT
         private System.Windows.Forms.Button ButOptClose;
         private System.Windows.Forms.Label LabelPortServ;
         private System.Windows.Forms.TextBox ControlBoxPortServ;
-        public System.ComponentModel.BackgroundWorker backgroundWorker1;
+        public System.ComponentModel.BackgroundWorker ListWorker;
         private System.Windows.Forms.Button ButStart;
         private System.Windows.Forms.ColumnHeader Messaging;
         private System.Windows.Forms.ListView listView1;

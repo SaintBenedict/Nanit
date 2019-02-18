@@ -26,7 +26,7 @@ namespace NaNiT
                 gl_f_options = new FormOptions();
                 gl_f_options.Text = (@"N.A.N.I.T (((ver." + gl_s_version + ")))");
                 gl_f_options.Show();
-                gl_b_isOptOpen = true;
+                ServerFormIsOpen = true;
                 this.Close();
             }
             else

@@ -5,10 +5,11 @@ namespace NaNiT
 {
     class XmlUser : _XmlFile
     {
+        ServerObject MainServer { get; set; }
         /// <summary>
         /// Массив/перечень под-свойств юзера
         /// </summary>
-        public string[] childs { get; } = new string[] { "RegistredDate", "LastSeenDate", "HostName", "IPaddress", "HardwareFile", "SoftwareFile" };
+        public string[] Childs { get; } = new string[] { "RegistredDate", "LastSeenDate", "HostName", "IPaddress", "HardwareFile", "SoftwareFile" };
         /// <summary>
         /// Массив со всеми значениями юзеров
         /// </summary>
@@ -17,8 +18,9 @@ namespace NaNiT
         /// <summary>
         /// XML юзер, работает с пользователями
         /// </summary>
-        public XmlUser() : base("RegistredUsers.xml", "users", "user")
+        public XmlUser(ServerObject currentServer) : base("RegistredUsers.xml", "users", "user")
         {
+            MainServer = currentServer;
             ReCheck(true);
             Sorting();
         }
@@ -29,7 +31,7 @@ namespace NaNiT
         /// <param name="deep">И всего массива значений Value</param>
         protected void ReCheck(bool deep = false)
         {
-            Value = new string[xRoot.SelectNodes("*").Count, childs.Length + 1];
+            Value = new string[xRoot.SelectNodes("*").Count, Childs.Length + 1];
             int n = 0, p = 0;
             foreach (XmlNode _user in xRoot.SelectNodes("*"))
             {
@@ -41,9 +43,9 @@ namespace NaNiT
                     {
                         foreach (XmlNode _params in _user.ChildNodes)
                         {
-                            for (p = 0; p < childs.Length; p++)
+                            for (p = 0; p < Childs.Length; p++)
                             {
-                                if (_params.Name == childs[p])
+                                if (_params.Name == Childs[p])
                                 {
                                     Value[n, p + 1] = _params.InnerText;
                                 }
@@ -81,43 +83,41 @@ namespace NaNiT
         /// Проверяет наличие Клиента в базе и регистрирует его если нет.
         /// </summary>
         /// <param name="client">Клиент подключившийся к серверу</param>
-        public bool isRegistred(ClientObject client)
+        public bool IsRegistred(ClientObject client)
         {
             // Забиваем массив данными, который пойдут в файл при регистрации, либо после авторизации для проверки
-            string[] _client = new string[] { DateTime.Now.ToString(), DateTime.Now.ToString(), client.UserHostName, client.UserIpAdress,
-                                            @"ClientsBase\" + client.CryptedName + @"_Hardware.xml", @"ClientsBase\" + client.CryptedName + @"_Software.xml" };
+            string[] _client = new string[] { DateTime.Now.ToString(), DateTime.Now.ToString(), client.MyInfo.UserHostName, client.MyInfo.UserIpAdress,
+                                            @"ClientsBase\" + client.MyInfo.CryptedName + @"_Hardware.xml", @"ClientsBase\" + client.MyInfo.CryptedName + @"_Software.xml" };
             ReCheck(true);
             for (int i = 0; i < xRoot.SelectNodes("*").Count; i++)
             {
-                if (Value[i, 0] == client.CryptedName)
+                if (Value[i, 0] == client.MyInfo.CryptedName)
                 {
-                    client.Database_id = i;
+                    client.MyInfo.Database_id = i;
                     // Тут мы проверяем текущие ноды в файле на соответствие с параметрами программы, чтобы добавить новые (после обновления версии если появятся)
                     // Или сообщить администратору о задвоении
-                    if (Node(i).ChildNodes.Count != childs.Length)
+                    if (Node(i).ChildNodes.Count != Childs.Length)
                         Repair(i);
                     Edit(i, 1, DateTime.Now.ToString());
-                    if (Value[i, 3] != client.UserIpAdress)
+                    if (Value[i, 3] != client.MyInfo.UserIpAdress)
                     {
-                        Error.Msg("ES2Xm3.2", i.ToString(), Value[i, 0], client.UserIpAdress, Value[i, 3]);
-                        Edit(i, 3, client.UserIpAdress);
+                        Error.Msg("ES2Xm3.2", i.ToString(), Value[i, 0], client.MyInfo.UserIpAdress, Value[i, 3]);
+                        Edit(i, 3, client.MyInfo.UserIpAdress);
                     }
-                    if (Value[i, 2] != client.UserHostName)
+                    if (Value[i, 2] != client.MyInfo.UserHostName)
                     {
-                        Error.Msg("ED3Xm3.3", i.ToString(), Value[i, 0], client.UserHostName);
-                        Edit(i, 2, client.UserHostName);
+                        Error.Msg("ED3Xm3.3", i.ToString(), Value[i, 0], client.MyInfo.UserHostName);
+                        Edit(i, 2, client.MyInfo.UserHostName);
                     }
-                    client.IsRegister = true;
                     return true;
                 }
             }
             ReCheck();
             // Если клиент не зарегистрирован, то забиваем новый массив данными, которые пойдут в его потомков (параметры)
-            client.DateOfRegistration = DateTime.Now.ToString();
-            client.Database_id = xRoot.SelectNodes("*").Count;
+            client.MyInfo.DateOfRegistration = DateTime.Now.ToString();
+            client.MyInfo.Database_id = xRoot.SelectNodes("*").Count;
             // И добавляем его в xml файл (сохранение файла идёт в конце AddMain метода)
-            AddMain("user", client.CryptedName, childs, _client);
-            client.IsRegister = true;
+            AddMain("user", client.MyInfo.CryptedName, Childs, _client);
             ReCheck(true);
             return false;
 
@@ -127,24 +127,24 @@ namespace NaNiT
             /// <param name="id">id клиента в базе xml</param>
             void Repair(int id)
             {
-                int[] temp = new int[childs.Length];
+                int[] temp = new int[Childs.Length];
                 foreach (XmlNode tempChild in Node(id))
                 {
                     // Пересчитываем количество совпадений имени ноды и параметра
-                    for (int k = 0; k < childs.Length; k++)
+                    for (int k = 0; k < Childs.Length; k++)
                     {
-                        if (tempChild.Name == childs[k])
+                        if (tempChild.Name == Childs[k])
                             temp[k]++;
                     }
                 }
-                for (int z = 0; z < childs.Length; z++)
+                for (int z = 0; z < Childs.Length; z++)
                 {
                     // И выполняем одно из двух действий, если какая-то нода отсутствует или задваивается
                     if (temp[z] == 0)
                         // добавить юзеру {id} чилда [z]
                         Restore(z);
                     if (temp[z] > 1)
-                        Error.Msg("ED4Xm2.1", id.ToString(), client.UserHostName, childs[z], temp[z].ToString());
+                        Error.Msg("ED4Xm2.1", id.ToString(), client.MyInfo.UserHostName, Childs[z], temp[z].ToString());
                 }
 
                 /// <summary>
@@ -154,7 +154,7 @@ namespace NaNiT
                 void Restore(int z)
                 {
                     XmlNode pure = Node(id);
-                    XmlElement pureChild = xDoc.CreateElement(childs[z]);
+                    XmlElement pureChild = xDoc.CreateElement(Childs[z]);
                     XmlText pureText = xDoc.CreateTextNode(_client[z]);
                     pureChild.AppendChild(pureText);
                     pure.AppendChild(pureChild);
@@ -174,7 +174,7 @@ namespace NaNiT
         {
             foreach (XmlNode tempChild in Node(id))
             {
-                if (tempChild.Name == childs[child])
+                if (tempChild.Name == Childs[child])
                 {
                     tempChild.InnerText = _value;
                     Value[id, child] = _value;
@@ -189,14 +189,14 @@ namespace NaNiT
         /// <param name="_userSort">Нода, детей которой сортируем</param>
         protected void Sorting(XmlNode _userSort)
         {
-            XmlNode firstChild = _userSort.SelectSingleNode(childs[0]);
+            XmlNode firstChild = _userSort.SelectSingleNode(Childs[0]);
             _userSort.PrependChild(firstChild);
-            for (int i = 1; i < childs.Length; i++)
+            for (int i = 1; i < Childs.Length; i++)
             {
-                XmlNode childToMove = _userSort.SelectSingleNode(childs[i]);
+                XmlNode childToMove = _userSort.SelectSingleNode(Childs[i]);
                 if (childToMove == null)
                 {
-                    XmlElement newEl = xDoc.CreateElement(childs[i]);
+                    XmlElement newEl = xDoc.CreateElement(Childs[i]);
                     _userSort.AppendChild(newEl);
                     childToMove = newEl;
                 }

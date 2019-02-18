@@ -12,11 +12,11 @@ namespace NaNiT
             {
                 components.Dispose();
                 gl_b_isAboutLoaded = false;
-                gl_b_isOptOpen = false;
+                ServerFormIsOpen = false;
             }
             base.Dispose(disposing);
             gl_b_isAboutLoaded = false;
-            gl_b_isOptOpen = false;
+            ServerFormIsOpen = false;
         }
 
         #region Windows Form Designer generated code
