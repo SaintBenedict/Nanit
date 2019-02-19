@@ -12,29 +12,28 @@ namespace NaNiT.Permissions
     {
         public static List<Connection> connections = new List<Connection>(); // все подключения
         public NetworkStream StreamOfApplication;
-        TcpClient NewConnection;
-        Thread newConnectThread;
+        internal TcpClient NewConnection;
+        internal Thread newConnectThread;
 
         public void Run()
         {
             try
             {
-                NewConnection = new TcpClient();
-                NewConnection.Connect(gl_s_servIP, gl_i_servPort); //подключение клиента
-
-                ClientProgram.logInfo("Соединение с сервером установлено");
-                ClientProgram.CurrentClientStatus = _ClientState.Running;
                 while (true)
                 {
                     if (connections.Count == 0 && ClientProgram.AllowToConnect)
                     {
-                            StreamOfApplication = NewConnection.GetStream(); // получаем поток
-                            Connection ThisServerConnection = new Connection(NewConnection, this, StreamOfApplication);
-                            gl_c_current = ThisServerConnection;
-                            newConnectThread = new Thread(new ThreadStart(ThisServerConnection.Start));
-                            newConnectThread.Name = "Новое соединение";
-                            newConnectThread.Start();
-                            Thread.Sleep(10000);
+                        NewConnection = new TcpClient();
+                        NewConnection.Connect(gl_s_servIP, gl_i_servPort); //подключение клиента
+                        StreamOfApplication = NewConnection.GetStream(); // получаем поток
+                        Connection ThisServerConnection = new Connection(NewConnection, this, StreamOfApplication);
+                        gl_c_current = ThisServerConnection;
+                        ClientProgram.logInfo("Соединение с сервером установлено");
+                        ClientProgram.CurrentClientStatus = _ClientState.Running;
+                        newConnectThread = new Thread(new ThreadStart(ThisServerConnection.Start));
+                        newConnectThread.Name = "Новое соединение";
+                        newConnectThread.Start();
+                        Thread.Sleep(10000);
                     }
                     else
                     {

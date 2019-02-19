@@ -71,7 +71,8 @@ namespace NaNiT
                 MyName.Name = "Основной поток";
 
             _CrashMonitorThread = new Thread(new ThreadStart(_СrashMonitor));
-            _CrashMonitorThread.Name = "Поток монитора состояний";
+            if (_CrashMonitorThread.Name == null)
+                _CrashMonitorThread.Name = "Поток монитора состояний";
             _CrashMonitorThread.Start();
 
             gl_s_OSdate = GetOSDate();
@@ -90,7 +91,8 @@ namespace NaNiT
 
             _ClientActivities = new _ClientThread();
             _ClientProgramThread = new Thread(new ThreadStart(_ClientActivities.Run));
-            _ClientProgramThread.Name = "Новый Клиент (Main)";
+            if (_ClientProgramThread.Name == null)
+                _ClientProgramThread.Name = "Новый Клиент (Main)";
             _ClientProgramThread.Start();
             
             // Старт таймеров и тредов
@@ -108,53 +110,25 @@ namespace NaNiT
         {
             while (true)
             {
-                if (CurrentClientStatus == _ClientState.Aborted)
+                if (!gl_b_serverIsConnected)
                 {
                     logFatal("Критическая ошибка клиента. Перезапуск через 10 секунд.");
+                    _ClientActivities.newConnectThread.Abort();
+                    _ClientActivities.newConnectThread = null;
+                    _ClientActivities.StreamOfApplication.Close();
+                    _ClientActivities.StreamOfApplication = null;
+                    _ClientActivities.NewConnection.Close();
+                    _ClientActivities.NewConnection = null;
+                    _ClientThread.connections.Clear();
+                    gl_s_serverStatus = "Сервер недоступен";
+                    ClientProgram.TrayNotify.Icon = Resources.net1;
                     Thread.Sleep(10000);
-                    RestartingClient();
                     break;
                 }
                 Thread.Sleep(2000);
             }
         }
-        public static void StopClient()
-        {
-            AllowToConnect = false;
-            gl_b_serverIsConnected = false;
-            TrayNotify.Icon = Resources.net1;
-            while (_ClientThread.connections.Count > 0)
-            {
-                // Waiting
-            }
-
-            if (_ClientProgramThread != null) _ClientProgramThread.Abort();
-            Thread.Sleep(500);
-        }
-
-        public static void StartClient()
-        {
-            CurrentClientStatus = _ClientState.Starting;
-            _ClientActivities = null;
-            writeLog("", LogType.FileOnly);
-            writeLog("-- Log Start [After Restart]: " + DateTime.Now + " --", LogType.FileOnly);
-            _ClientActivities = new _ClientThread();
-            AllowToConnect = true;
-            _ClientProgramThread.Start();
-            _CrashMonitorThread.Start();
-            while (CurrentClientStatus != _ClientState.Running) { if (CurrentClientStatus == _ClientState.Aborted) return; }
-            TrayNotify.Icon = Resources.net2;
-            logInfo("Все приготовления выполнены. Клиент запущен.");
-        }
-
-        public static void RestartingClient()
-        {
-            CurrentClientStatus = _ClientState.Aborted;
-            StopClient();
-            logInfo("Поток завершился, перезапускаем.");
-            Thread.Sleep(3000);
-            StartClient();
-        }
+        
 
         public static void logDebug(string source, string message) { writeLog("[" + source + "]:" + message, LogType.Debug); }
         public static void logInfo(string message) { writeLog(message, LogType.Info); }
