@@ -1,4 +1,4 @@
-﻿using NaNiT.Utils;
+﻿using NaNiT.Functions;
 using System;
 
 namespace NaNiT.Packets
@@ -6,7 +6,7 @@ namespace NaNiT.Packets
     abstract class PacketBase
     {
         protected Object mStream;
-        protected Connection mClient;
+        protected ClientThread mClient;
         protected Direction mDirection;
 
         public abstract Object OnReceive();

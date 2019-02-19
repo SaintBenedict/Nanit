@@ -1,14 +1,13 @@
-﻿using NaNiT.Functions;
+﻿using NaNiT.Utils;
 using System;
 using System.IO;
-using NaNiT.Permissions;
-using System.Text;
+using static NaNiT.Utils.Functions;
 
 namespace NaNiT.Packets
 {
-    class Packet7ClientConnect : PacketBase
+    class Packet2ClientConnect : PacketBase
     {
-        public Packet7ClientConnect(ClientThread clientThread, Object stream, Direction direction)
+        public Packet2ClientConnect(Connection clientThread, Object stream, Direction direction)
         {
             mClient = clientThread;
             mStream = stream;
@@ -25,12 +24,11 @@ namespace NaNiT.Packets
             string _userhost = datas[1];
 
             // Identify player to server
-            mClient.myInfo.CryptoLogin = _cryptologin;
-            mClient.myInfo.HostShortName = _userhost;
+            mClient.MyInfo.CryptoLogin = _cryptologin;
+            mClient.MyInfo.HostShortName = _userhost;
             
-            MainProgram.logDebug("AssetDigest", "[" + mClient.myInfo.client + "] ");
-
-            User userPData = new User(mClient.myInfo.CryptoLogin, DateTime.Now.ToString(), DateTime.Now.ToString(), mClient.myInfo.HostShortName, mClient.myInfo.UserIpAdress);
+            ClientProgram.logDebug("AssetDigest", "[" + mClient.MyInfo.client + "] ");
+            
             return null;
         }
 

@@ -1,4 +1,8 @@
-﻿namespace NaNiT.Functions
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace NaNiT.Utils
 {
     public enum Packet
     {
@@ -31,7 +35,19 @@
         Exception = 4,
         Fatal = 5,
     }
-        
+
+    public enum _ClientState
+    {
+        PendingConnect = 0,
+        PendingAuthentication = 1,
+        PendingConnectResponse = 2,
+        Connected = 3,
+        Disposing = 4,
+        Starting = 5,
+        Running = 6,
+        Aborted = 7,
+    }
+
     public enum ClientState
     {
         PendingConnect = 0,
@@ -39,6 +55,9 @@
         PendingConnectResponse = 2,
         Connected = 3,
         Disposing = 4,
+        Starting = 5,
+        Running = 6,
+        Aborted = 7,
     }
 
     public enum ServerState
@@ -47,5 +66,6 @@
         Running = 1,
         Restarting = 2,
         Crashed = 3,
+        Stoped = 4,
     }
 }

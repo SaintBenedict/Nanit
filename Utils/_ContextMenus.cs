@@ -89,7 +89,7 @@ namespace NaNiT
 
 		void Exit_Click(object sender, EventArgs e)
 		{
-            Program.notifyIcon.Dispose();
+            ClientProgram.TrayNotify.Dispose();
             Application.Exit();
             Process.GetCurrentProcess().Kill();
         }

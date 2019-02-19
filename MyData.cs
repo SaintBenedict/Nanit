@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace NaNiT
+{
+    public class UserActiveInfo
+    {
+        public string CryptoLogin;
+        public string RegistredDate;
+        public string LastSeenDate;
+        public string HostShortName;
+        public string UserIpAdress;
+        public int DatabaseId;
+
+        public string client { get { if (String.IsNullOrEmpty(CryptoLogin)) return UserIpAdress; else return CryptoLogin; } }
+
+    }
+}

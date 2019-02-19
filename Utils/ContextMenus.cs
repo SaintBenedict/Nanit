@@ -44,8 +44,9 @@ namespace NaNiT
         void Exit_Click(object sender, EventArgs e)
         {
             MainProgram.StopServer();
-            MainProgram.ServerForm.Dispose();
             MainProgram.TrayNotify.Icon.Dispose();
+            MainProgram.TrayNotify.Dispose();
+            MainProgram.ServerForm.Dispose();
             Application.Exit();
             Process.GetCurrentProcess().Kill();
         }

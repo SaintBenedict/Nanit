@@ -70,37 +70,41 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Main.cs" />
-    <Compile Include="NanitClient\CatchInfo.cs" />
-    <Compile Include="NanitClient\Connection.cs" />
-    <Compile Include="NanitClient\Forms\ContextMenus.cs" />
-    <Compile Include="NanitClient\Forms\FormLogin.cs">
+    <Compile Include="MyData.cs" />
+    <Compile Include="Utils\CatchInfo.cs" />
+    <Compile Include="Connection.cs" />
+    <Compile Include="Packets\Packet2ClientConnect.cs" />
+    <Compile Include="Packets\Packet5ConnectResponse.cs" />
+    <Compile Include="Packets\PacketBase.cs" />
+    <Compile Include="RearwardThread.cs" />
+    <Compile Include="Utils\UtilitiesClasses.cs" />
+    <Compile Include="Utils\_ContextMenus.cs" />
+    <Compile Include="Forms\FormLogin.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="NanitClient\Forms\FormLogin.Designer.cs">
+    <Compile Include="Forms\FormLogin.Designer.cs">
       <DependentUpon>FormLogin.cs</DependentUpon>
     </Compile>
-    <Compile Include="NanitClient\Forms\FormOptions.cs">
+    <Compile Include="Forms\FormOptions.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="NanitClient\Forms\FormOptions.Designer.cs">
+    <Compile Include="Forms\FormOptions.Designer.cs">
       <DependentUpon>FormOptions.cs</DependentUpon>
     </Compile>
-    <Compile Include="NanitClient\Forms\FormUpdater.cs">
+    <Compile Include="Forms\FormUpdater.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="NanitClient\Forms\FormUpdater.Designer.cs">
+    <Compile Include="Forms\FormUpdater.Designer.cs">
       <DependentUpon>FormUpdater.cs</DependentUpon>
     </Compile>
-    <Compile Include="NanitClient\ClientsCommandsFromServer.cs" />
-    <Compile Include="NanitClient\Functions.cs" />
-    <Compile Include="NanitClient\Program.cs" />
+    <Compile Include="Utils\_Functions.cs" />
+    <Compile Include="ClientProgram.cs" />
     <Compile Include="Properties\AssemblyInfoClient.cs" />
-    <Compile Include="NanitClient\ServiceWork.cs" />
-    <Compile Include="NanitClient\Forms\FormSoft.cs">
+    <Compile Include="Utils\ServiceWork.cs" />
+    <Compile Include="Forms\FormSoft.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="NanitClient\Forms\FormSoft.Designer.cs">
+    <Compile Include="Forms\FormSoft.Designer.cs">
       <DependentUpon>FormSoft.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\Errors.cs" />
@@ -109,6 +113,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Utils\Enum.cs" />
+    <Compile Include="_ClientThread.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
@@ -118,15 +124,15 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="NanitClient\Forms\FormLogin.resx">
+    <EmbeddedResource Include="Forms\FormLogin.resx">
       <DependentUpon>FormLogin.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="NanitClient\Forms\FormOptions.resx">
+    <EmbeddedResource Include="Forms\FormOptions.resx">
       <DependentUpon>FormOptions.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="NanitClient\Forms\FormUpdater.resx">
+    <EmbeddedResource Include="Forms\FormUpdater.resx">
       <DependentUpon>FormUpdater.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -135,7 +141,7 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="NanitClient\Forms\FormSoft.resx">
+    <EmbeddedResource Include="Forms\FormSoft.resx">
       <DependentUpon>FormSoft.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>

@@ -83,7 +83,7 @@ namespace NaNiT
                             if (packetID == Packet.ClientConnect)
                             {
                                 _clientSender.statusOfCurrentClient = ClientState.PendingAuthentication;
-                                returnData = new Packet7ClientConnect(_clientSender, packetData, _messageDirection).OnReceive();
+                                returnData = new Packet2ClientConnect(_clientSender, packetData, _messageDirection).OnReceive();
                                 MemoryStream packet = new MemoryStream();
                                 BinaryWriter packetWrite = new BinaryWriter(packet);
                                 byte[] buffer = Encoding.Unicode.GetBytes("Ok");
@@ -102,18 +102,14 @@ namespace NaNiT
                         }
                         else
                         {
-                            if (packetID == Packet.ChatReceive)
-                            {
-                                returnData = new Packet5ChatReceive(_clientSender, packetData, _messageDirection).OnReceive();
-                            }
-                            else if (packetID == Packet.HandshakeChallenge)
+                            if (packetID == Packet.HandshakeChallenge)
                             {
                                 string claimMessage = packetData.ReadString();
                                 int passwordRounds = packetData.ReadInt32();
                                 
                                 MemoryStream packet = new MemoryStream();
                                 BinaryWriter packetWrite = new BinaryWriter(packet);
-                                byte[] buffer = Encoding.UTF8.GetBytes("");
+                                byte[] buffer = Encoding.Unicode.GetBytes("");
                                 packetWrite.Write((short)buffer.Length);
                                 packetWrite.Write(buffer);
                                 _clientSender.SendServerPacket(Packet.HandshakeResponse, packet.ToArray());
@@ -123,7 +119,7 @@ namespace NaNiT
                             else if (packetID == Packet.ConnectResponse)
                             {
                                 while (_clientSender.statusOfCurrentClient != ClientState.PendingConnectResponse) { } //TODO: needs timeout
-                                returnData = new Packet2ConnectResponse(_clientSender, packetData, _messageDirection).OnReceive();
+                                returnData = new Packet5ConnectResponse(_clientSender, packetData, _messageDirection).OnReceive();
                             }
                         }
                     }

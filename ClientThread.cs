@@ -1,10 +1,10 @@
 ﻿using System;
 using NaNiT.Functions;
-using NaNiT.Packets;
 using System.Net.Sockets;
 using System.IO;
 using System.Net;
 using System.Threading;
+using NaNiT.Packets;
 
 namespace NaNiT
 {
@@ -39,7 +39,8 @@ namespace NaNiT
                 myInfo.UserIpAdress = ipep.Address.ToString();
 
                 Thread ThisThread = Thread.CurrentThread;
-                ThisThread.Name = "ClientThread " + ipa.ToString(); 
+                if (ThisThread.Name == null)
+                    ThisThread.Name = "ClientThread " + ipa.ToString(); 
 
                 MainProgram.logInfo("[" + myInfo.client + "] Accepting new connection.");
 
@@ -105,7 +106,7 @@ namespace NaNiT
 
         public void RejectPreConnected(string reason)
         {
-            Packet2ConnectResponse packet = new Packet2ConnectResponse(this, false, Direction.Client);
+            Packet5ConnectResponse packet = new Packet5ConnectResponse(this, false, Direction.Client);
             packet.Prepare(reason);
             packet.OnSend();
             ForceDisconnect(reason);

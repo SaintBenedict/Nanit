@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using static NaNiT.GlobalVariable;
 using static NaNiT.GlobalFunctions;
 using static NaNiT.LocalGlobals;
+using NaNiT.Utils;
 
 namespace NaNiT
 {

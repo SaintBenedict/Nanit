@@ -6,11 +6,11 @@ using System.Text;
 
 namespace NaNiT.Packets
 {
-    class Packet2ConnectResponse : PacketBase
+    class Packet5ConnectResponse : PacketBase
     {
         Dictionary<string, object> tmpArray = new Dictionary<string, object>();
 
-        public Packet2ConnectResponse(ClientThread clientThread, Object stream, Direction direction)
+        public Packet5ConnectResponse(ClientThread clientThread, Object stream, Direction direction)
         {
             mClient = clientThread;
             mStream = stream;
@@ -52,7 +52,7 @@ namespace NaNiT.Packets
 
             packetWrite.Write(false);
             packetWrite.Write((short)0);
-            byte[] buffer = Encoding.UTF8.GetBytes("rejectReason");
+            byte[] buffer = Encoding.Unicode.GetBytes("rejectReason");
             packetWrite.Write((short)buffer.Length);
             packetWrite.Write(buffer);
 

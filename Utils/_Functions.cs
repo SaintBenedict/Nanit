@@ -2,49 +2,113 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net;
-using System.Threading;
+using System.Text;
 using System.Windows.Forms;
 using static NaNiT.GlobalFunctions;
 using static NaNiT.GlobalVariable;
-using static NaNiT.LocalGlobals;
 
 /*Форматировать фрагмент кода - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + F.
 Форматировать весь код - жмёшь Ctrl + K, отпускаешь и сразу жмёшь Ctrl + D*/
 
-namespace NaNiT
+namespace NaNiT.Utils
 {
     class Functions
     {
-        public static void FirstRunOptionsLoad()
+        public class Function
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            public static string ByteArrayToString(byte[] buffer)
+            {
+                System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                foreach (byte b in buffer)
+                    sb.Append(b.ToString("X2"));
 
-            // Установка трей иконки
-            Program.notifyIcon = new NotifyIcon();
-            Program.notifyIcon.Icon = Resources.net1;
-            Program.notifyIcon.Visible = true;
-            Program.notifyIcon.ContextMenuStrip = new ContextMenus().Create();
-            Program.notifyIcon.Text = "Сетевой агент НИИ Телевидения";
+                return (sb.ToString());
+            }
 
+            public static string ByteToBinaryString(byte byteIn)
+            {
+                StringBuilder out_string = new StringBuilder();
+                byte mask = 128;
+                for (int i = 7; i >= 0; --i)
+                {
+                    out_string.Append((byteIn & mask) != 0 ? "1" : "0");
+                    mask >>= 1;
+                }
+                return out_string.ToString();
+            }
 
-            gl_s_OSdate = GetOSDate();
-            // Проверка наличия настроек в реестре // Обязательно после ГетОСДаты, она там используется
-            RegCheck();
+            public static int getTimestamp()
+            {
+                int unixTimeStamp;
+                DateTime currentTime = DateTime.Now;
+                DateTime zuluTime = currentTime.ToUniversalTime();
+                DateTime unixEpoch = new DateTime(1970, 1, 1);
+                unixTimeStamp = (Int32)(zuluTime.Subtract(unixEpoch)).TotalSeconds;
+                return unixTimeStamp;
+            }
 
-            // Узнаём имя треда, для удобства дебага
-            Thread MyName = Thread.CurrentThread;
-            if (MyName.Name == null)
-                MyName.Name = "Main Program";
+            public static void WriteToString(short _id, BinaryWriter _bw, string _message)
+            {
+                MemoryStream packet = new MemoryStream();
+                BinaryWriter packetWrite = new BinaryWriter(packet);
+                byte[] buffer = Encoding.Unicode.GetBytes(_message);
+                packetWrite.Write((short)buffer.Length);
+                packetWrite.Write(buffer);
+                byte[] message = packet.ToArray();
+                _bw.Write((short)7);
+                _bw.Write(message.Length);
+                _bw.Write(message);
+                _bw.Flush();
+            }
 
+            public static string ReadString(BinaryReader _packetData)
+            {
+                short len = _packetData.ReadInt16();
+                byte[] data = new byte[len]; // буфер для получаемых данных
+                StringBuilder builder = new StringBuilder();
+                int bytes = 0;
+                bytes = _packetData.Read(data, 0, len);
+                builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
+                string _result = builder.ToString();
+                return _result;
+            }
+            public static string[] ReadStrings(BinaryReader _packetData, int _val)
+            {
+                short[] len = new short[_val];
+                int[] bytes = new int[_val];
+                string[] result = new string[_val];
+                StringBuilder builder = new StringBuilder();
+                len[0] = _packetData.ReadInt16();
+                byte[] data = new byte[len[0]];
 
-            gl_s_myHostName = Dns.GetHostName();
-            
-            gl_f_soft = new FormSoft();
-            gl_s_userName = gl_s_myHostName + @"*" + gl_s_OSdate.Substring(4, 2) + gl_s_OSdate.Substring(2, 2);
+                for (int i = 1; i < _val; i++)
+                {
+                    len[i] = _packetData.ReadInt16();
+                }
+                int u = 0;
+                short y = new short();
+                bytes[0] = _packetData.Read(data, u, len[1]);
+                builder.Append(Encoding.Unicode.GetString(data, 0, bytes[0]));
+                result[0] = builder.ToString();
+                for (short k = 1; k < _val - 1; k++)
+                {
+                    u = u + len[k];
+                    y = Convert.ToInt16(y + len[k + 1]);
+                    bytes[k] = _packetData.Read(data, u, len[k + 1]);
+                    builder = new StringBuilder();
+                    builder.Append(Encoding.Unicode.GetString(data, len[k], bytes[k]));
+                    result[k] = builder.ToString();
+                }
+                u = u + len[_val - 1];
+                y = Convert.ToInt16(y + len[_val - 1]);
+                bytes[_val - 1] = _packetData.Read(data, u, len[0] - u);
+                builder = new StringBuilder();
+                builder.Append(Encoding.Unicode.GetString(data, len[_val - 1], bytes[_val - 1]));
+                result[_val - 1] = builder.ToString();
+                return result;
+            }
         }
-
-        public static string UrlCorrect(string url)
+            public static string UrlCorrect(string url)
         {
             if (url == null)
                 return null;
@@ -162,7 +226,7 @@ namespace NaNiT
                 var result = MessageBox.Show(message, caption, MessageBoxButtons.OK);
                 if (result == DialogResult.OK)
                 {
-                    Program.notifyIcon.Dispose();
+                    ClientProgram.TrayNotify.Dispose();
                     Application.Exit();
                     Process.GetCurrentProcess().Kill();
                 }
@@ -174,7 +238,7 @@ namespace NaNiT
                 var result = MessageBox.Show(message, caption, MessageBoxButtons.OK);
                 if (result == DialogResult.OK)
                 {
-                    Program.notifyIcon.Dispose();
+                    ClientProgram.TrayNotify.Dispose();
                     Application.Exit();
                     Process.GetCurrentProcess().Kill();
                 }
@@ -232,7 +296,7 @@ namespace NaNiT
                     dirs2 = null;
                     File.Copy(sourceFile, targetFile, true);
                     Process.Start(targetFile);
-                    Program.notifyIcon.Dispose();
+                    ClientProgram.TrayNotify.Dispose();
                     Application.Exit();
                     currentProcess.Kill();
                 }

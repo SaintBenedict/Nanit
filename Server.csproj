@@ -77,10 +77,9 @@
     </Compile>
     <Compile Include="ForwardThread.cs" />
     <Compile Include="MainProgam.cs" />
-    <Compile Include="Packets\Packet2ConnectResponse.cs" />
-    <Compile Include="Packets\Packet5ChatReceive.cs" />
-    <Compile Include="Packets\Packet7ClientConnect.cs" />
-    <Compile Include="Packets\PacketBase.cs" />
+    <Compile Include="Packets\Packet2ClientConnectS.cs" />
+    <Compile Include="Packets\Packet5ConnectResponseS.cs" />
+    <Compile Include="Packets\PacketBases.cs" />
     <Compile Include="ServerThread.cs" />
     <Compile Include="Permissions\Users.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

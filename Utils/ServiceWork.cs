@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using NaNiT.Utils;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -8,7 +9,6 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using static NaNiT.GlobalVariable;
-using static NaNiT.LocalGlobals;
 
 namespace NaNiT
 {

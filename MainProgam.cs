@@ -32,6 +32,8 @@ namespace NaNiT
 
         private static void ProcessExit(object sender, EventArgs e)
         {
+            TrayNotify.Icon.Dispose();
+            TrayNotify.Dispose();
             Process This = Process.GetCurrentProcess();
             This.Kill();
         }
@@ -53,7 +55,8 @@ namespace NaNiT
             CurrentServerStatus = ServerState.Starting;
             
             CrashMonitorThread = new Thread(new ThreadStart(СrashMonitor));
-            CrashMonitorThread.Name = "Поток монитора состояний";
+            if(CrashMonitorThread.Name == null)
+                CrashMonitorThread.Name = "Поток монитора состояний";
             CrashMonitorThread.Start();
 
             NaNiT.ServerConfig.SetupConfig();
@@ -65,7 +68,8 @@ namespace NaNiT
             
             MainServer = new ServerThread();
             MainServerThread = new Thread(new ThreadStart(MainServer.Run));
-            MainServerThread.Name = "Поток запуска сервера";
+            if (MainServerThread.Name == null)
+                MainServerThread.Name = "Поток запуска сервера";
             MainServerThread.Start();
             
             while (CurrentServerStatus != ServerState.Running) { if (CurrentServerStatus == ServerState.Crashed) return; }
