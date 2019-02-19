@@ -27,7 +27,7 @@ namespace NaNiT.Packets
             mClient.MyInfo.CryptoLogin = _cryptologin;
             mClient.MyInfo.HostShortName = _userhost;
             
-            ClientProgram.logDebug("AssetDigest", "[" + mClient.MyInfo.client + "] ");
+            MainClient.logDebug("AssetDigest", "[" + mClient.MyInfo.client + "] ");
             
             return null;
         }
@@ -39,7 +39,7 @@ namespace NaNiT.Packets
 
         public override int getPacketID()
         {
-            return 5;
+            return 2;
         }
     }
 }

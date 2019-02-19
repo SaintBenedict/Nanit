@@ -98,7 +98,7 @@
       <DependentUpon>FormUpdater.cs</DependentUpon>
     </Compile>
     <Compile Include="Utils\_Functions.cs" />
-    <Compile Include="ClientProgram.cs" />
+    <Compile Include="MainClient.cs" />
     <Compile Include="Properties\AssemblyInfoClient.cs" />
     <Compile Include="Utils\ServiceWork.cs" />
     <Compile Include="Forms\FormSoft.cs">
@@ -114,7 +114,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Utils\Enum.cs" />
-    <Compile Include="_ClientThread.cs" />
+    <Compile Include="AttemptingServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">

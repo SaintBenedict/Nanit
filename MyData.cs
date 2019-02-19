@@ -15,5 +15,10 @@ namespace NaNiT
 
         public string client { get { if (String.IsNullOrEmpty(CryptoLogin)) return UserIpAdress; else return CryptoLogin; } }
 
+        public UserActiveInfo(string crypto, string host)
+        {
+            this.CryptoLogin = crypto;
+            this.HostShortName = host;
+        }
     }
 }

@@ -18,8 +18,6 @@ namespace NaNiT.Commands
 
         public override bool doProcess(string[] args)
         {
-            MainProgram.AllowNewClients = false;
-
             foreach (ClientThread client in MainProgram.ActiveClients.Values)
             {
                 client.SendServerPacket(Packet.ClientDisconnect, new byte[1]); //This causes the server to gracefully save and remove the player, and close its connection, even if the client ignores ServerDisconnect.
@@ -59,17 +57,11 @@ namespace NaNiT.Commands
 
             if (MainProgram.CurrentServerStatus == ServerState.Restarting)
             {
-
                 MainProgram.CurrentServerStatus = ServerState.Running;
-
-                MainProgram.RestartTime = 0;
             }
             else
             {
-
                 MainProgram.CurrentServerStatus = ServerState.Restarting;
-
-                MainProgram.RestartTime = Function.getTimestamp() + 30;
             }
 
             return true;

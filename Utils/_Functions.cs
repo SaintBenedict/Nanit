@@ -55,7 +55,7 @@ namespace NaNiT.Utils
                 packetWrite.Write((short)buffer.Length);
                 packetWrite.Write(buffer);
                 byte[] message = packet.ToArray();
-                _bw.Write((short)7);
+                _bw.Write((short)_id);
                 _bw.Write(message.Length);
                 _bw.Write(message);
                 _bw.Flush();
@@ -226,7 +226,7 @@ namespace NaNiT.Utils
                 var result = MessageBox.Show(message, caption, MessageBoxButtons.OK);
                 if (result == DialogResult.OK)
                 {
-                    ClientProgram.TrayNotify.Dispose();
+                    MainClient.TrayNotify.Dispose();
                     Application.Exit();
                     Process.GetCurrentProcess().Kill();
                 }
@@ -238,7 +238,7 @@ namespace NaNiT.Utils
                 var result = MessageBox.Show(message, caption, MessageBoxButtons.OK);
                 if (result == DialogResult.OK)
                 {
-                    ClientProgram.TrayNotify.Dispose();
+                    MainClient.TrayNotify.Dispose();
                     Application.Exit();
                     Process.GetCurrentProcess().Kill();
                 }
@@ -296,7 +296,7 @@ namespace NaNiT.Utils
                     dirs2 = null;
                     File.Copy(sourceFile, targetFile, true);
                     Process.Start(targetFile);
-                    ClientProgram.TrayNotify.Dispose();
+                    MainClient.TrayNotify.Dispose();
                     Application.Exit();
                     currentProcess.Kill();
                 }

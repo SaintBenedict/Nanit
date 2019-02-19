@@ -25,6 +25,13 @@ namespace NaNiT.Utils
         Server = 0,
         Client = 1,
     }
+    public enum ServChecker
+    {
+        IsConnecting = 0,
+        NotConnecting = 1,
+        Crashing = 2,
+        DisconnectingMe,
+    }
 
     public enum LogType
     {
@@ -36,16 +43,14 @@ namespace NaNiT.Utils
         Fatal = 5,
     }
 
-    public enum _ClientState
+    public enum _ClientState //my activity
     {
-        PendingConnect = 0,
-        PendingAuthentication = 1,
-        PendingConnectResponse = 2,
-        Connected = 3,
-        Disposing = 4,
-        Starting = 5,
-        Running = 6,
-        Aborted = 7,
+        OfflineWork = 0,
+        AtemtingToConnect = 1,
+        Connected = 2,
+        MessageTrading = 3,
+        Disconnecting = 4,
+        Crashing = 5,
     }
 
     public enum ClientState

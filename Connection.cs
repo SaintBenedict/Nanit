@@ -13,26 +13,26 @@ namespace NaNiT
     class Connection
     {
         protected internal TcpClient Tcp;
-        _ClientThread ClientThis;
+        AttemptingServer ClientThis;
         public UserActiveInfo MyInfo;
         protected internal NetworkStream StreamOfClient;
-        public ClientState statusOfCurrentClient = ClientState.PendingConnect;
+        public ClientState MyStateOnServer = ClientState.PendingConnect;
+        public _ClientState UserState = MainClient.StateMyActtivity;
+        public ServChecker ServState = MainClient.ServerStatus;
         private BinaryReader myStreamToRead;
         private BinaryWriter myStreamToWrite;
         public int kickTargetTimestamp = 0;
 
-        public bool connectionAlive { get { if (Tcp.Connected && ClientProgram.CurrentClientStatus != _ClientState.Aborted) return true; else return false; } }
+        public bool connectionAlive { get { if (Tcp.Connected && UserState != _ClientState.Connected && ServState != ServChecker.IsConnecting) return true; else return false; } }
 
-        public Connection(TcpClient NewTcp, _ClientThread ThisStarter, NetworkStream thisNewStream)
+        public Connection(TcpClient NewTcp, AttemptingServer ThisStarter, NetworkStream thisNewStream)
         {
             Tcp = NewTcp;
             ClientThis = ThisStarter;
             StreamOfClient = thisNewStream;
-            gl_b_serverIsConnected = true;
-            _ClientThread.connections.Add(this);
-            MyInfo = new UserActiveInfo();
-            MyInfo.CryptoLogin = gl_s_OSdateCrypt;
-            MyInfo.HostShortName = gl_s_userName;
+            UserState = _ClientState.Connected;
+            ServState = ServChecker.IsConnecting;
+            MyInfo = new UserActiveInfo(gl_s_OSdateCrypt, gl_s_userName);
             
         }
 
@@ -43,17 +43,33 @@ namespace NaNiT
             {
                 myStreamToRead = new BinaryReader(Tcp.GetStream());
                 myStreamToWrite = new BinaryWriter(Tcp.GetStream());
-                ClientProgram.logInfo("Установлена связь с сервером.");
+                MainClient.logInfo("Установлена связь с сервером.");
+                string message = "h@@lLloui-" + gl_s_userName;
+                byte[] data = Encoding.Unicode.GetBytes(message);
+                StreamOfClient.Write(data, 0, data.Length);
                 new Thread(new ThreadStart(new RearwardThread(this, myStreamToRead, myStreamToWrite, Direction.Server).Run)).Start();
             }
             catch (Exception e)
             {
-                if (gl_b_serverIsConnected)
+                if (ServState == ServChecker.IsConnecting)
                 {
                     Disconnect();
+                    ServState = ServChecker.DisconnectingMe;
+                    UserState = _ClientState.Disconnecting;
+                    DoDisconnect(true);
                 }
-                ClientProgram.logException("ClientThread Exception: " + e.Message);
+                MainClient.logException("ClientThread Exception: " + e.Message);
             }  
+            finally
+            {
+                if (ServState == ServChecker.IsConnecting)
+                {
+                    Disconnect();
+                    ServState = ServChecker.DisconnectingMe;
+                    UserState = _ClientState.Disconnecting;
+                    DoDisconnect(true);
+                }
+            }
         }
         
         public void SendServerPacket(Packet packetID, byte[] packetData)
@@ -79,9 +95,9 @@ namespace NaNiT
 
         private void DoDisconnect(bool log)
         {
-            if (ClientProgram.CurrentClientStatus != _ClientState.Aborted)
+            if (UserState != _ClientState.Disconnecting)
             {
-                ClientProgram.CurrentClientStatus = _ClientState.Aborted;
+                UserState = _ClientState.Disconnecting;
                 try
                 {
                     Tcp.Close();
@@ -92,15 +108,15 @@ namespace NaNiT
         
         public void ForceDisconnect(string reason)
         {
-            if (ClientProgram.CurrentClientStatus != _ClientState.Aborted)
-                ClientProgram.logError("[" + MyInfo.client + "] Dropped for " + reason);
+            if (UserState != _ClientState.Disconnecting)
+                MainClient.logError("[" + MyInfo.client + "] Dropped for " + reason);
             DoDisconnect(true);
         }
 
         public void ErrorDisconnect(Direction direction, string reason)
         {
-            if (ClientProgram.CurrentClientStatus != _ClientState.Aborted)
-                ClientProgram.logError("[" + MyInfo.client + "] Dropped by parent " + direction.ToString() + " for " + reason);
+            if (UserState != _ClientState.Crashing)
+                MainClient.logError("[" + MyInfo.client + "] Dropped by parent " + direction.ToString() + " for " + reason);
             DoDisconnect(true);
         }
 
@@ -113,9 +129,9 @@ namespace NaNiT
                 // отключение
         public static void Disconnect()
         {
-            if (gl_b_serverIsConnected)
+            if (MainClient.ServerStatus == ServChecker.IsConnecting)
             {
-                gl_b_serverIsConnected = false;
+                MainClient.ServerStatus = ServChecker.DisconnectingMe;
             }
         }
     }

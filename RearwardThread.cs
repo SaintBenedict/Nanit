@@ -79,7 +79,7 @@ namespace NaNiT
                         }
                         else if (packetID == Packet.ConnectResponse)
                         {
-                            while (ClientProgram.CurrentClientStatus != _ClientState.PendingConnectResponse) { } //TODO: needs timeout
+                            while (_clientSender.MyStateOnServer != ClientState.PendingConnectResponse) { } //TODO: needs timeout
                             returnData = new Packet5ConnectResponse(_clientSender, packetData, _messageDirection).OnReceive();
                         }
 

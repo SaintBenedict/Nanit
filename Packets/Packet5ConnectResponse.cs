@@ -52,7 +52,7 @@ namespace NaNiT.Packets
 
         public override int getPacketID()
         {
-            return 2;
+            return 5;
         }
     }
 }

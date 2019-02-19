@@ -23,13 +23,7 @@ namespace NaNiT
         public static ServerThread MainServer;
         static Thread MainServerThread;
         static Thread CrashMonitorThread;
-
-        public static bool AllowNewClients = true;
-
         public static ServerState CurrentServerStatus;
-
-        public static int StartTime;
-        public static int RestartTime = 0;
 
         private static void ProcessExit(object sender, EventArgs e)
         {
@@ -46,7 +40,6 @@ namespace NaNiT
             TrayNotify = Tray.Setup(TrayNotify, Resources.net4);
 
             ServerForm = new FormSOptions();
-            StartTime = Function.getTimestamp();
             CurrentServerStatus = ServerState.Starting;
             
             CrashMonitorThread = new Thread(new ThreadStart(СrashMonitor));
@@ -81,11 +74,6 @@ namespace NaNiT
         {
             while (true)
             {
-                if (RestartTime != 0)
-                {
-                    if (RestartTime < Function.getTimestamp()) RestartingServer();
-                }
-
                 if (CurrentServerStatus == ServerState.Crashed)
                 {
                     logFatal("Фатальная ошибка на сервере. Перезапуск через 10 секунд.");
@@ -121,12 +109,7 @@ namespace NaNiT
         public static void StartServer()
         {
             CurrentServerStatus = ServerState.Starting;
-            RestartTime = 0;
-            MainServer = null;
-            MainServerThread = null;
-            StartTime = Function.getTimestamp();
-            Users.SetupUsers();
-            Thread.Sleep(2000);
+            Thread.Sleep(3000);
             writeLog("", LogType.FileOnly);
             writeLog("-- Log Start [After Restart]: " + DateTime.Now + " --", LogType.FileOnly);
             MainServer = new ServerThread();
@@ -134,6 +117,7 @@ namespace NaNiT
             if (MainServerThread.Name == null)
                 MainServerThread.Name = "Поток запуска сервера";
             MainServerThread.Start();
+
             while (CurrentServerStatus != ServerState.Running) { if (CurrentServerStatus == ServerState.Crashed) return; }
             TrayNotify = Tray.Setup(TrayNotify, Resources.net3);
             logInfo("Все приготовления выполнены. Сервер работает.");
@@ -144,7 +128,7 @@ namespace NaNiT
             CurrentServerStatus = ServerState.Restarting;
             StopServer();
             Thread.Sleep(2000);
-            logInfo("Поток завершился, перезапускаем.");
+            logInfo("Все службы сервера остановлены. Перезапускаем.");
             Thread.Sleep(3000);
             StartServer();
         }

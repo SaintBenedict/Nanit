@@ -45,7 +45,7 @@ namespace NaNiT.Functions
             packetWrite.Write((short)buffer.Length);
             packetWrite.Write(buffer);
             byte[] message = packet.ToArray();
-            _bw.Write((short)7);
+            _bw.Write((short)_id);
             _bw.Write(message.Length);
             _bw.Write(message);
             _bw.Flush();

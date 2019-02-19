@@ -67,7 +67,7 @@ namespace NaNiT
             {
                 gl_s_servIP = ControlBoxIpServ.Text;
                 gl_s_serverStatus = "Сервер стал недоступен";
-                ClientProgram.TrayNotify.Icon = Resources.net2;
+                MainClient.TrayNotify.Icon = Resources.net2;
                 gl_b_serverIsConnected = false;
             }
             if (gl_i_servPort != Convert.ToInt32(ControlBoxPortServ.Text))

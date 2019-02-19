@@ -40,7 +40,7 @@ namespace NaNiT.Packets
 
         public override int getPacketID()
         {
-            return 5;
+            return 2;
         }
     }
 }

@@ -14,34 +14,17 @@ using System.IO;
 
 namespace NaNiT
 {
-    class LocalGlobals
-    {
-        //-Forms-//
-        public static FormLogin gl_f_login = null;
-        public static FormOptions gl_f_options = null;
-        public static FormUpdater gl_f_updater = null;
-        public static FormSoft gl_f_soft = null;
-        //-Connections-//
-        public static Connection gl_c_current = null;
-        //-Integers-//
-        public static int gl_i_numbOfSoft;
-        //-Strings-//
-        public static string gl_s_dateTimeOfSoftTransfere;
-        //-Settings-//
-        public string logFile = "server.log";
-    }
-
-    class ClientProgram
+    class MainClient
     {
         public static NotifyIcon TrayNotify = null;
         public static TimerCallback Upd = new TimerCallback(CheckServiceUpdate);
-        public static _ClientThread _ClientActivities;
-        static Thread _ClientProgramThread;
-        static Thread _CrashMonitorThread;
 
-        public static bool AllowToConnect = true;
-
-        public static _ClientState CurrentClientStatus;
+        public static AttemptingServer ServFinder;
+        static Thread MainClientThread;
+        static Thread ProblemMonitorThread;
+        
+        public static _ClientState StateMyActtivity;
+        public static ServChecker ServerStatus;
         public static LogType logLevel = LogType.Info;
 
         private static void ProcessExit(object sender, EventArgs e)
@@ -49,13 +32,12 @@ namespace NaNiT
             Process This = Process.GetCurrentProcess();
             This.Kill();
         }
+
         static void Main()
         {
-            // Первоначальная настройка. Загрузка из реестра и прописывание некоторых параметров
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-
-            // Установка трей иконки
+            
             TrayNotify = new NotifyIcon()
             {
                 Icon = Resources.net1,
@@ -64,16 +46,17 @@ namespace NaNiT
                 Text = "Сетевой клиент НИИ Телевидения"
             };
             
-            CurrentClientStatus = _ClientState.Starting;
-            
+            StateMyActtivity = _ClientState.OfflineWork;
+            ServerStatus = ServChecker.NotConnecting;
+
             Thread MyName = Thread.CurrentThread;
             if (MyName.Name == null)
                 MyName.Name = "Основной поток";
 
-            _CrashMonitorThread = new Thread(new ThreadStart(_СrashMonitor));
-            if (_CrashMonitorThread.Name == null)
-                _CrashMonitorThread.Name = "Поток монитора состояний";
-            _CrashMonitorThread.Start();
+            ProblemMonitorThread = new Thread(new ThreadStart(ProblemMonitor));
+            if (ProblemMonitorThread.Name == null)
+                ProblemMonitorThread.Name = "Поток монитора состояний";
+            ProblemMonitorThread.Start();
 
             gl_s_OSdate = GetOSDate();
             // Проверка наличия настроек в реестре // Обязательно после ГетОСДаты, она там используется
@@ -89,39 +72,36 @@ namespace NaNiT
             writeLog("", LogType.FileOnly);
             writeLog("-- Log Start: " + DateTime.Now + " --", LogType.FileOnly);
 
-            _ClientActivities = new _ClientThread();
-            _ClientProgramThread = new Thread(new ThreadStart(_ClientActivities.Run));
-            if (_ClientProgramThread.Name == null)
-                _ClientProgramThread.Name = "Новый Клиент (Main)";
-            _ClientProgramThread.Start();
+            ServFinder = new AttemptingServer();
+            MainClientThread = new Thread(new ThreadStart(ServFinder.Run));
+            if (MainClientThread.Name == null)
+                MainClientThread.Name = "Попытка подлючиться";
+            MainClientThread.Start();
             
             // Старт таймеров и тредов
             Timer UpdateTimer = new Timer(Upd, null, 0, 3000000);
-
-            while (CurrentClientStatus != _ClientState.Running) { if (CurrentClientStatus == _ClientState.Aborted) return; }
-            TrayNotify.Icon = Resources.net2;
-            logInfo("Все приготовления выполнены. Клиент запущен.");
             
             //
             Application.Run();
         }
 
-        public static void _СrashMonitor()
+        public static void ProblemMonitor()
         {
             while (true)
             {
-                if (!gl_b_serverIsConnected)
+                if (StateMyActtivity == _ClientState.Crashing || StateMyActtivity == _ClientState.Disconnecting || ServerStatus == ServChecker.Crashing || ServerStatus == ServChecker.DisconnectingMe)
                 {
-                    logFatal("Критическая ошибка клиента. Перезапуск через 10 секунд.");
-                    _ClientActivities.newConnectThread.Abort();
-                    _ClientActivities.newConnectThread = null;
-                    _ClientActivities.StreamOfApplication.Close();
-                    _ClientActivities.StreamOfApplication = null;
-                    _ClientActivities.NewConnection.Close();
-                    _ClientActivities.NewConnection = null;
-                    _ClientThread.connections.Clear();
-                    gl_s_serverStatus = "Сервер недоступен";
-                    ClientProgram.TrayNotify.Icon = Resources.net1;
+                    logFatal("Критическая ошибка на одной из сторон вызвала отключение.");
+                    ServFinder.newConnectThread.Abort();
+                    ServFinder.newConnectThread = null;
+                    ServFinder.StreamApp.Close();
+                    ServFinder.StreamApp = null;
+                    ServFinder.NewConnection.Close();
+                    ServFinder.NewConnection = null;
+                    AttemptingServer.connections.Clear();
+                    ServerStatus = ServChecker.NotConnecting;
+                    StateMyActtivity = _ClientState.OfflineWork;
+                    TrayNotify.Icon = Resources.net1;
                     Thread.Sleep(10000);
                     break;
                 }
