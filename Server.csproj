@@ -93,6 +93,7 @@
     <Compile Include="Utils\Enums.cs" />
     <Compile Include="Utils\Functions.cs" />
     <Compile Include="Utils\ContextMenus.cs" />
+    <Compile Include="Utils\RegistryWork.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="FormSOptions.resx">

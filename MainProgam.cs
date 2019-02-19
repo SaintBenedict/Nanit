@@ -6,6 +6,7 @@ using System.Threading;
 using System.Windows.Forms;
 using NaNiT.Permissions;
 using NaNiT.Functions;
+using System.Net.Sockets;
 
 namespace NaNiT
 {
@@ -32,7 +33,6 @@ namespace NaNiT
 
         private static void ProcessExit(object sender, EventArgs e)
         {
-            TrayNotify.Icon.Dispose();
             TrayNotify.Dispose();
             Process This = Process.GetCurrentProcess();
             This.Kill();
@@ -43,13 +43,8 @@ namespace NaNiT
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            TrayNotify = new NotifyIcon()
-            {
-                Icon = Resources.net4,
-                Visible = true,
-                ContextMenuStrip = new ContextMenus().Create(),
-                Text = "Сетевой сервер НИИ Телевидения"
-            };
+            TrayNotify = Tray.Setup(TrayNotify, Resources.net4);
+
             ServerForm = new FormSOptions();
             StartTime = Function.getTimestamp();
             CurrentServerStatus = ServerState.Starting;
@@ -65,7 +60,10 @@ namespace NaNiT
             ServerConfig.Write(NaNiT.ServerConfig.ConfigPath);
             writeLog("", LogType.FileOnly);
             writeLog("-- Log Start: " + DateTime.Now + " --", LogType.FileOnly);
-            
+
+            ServerForm.Show();
+            ServerConfig.ServerFormIsOpen = true;
+
             MainServer = new ServerThread();
             MainServerThread = new Thread(new ThreadStart(MainServer.Run));
             if (MainServerThread.Name == null)
@@ -73,12 +71,12 @@ namespace NaNiT
             MainServerThread.Start();
             
             while (CurrentServerStatus != ServerState.Running) { if (CurrentServerStatus == ServerState.Crashed) return; }
-            TrayNotify.Icon = Resources.net3;
+            TrayNotify = Tray.Setup(TrayNotify, Resources.net3);
             logInfo("Все приготовления выполнены. Сервер работает.");
 
             Application.Run();
         }
-
+        public static TcpListener troubler;
         public static void СrashMonitor()
         {
             while (true)
@@ -92,6 +90,7 @@ namespace NaNiT
                 {
                     logFatal("Фатальная ошибка на сервере. Перезапуск через 10 секунд.");
                     Thread.Sleep(10000);
+                    troubler.Stop();
                     RestartingServer();
                     break;
                 }
@@ -102,11 +101,14 @@ namespace NaNiT
         {
             foreach (ClientThread client in ActiveClients.Values)
             {
-                client.SendServerPacket(Packet.ClientDisconnect, new byte[1]);
+                //client.SendServerPacket(Packet.ClientDisconnect, new byte[1]);
                 client.statusOfCurrentClient = ClientState.Disposing;
                 client.kickTargetTimestamp = Function.getTimestamp() + 7;
+                client.DoDisconnect(true);
             }
-            TrayNotify.Icon = Resources.net4;
+            
+            CurrentServerStatus = ServerState.Crashed;
+            TrayNotify = Tray.Setup(TrayNotify, Resources.net4);
             while (ActiveClients.Count > 0)
             {
                 // Waiting
@@ -121,15 +123,19 @@ namespace NaNiT
             CurrentServerStatus = ServerState.Starting;
             RestartTime = 0;
             MainServer = null;
+            MainServerThread = null;
             StartTime = Function.getTimestamp();
             Users.SetupUsers();
+            Thread.Sleep(2000);
             writeLog("", LogType.FileOnly);
             writeLog("-- Log Start [After Restart]: " + DateTime.Now + " --", LogType.FileOnly);
             MainServer = new ServerThread();
+            MainServerThread = new Thread(new ThreadStart(MainServer.Run));
+            if (MainServerThread.Name == null)
+                MainServerThread.Name = "Поток запуска сервера";
             MainServerThread.Start();
-            CrashMonitorThread.Start();
             while (CurrentServerStatus != ServerState.Running) { if (CurrentServerStatus == ServerState.Crashed) return; }
-            TrayNotify.Icon = Resources.net3;
+            TrayNotify = Tray.Setup(TrayNotify, Resources.net3);
             logInfo("Все приготовления выполнены. Сервер работает.");
         }
 
@@ -137,11 +143,12 @@ namespace NaNiT
         {
             CurrentServerStatus = ServerState.Restarting;
             StopServer();
+            Thread.Sleep(2000);
             logInfo("Поток завершился, перезапускаем.");
             Thread.Sleep(3000);
             StartServer();
         }
-
+        public static List<string> LogMessageList = new List<string>();
         public static void logDebug(string source, string message) { writeLog("[" + source + "]:" + message, LogType.Debug); }
         public static void logInfo(string message) { writeLog(message, LogType.Info); }
         public static void logError(string message) { writeLog(message, LogType.Error); }
@@ -179,6 +186,10 @@ namespace NaNiT
                 using (StreamWriter w = File.AppendText(Path.Combine(SavePath, "log.txt")))
                 {
                     w.WriteLine(message);
+                }
+                if (ServerForm != null && ServerConfig.ServerFormIsOpen)
+                {
+                    LogMessageList.Add(message);
                 }
             }
             catch (Exception e)

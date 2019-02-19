@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace NaNiT
@@ -44,11 +45,25 @@ namespace NaNiT
         void Exit_Click(object sender, EventArgs e)
         {
             MainProgram.StopServer();
-            MainProgram.TrayNotify.Icon.Dispose();
             MainProgram.TrayNotify.Dispose();
             MainProgram.ServerForm.Dispose();
             Application.Exit();
             Process.GetCurrentProcess().Kill();
+        }
+    }
+
+    static class Tray
+    {
+        public static NotifyIcon Setup(NotifyIcon _tray, Icon _res)
+        {
+            if( _tray != null)
+                _tray.Dispose();
+            NotifyIcon temptray = new NotifyIcon();
+            temptray.Icon = _res;
+            temptray.Visible = true;
+            temptray.ContextMenuStrip = new ContextMenus().Create();
+            temptray.Text = "Сетевой сервер НИИ Телевидения";
+            return temptray;
         }
     }
 }

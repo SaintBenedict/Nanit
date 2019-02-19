@@ -91,7 +91,7 @@ namespace NaNiT
             kickTargetTimestamp = Function.getTimestamp() + 7;
         }
 
-        private void DoDisconnect(bool log)
+        internal void DoDisconnect(bool log)
         {
             if (statusOfCurrentClient != ClientState.Disposing)
             {
@@ -99,6 +99,7 @@ namespace NaNiT
                 try
                 {
                     ConnectingSocket.Close();
+                    ConnectingSocket = null;
                 }
                 catch (Exception) { }
             }

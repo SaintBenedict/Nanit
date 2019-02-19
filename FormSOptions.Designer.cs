@@ -22,7 +22,7 @@
             this.ButOptClose = new System.Windows.Forms.Button();
             this.LabelPortServ = new System.Windows.Forms.Label();
             this.ControlBoxPortServ = new System.Windows.Forms.TextBox();
-           // this.ListWorker = new System.ComponentModel.BackgroundWorker();
+            this.ListWorker = new System.ComponentModel.BackgroundWorker();
             this.ButStart = new System.Windows.Forms.Button();
             this.listView1 = new System.Windows.Forms.ListView();
             this.Messaging = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -37,7 +37,7 @@
             this.ButOptSave.TabIndex = 1;
             this.ButOptSave.Text = "Сохранить";
             this.ButOptSave.UseVisualStyleBackColor = true;
-           // this.ButOptSave.Click += new System.EventHandler(this.ButOptSave_Click);
+            this.ButOptSave.Click += new System.EventHandler(this.ButOptSave_Click);
             // 
             // ButOptClose
             // 
@@ -70,11 +70,11 @@
             // 
             // backgroundWorker1
             // 
-            //this.ListWorker.WorkerReportsProgress = true;
-            //this.ListWorker.RunWorkerAsync();
-            //this.ListWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.ListWorker_DoWork);
-            //this.ListWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.ListWorker_ProgressChanged);
-            //this.ListWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.ListWorker_RunWorkerCompleted);
+            this.ListWorker.WorkerReportsProgress = true;
+            this.ListWorker.RunWorkerAsync();
+            this.ListWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.ListWorker_DoWork);
+            this.ListWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.ListWorker_ProgressChanged);
+            this.ListWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.ListWorker_RunWorkerCompleted);
             //// 
             // ButStart
             // 
@@ -135,7 +135,7 @@
         private System.Windows.Forms.Button ButOptClose;
         private System.Windows.Forms.Label LabelPortServ;
         private System.Windows.Forms.TextBox ControlBoxPortServ;
-        //public System.ComponentModel.BackgroundWorker ListWorker;
+        public System.ComponentModel.BackgroundWorker ListWorker;
         private System.Windows.Forms.Button ButStart;
         private System.Windows.Forms.ColumnHeader Messaging;
         private System.Windows.Forms.ListView listView1;
