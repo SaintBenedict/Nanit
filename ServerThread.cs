@@ -1,6 +1,5 @@
 ﻿using NaNiT.Functions;
 using System;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -9,30 +8,32 @@ namespace NaNiT.Permissions
 {
     class ServerThread
     {
-        public void run()
+        public void Run()
         {
-            TcpListener serversocket = new TcpListener(IPAddress.Any, MainProgram.config.serverPort);
-            serversocket.Start();
+            TcpListener _listener = new TcpListener(IPAddress.Any, MainProgram.ServerConfig.serverPort);
+            _listener.Start();
 
             MainProgram.logInfo("Сокет для подключений открыт");
-            MainProgram.serverState = ServerState.Running;
+            MainProgram.CurrentServerStatus = ServerState.Running;
 
             try
             {
                 while (true)
                 {
-                    TcpClient clientSocket = serversocket.AcceptTcpClient();
+                    TcpClient clientSocket = _listener.AcceptTcpClient();
                     new Thread(new ThreadStart(new ClientThread(clientSocket).run)).Start();
                 }
             }
             catch (Exception e)
             {
-                MainProgram.logException("ListenerThread: " + e.ToString());
+                MainProgram.logException("Поток прослушивания: " + e.ToString());
             }
-
-            serversocket.Stop();
-            MainProgram.logException("ListenerThread has failed - No new connections will be possible.");
-            Console.ReadLine();
+            finally
+            {
+                _listener.Stop();
+                MainProgram.logException("Прослушивающий поток закрылся, подключение новых клиентов невозможно.");
+                MainProgram.CurrentServerStatus = ServerState.Crashed;
+            }
         }
     }
 }

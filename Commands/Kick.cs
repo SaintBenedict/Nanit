@@ -1,8 +1,4 @@
-﻿using NaNiT.Packets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace NaNiT.Commands
 {
@@ -10,13 +6,13 @@ namespace NaNiT.Commands
     {
         public Kick(ClientThread client)
         {
-            this.name = "kick";
-            this.HelpText = " <username>: Kicks the user from the server.";
-            this.Permission = new List<string>();
-            this.Permission.Add("admin.kick");
+            name = "kick";
+            HelpText = " <username>: Kicks the user from the server.";
+            Permission = new List<string>();
+            Permission.Add("admin.kick");
 
             this.client = client;
-            this.player = client.myInfo;
+            player = client.myInfo;
         }
 
         public override bool doProcess(string[] args)
@@ -26,14 +22,13 @@ namespace NaNiT.Commands
 
             if (player == null || player.Length < 1) { showHelpText(); return false; }
 
-            if (MainProgram.clients.ContainsKey(player))
+            if (MainProgram.ActiveClients.ContainsKey(player))
             {
-                MainProgram.clients[player].kickClient(null);
+                MainProgram.ActiveClients[player].KickClient(null);
                 return true;
             }
             else
             {
-                this.client.sendCommandMessage("Player '" + player + "' not found.");
                 return false;
             }
         }

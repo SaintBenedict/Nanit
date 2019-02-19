@@ -1,13 +1,13 @@
-﻿using System;
+﻿using NaNiT.Functions;
+using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Soap;
-using System.Windows.Forms;
 
 namespace NaNiT
 {
     class ServerConfig
     {
-        internal static string ConfigPath { get { return Application.StartupPath; } }
+        internal static string ConfigPath { get { return @"Server.config"; } }
 
         public static void CreateIfNot(string file, string data = "")
         {
@@ -21,9 +21,9 @@ namespace NaNiT
         {
             if (File.Exists(ConfigPath))
             {
-                MainProgram.serverConfig = ServerFile.Read(ConfigPath);
+                MainProgram.ServerConfig = ServerFile.Read(ConfigPath);
             }
-            MainProgram.serverConfig.Write(ConfigPath);
+            MainProgram.ServerConfig.Write(ConfigPath);
         }
     }
 
@@ -31,12 +31,11 @@ namespace NaNiT
     class ServerFile
     {
         public int serverPort = 51780;
-       
-        public bool allowAdminCommandsFromAnyone = false;
-        
         public bool attemptAuthentication = false;
-
-
+        public bool TrayMenuIsOpen = false;
+        public bool ServerFormIsOpen = false;
+        public string logFile = "server.log";
+        public LogType logLevel = LogType.Info;
 
         public static ServerFile Read(string path)
         {
@@ -46,7 +45,7 @@ namespace NaNiT
             using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 ServerFile file = Read(fs);
-                MainProgram.logInfo("Конфиг сервера успешно загружен");
+                MainProgram.logInfo("Файл настроек прочитан");
                 return file;
             }
         }
@@ -61,7 +60,7 @@ namespace NaNiT
             }
             catch (Exception)
             {
-                MainProgram.logException("Конфиг нечитаем, делаем новый");
+                MainProgram.logException("Не удалось прочитать файл настроек. Создаём новый.");
                 return new ServerFile();
             }
         }

@@ -12,25 +12,23 @@ namespace NaNiT
     class MainProgram
     {
         public static readonly string SavePath = Application.StartupPath;
-        public static ConfigFile config = new ConfigFile();
-        public static ServerFile serverConfig = new ServerFile();
+        public static ServerFile ServerConfig = new ServerFile();
+        public static NotifyIcon TrayNotify;
+        public static FormSOptions ServerForm;
 
-        public static Dictionary<string, ClientThread> clients = new Dictionary<string, ClientThread>();
-        public static int clientCount { get { return clients.Count; } set { return; } }
+        public static Dictionary<string, ClientThread> ActiveClients = new Dictionary<string, ClientThread>();
+        public static int CountOfActiveClients { get { return ActiveClients.Count; } set { return; } }
 
         public static ServerThread MainServer;
         static Thread MainServerThread;
-        static Thread monitorThread;
+        static Thread CrashMonitorThread;
 
-        public static bool allowNewClients = true;
+        public static bool AllowNewClients = true;
 
-        public static ServerState serverState;
+        public static ServerState CurrentServerStatus;
 
-        public static int startTime;
-        public static int restartTime = 0;
-
-        public static string defaultGroup = null;
-        
+        public static int StartTime;
+        public static int RestartTime = 0;
 
         private static void ProcessExit(object sender, EventArgs e)
         {
@@ -40,91 +38,114 @@ namespace NaNiT
 
         static void Main(string[] args)
         {
-            startTime = Function.getTimestamp();
-            serverState = ServerState.Starting;
-            
-            monitorThread = new Thread(new ThreadStart(MainProgram.crashMonitor));
-            monitorThread.Name = "Монитор состояния";
-            monitorThread.Start();
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
 
-            Config.SetupConfig();
-            ServerConfig.SetupConfig();
+            TrayNotify = new NotifyIcon()
+            {
+                Icon = Resources.net4,
+                Visible = true,
+                ContextMenuStrip = new ContextMenus().Create(),
+                Text = "Сетевой сервер НИИ Телевидения"
+            };
+            ServerForm = new FormSOptions();
+            StartTime = Function.getTimestamp();
+            CurrentServerStatus = ServerState.Starting;
+            
+            CrashMonitorThread = new Thread(new ThreadStart(СrashMonitor));
+            CrashMonitorThread.Name = "Поток монитора состояний";
+            CrashMonitorThread.Start();
+
+            NaNiT.ServerConfig.SetupConfig();
             Users.SetupUsers();
 
-            serverConfig.Write(ServerConfig.ConfigPath);
+            ServerConfig.Write(NaNiT.ServerConfig.ConfigPath);
             writeLog("", LogType.FileOnly);
             writeLog("-- Log Start: " + DateTime.Now + " --", LogType.FileOnly);
             
             MainServer = new ServerThread();
-            MainServerThread = new Thread(new ThreadStart(MainServer.run));
+            MainServerThread = new Thread(new ThreadStart(MainServer.Run));
+            MainServerThread.Name = "Поток запуска сервера";
             MainServerThread.Start();
-
-            logInfo("Запуск сервера...");
-            while (serverState != ServerState.Running) { if (serverState == ServerState.Crashed) return; }
+            
+            while (CurrentServerStatus != ServerState.Running) { if (CurrentServerStatus == ServerState.Crashed) return; }
+            TrayNotify.Icon = Resources.net3;
             logInfo("Все приготовления выполнены. Сервер работает.");
+
+            Application.Run();
         }
 
-        public static void crashMonitor()
+        public static void СrashMonitor()
         {
             while (true)
             {
-                if (restartTime != 0)
+                if (RestartTime != 0)
                 {
-                    if (restartTime < Function.getTimestamp()) doRestart();
+                    if (RestartTime < Function.getTimestamp()) RestartingServer();
                 }
 
-                if (serverState == ServerState.Crashed)
+                if (CurrentServerStatus == ServerState.Crashed)
                 {
                     logFatal("Фатальная ошибка на сервере. Перезапуск через 10 секунд.");
                     Thread.Sleep(10000);
-                    doRestart();
+                    RestartingServer();
                     break;
                 }
                 Thread.Sleep(2000);
             }
         }
-
-        public static void doRestart()
+        public static void StopServer()
         {
-            serverState = ServerState.Restarting;
-
-            foreach (ClientThread client in clients.Values)
+            foreach (ClientThread client in ActiveClients.Values)
             {
-                client.sendServerPacket(Packet.ClientDisconnect, new byte[1]);
-                client.sendChatMessage("^#f75d5d;You have been disconnected.");
-                client.clientState = ClientState.Disposing;
+                client.SendServerPacket(Packet.ClientDisconnect, new byte[1]);
+                client.statusOfCurrentClient = ClientState.Disposing;
                 client.kickTargetTimestamp = Function.getTimestamp() + 7;
             }
-
-            while (clients.Count > 0)
+            TrayNotify.Icon = Resources.net4;
+            while (ActiveClients.Count > 0)
             {
                 // Waiting
             }
 
             if (MainServerThread != null) MainServerThread.Abort();
             Thread.Sleep(500);
+        }
+
+        public static void StartServer()
+        {
+            CurrentServerStatus = ServerState.Starting;
+            RestartTime = 0;
+            MainServer = null;
+            StartTime = Function.getTimestamp();
+            Users.SetupUsers();
+            writeLog("", LogType.FileOnly);
+            writeLog("-- Log Start [After Restart]: " + DateTime.Now + " --", LogType.FileOnly);
+            MainServer = new ServerThread();
+            MainServerThread.Start();
+            CrashMonitorThread.Start();
+            while (CurrentServerStatus != ServerState.Running) { if (CurrentServerStatus == ServerState.Crashed) return; }
+            TrayNotify.Icon = Resources.net3;
+            logInfo("Все приготовления выполнены. Сервер работает.");
+        }
+
+        public static void RestartingServer()
+        {
+            CurrentServerStatus = ServerState.Restarting;
+            StopServer();
             logInfo("Поток завершился, перезапускаем.");
             Thread.Sleep(3000);
-
-            Process.Start(Environment.CurrentDirectory + "\\NanServer.exe");
-            Environment.Exit(1);
+            StartServer();
         }
 
         public static void logDebug(string source, string message) { writeLog("[" + source + "]:" + message, LogType.Debug); }
-
         public static void logInfo(string message) { writeLog(message, LogType.Info); }
-
-        public static void logWarn(string message) { writeLog(message, LogType.Warn); }
-
         public static void logError(string message) { writeLog(message, LogType.Error); }
-
         public static void logException(string message) { writeLog(message, LogType.Exception); }
-
         public static void logFatal(string message) { writeLog(message, LogType.Fatal); }
-
         public static void writeLog(string message, LogType logType)
         {
-            if ((int)config.logLevel > (int)logType && logType != LogType.FileOnly) return;
+            if ((int)ServerConfig.logLevel > (int)logType && logType != LogType.FileOnly) return;
 
             switch (logType)
             {
@@ -134,10 +155,6 @@ namespace NaNiT
 
                 case LogType.Info:
                     message = "[INFO] " + message;
-                    break;
-
-                case LogType.Warn:
-                    message = "[WARN] " + message;
                     break;
 
                 case LogType.Error:
@@ -155,34 +172,17 @@ namespace NaNiT
 
             try
             {
-                using (StreamWriter w = File.AppendText(Path.Combine(MainProgram.SavePath, "log.txt")))
+                using (StreamWriter w = File.AppendText(Path.Combine(SavePath, "log.txt")))
                 {
                     w.WriteLine(message);
                 }
             }
             catch (Exception e)
             {
-                if (config.logLevel == LogType.Debug) Console.WriteLine("[DEBUG] Logger Exception: " + e.ToString());
+                if (ServerConfig.logLevel == LogType.Debug) Console.WriteLine("[DEBUG] Logger Exception: " + e.ToString());
             }
 
-            if ((int)logType >= (int)config.logLevel) Console.WriteLine(message);
-        }
-        
-
-        public static void sendGlobalMessage(string message)
-        {
-            foreach (ClientThread client in clients.Values)
-            {
-                client.sendChatMessage("^#5dc4f4;" + message);
-            }
-        }
-
-        public static void sendGlobalMessage(string message, string color)
-        {
-            foreach (ClientThread client in clients.Values)
-            {
-                client.sendChatMessage("^" + color + ";" + message);
-            }
+            if ((int)logType >= (int)ServerConfig.logLevel) Console.WriteLine(message);
         }
     }
 }

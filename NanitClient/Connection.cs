@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -100,10 +101,27 @@ namespace NaNiT
         {
             try
             {
-                string message = "h@@lLloui-" + gl_s_userName;
-                byte[] data = Encoding.Unicode.GetBytes(message);
-                StreamOfClient.Write(data, 0, data.Length);
-                // запускаем новый поток для получения данных
+                //client.Connect("127.0.0.1", 51780);
+                BinaryReader sIn = new BinaryReader(StreamOfClient);
+                BinaryWriter sOut = new BinaryWriter(StreamOfClient);
+                MemoryStream packet = new MemoryStream();
+                BinaryWriter packetWrite = new BinaryWriter(packet);
+                byte[] buffer = Encoding.Unicode.GetBytes("Hopheylalaley");
+                byte[] buffe2r = Encoding.Unicode.GetBytes("Pospero");
+                byte[] buffe2r3 = Encoding.Unicode.GetBytes("Hopheylalaley" + "Pospero");
+                packetWrite.Write((short)buffe2r3.Length);
+                packetWrite.Write((short)buffer.Length);
+                packetWrite.Write(buffe2r3);
+                byte[] message = packet.ToArray();
+                sOut.Write((short)7);
+                sOut.Write(message.Length);
+                sOut.Write(message);
+                sOut.Flush();
+
+                //string message = "h@@lLloui-" + gl_s_userName;
+                //byte[] data = Encoding.Unicode.GetBytes(message);
+                //StreamOfClient.Write(data, 0, data.Length);
+                //// запускаем новый поток для получения данных
                 gl_i_awaitVarForCom = 0;
                 Program.notifyIcon.Icon = Resources.net2;
                 gl_s_serverStatus = "Подключение установлено";

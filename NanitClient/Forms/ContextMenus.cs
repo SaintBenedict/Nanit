@@ -71,12 +71,12 @@ namespace NaNiT
                 gl_b_isAboutLoaded = true;
                 if (MD5Code("" + gl_s_OSdate) == gl_s_optionsPasswordReg)
                 {
-                    if (!ServerFormIsOpen)
+                    if (!gl_b_isOptOpen)
                     {
                         gl_f_options = new FormOptions();
                         gl_f_options.Text = (@"N.A.N.I.T (((ver." + gl_s_version + ")))");
                         gl_f_options.Show();
-                        ServerFormIsOpen = true;
+                        gl_b_isOptOpen = true;
                     }
                 }
                 else

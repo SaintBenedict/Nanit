@@ -14,6 +14,8 @@
         WarpCommand = 10, //Done
         ChatSend = 11, //Done
         ClientContextUpdate = 12, //In Progress - NetStateDelta
+        WorldStart = 13,
+        WorldStop = 14,
         Heartbeat = 48, //Not Needed
     }
 
@@ -28,28 +30,11 @@
         FileOnly = 0,
         Debug = 1,
         Info = 2,
-        Warn = 3,
-        Error = 4,
-        Exception = 5,
-        Fatal = 6,
+        Error = 3,
+        Exception = 4,
+        Fatal = 5,
     }
-
-    public enum ChatReceiveContext
-    {
-        Broadcast = 1, //Yellow, Universe
-        Channel = 0, //Green, Planet
-        Whisper = 2, //Light Pink
-        CommandResult = 3, //Grey
-        White = 4, //White, Not Offical, just defaults to white if not the above.
-        //Anything else is White
-    }
-
-    public enum ChatSendContext
-    {
-        Universe = 0,
-        Planet = 1,
-    }
-
+        
     public enum ClientState
     {
         PendingConnect = 0,

@@ -1,9 +1,4 @@
-﻿using NaNiT.Packets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NaNiT.Functions;
+﻿using System.Collections.Generic;
 
 namespace NaNiT.Commands
 {
@@ -23,7 +18,6 @@ namespace NaNiT.Commands
 
         public void showHelpText()
         {
-            this.client.sendCommandMessage("/" + this.name + this.HelpText);
         }
     }
 }

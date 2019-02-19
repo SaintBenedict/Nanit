@@ -18,7 +18,7 @@ namespace NaNiT
         public static List<string> LogMessageList = new List<string>();
         public static bool ServerIsDisconnecting { get; set; } = false;
 
-        static void Main()
+        static void Maian()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

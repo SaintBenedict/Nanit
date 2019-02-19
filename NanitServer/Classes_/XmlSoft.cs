@@ -33,7 +33,7 @@ namespace NaNiT
 
         public void Add(_xApplication tempApplication)
         {
-            this.List.Add(tempApplication);
+            List.Add(tempApplication);
         }
 
         public string[] AppMass(_xApplication xapp)

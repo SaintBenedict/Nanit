@@ -4,15 +4,14 @@ namespace NaNiT
 {
     public class UserActiveInfo
     {
-        public string name;
-        public string account;
-        public string ip;
-        public uint id;
-        public string uuid;
-        
-        public int lastOnline = 0;
-        
-        public string client { get { if (String.IsNullOrEmpty(name)) return ip; else return name; } }
+        public string CryptoLogin;
+        public string RegistredDate;
+        public string LastSeenDate;
+        public string HostShortName;
+        public string UserIpAdress;
+        public int DatabaseId;
+
+        public string client { get { if (String.IsNullOrEmpty(CryptoLogin)) return UserIpAdress; else return CryptoLogin; } }
         
     }
 }

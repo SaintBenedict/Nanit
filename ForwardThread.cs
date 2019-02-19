@@ -1,212 +1,134 @@
 ﻿using NaNiT.Functions;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using NaNiT.Packets;
-using NaNiT.Extensions;
+using System.Text;
 
 namespace NaNiT
 {
     class ForwardThread
     {
-        BinaryReader mInput;
-        BinaryWriter mOutput;
-        ClientThread mParent;
-        Direction mDirection;
-        private string passwordSalt;
+        BinaryReader _biReaderClient;
+        BinaryWriter _biWriterClient;
+        ClientThread _clientSender;
+        Direction _messageDirection;
 
-        public ForwardThread(ClientThread aParent, BinaryReader aInput, BinaryWriter aOutput, Direction aDirection)
+        public ForwardThread(ClientThread _clientThread, BinaryReader _biReader, BinaryWriter _biWriter, Direction _clientSendDirection)
         {
-            this.mParent = aParent;
-            this.mInput = aInput;
-            this.mOutput = aOutput;
-            this.mDirection = aDirection;
+            _clientSender = _clientThread;
+            _biReaderClient = _biReader;
+            _biWriterClient = _biWriter;
+            _messageDirection = _clientSendDirection;
         }
 
-        public void run()
+        public void Run()
         {
             try
             {
                 for (; ; )
                 {
-                    if (!this.mParent.connectionAlive)
+                    if (!_clientSender.connectionAlive)
                     {
-                        this.mParent.forceDisconnect("Connection Lost");
+                        _clientSender.ForceDisconnect("Connection Lost");
                         return;
                     }
-
-
-                    if (this.mParent.kickTargetTimestamp != 0)
+                    if (_clientSender.kickTargetTimestamp != 0)
                     {
-                        if (this.mParent.kickTargetTimestamp < Function.getTimestamp())
+                        if (_clientSender.kickTargetTimestamp < Function.getTimestamp())
                         {
-                            this.mParent.forceDisconnect("Kicked from server");
+                            _clientSender.ForceDisconnect("Kicked from server");
                             return;
                         }
                         continue;
                     }
 
-                    #region Process Packet
-                    //Packet ID and Vaildity Check.
-                    uint temp = this.mInput.ReadVarUInt32();
+                    short temp = _biReaderClient.ReadInt16();                        //Packet ID and Vaildity Check.
                     if (temp < 1 || temp > 48)
                     {
-                        this.mParent.errorDisconnect(mDirection, "Sent invalid packet ID [" + temp + "].");
+                        _clientSender.ErrorDisconnect(_messageDirection, "Sent invalid packet ID [" + temp + "].");
                         return;
                     }
                     Packet packetID = (Packet)temp;
-
-                    //Packet Size and Compression Check.
-                    int packetSize = this.mInput.ReadVarInt32();
+                    int packetSize = _biReaderClient.ReadInt32();                    //Packet Size and Compression Check.
                     if (packetSize < 0)
                     {
                         packetSize = -packetSize;
                     }
+                    byte[] dataBuffer = _biReaderClient.ReadBytes(packetSize);          //Create buffer for forwarding
+                    MemoryStream ms = new MemoryStream(dataBuffer);
+                    BinaryReader packetData = new BinaryReader(ms);                     //Create packet parser
+                    object returnData = true;                                           //Return data for packet processor
 
-                    //Create buffer for forwarding
-                    byte[] dataBuffer = this.mInput.ReadFully(packetSize);
-
-                    //Do decompression
-                    MemoryStream ms = new MemoryStream();
-                        ms = new MemoryStream(dataBuffer);
-
-                    //Create packet parser
-                    BinaryReader packetData = new BinaryReader(ms);
-                    #endregion
-
-                    //Return data for packet processor
-                    object returnData = true;
-
-                    if (packetID != Packet.Heartbeat && packetID != Packet.UniverseTimeUpdate)
+                    if (packetID != Packet.Heartbeat)
                     {
-                        if (mDirection == Direction.Client)
-                        #region Handle Client Packets
+                        if (_messageDirection == Direction.Client)
                         {
-                            #region Protocol State Security
-                            ClientState curState = this.mParent.clientState;
+                            ClientState curState = _clientSender.statusOfCurrentClient;
                             if (curState != ClientState.Connected)
                             {
                                 if (curState == ClientState.PendingConnect && packetID != Packet.ClientConnect)
                                 {
-                                    this.mParent.forceDisconnect("Violated PendingConnect protocol state with " + packetID);
+                                    _clientSender.ForceDisconnect("Violated PendingConnect protocol state with " + packetID);
                                 }
                                 else if (curState == ClientState.PendingAuthentication && packetID != Packet.HandshakeResponse)
                                 {
-                                    this.mParent.forceDisconnect("Violated PendingAuthentication protocol state with " + packetID);
+                                    _clientSender.ForceDisconnect("Violated PendingAuthentication protocol state with " + packetID);
                                 }
                                 else if (curState == ClientState.PendingConnectResponse)
                                 {
-                                    this.mParent.forceDisconnect("Violated PendingConnectResponse protocol state with " + packetID);
+                                    _clientSender.ForceDisconnect("Violated PendingConnectResponse protocol state with " + packetID);
                                 }
                             }
-                            #endregion
-
-                            if (packetID == Packet.ChatSend)
+                            
+                            if (packetID == Packet.ClientConnect)
                             {
-                                returnData = new Packet11ChatSend(this.mParent, packetData, this.mDirection).onReceive();
-                            }
-                            else if (packetID == Packet.ClientConnect)
-                            {
-                                this.mParent.clientState = ClientState.PendingAuthentication;
-                                returnData = new Packet7ClientConnect(this.mParent, packetData, this.mDirection).onReceive();
+                                _clientSender.statusOfCurrentClient = ClientState.PendingAuthentication;
+                                returnData = new Packet7ClientConnect(_clientSender, packetData, _messageDirection).OnReceive();
                                 MemoryStream packet = new MemoryStream();
                                 BinaryWriter packetWrite = new BinaryWriter(packet);
-
-                                passwordSalt = Function.GenerateSecureSalt();
-                                packetWrite.WriteStarString("");
-                                packetWrite.WriteStarString(passwordSalt);
-                                packetWrite.WriteBE(MainProgram.config.passwordRounds);
-                                this.mParent.sendClientPacket(Packet.HandshakeChallenge, packet.ToArray());
+                                byte[] buffer = Encoding.Unicode.GetBytes("Ok");
+                                packetWrite.Write((short)buffer.Length);
+                                packetWrite.Write(buffer);
+                                _clientSender.SendClientPacket(Packet.HandshakeChallenge, packet.ToArray());
                             }
                             else if (packetID == Packet.HandshakeResponse)
                             {
-                                string claimResponse = packetData.ReadStarString();
-                                string passwordHash = packetData.ReadStarString();
-
-                                string verifyHash = Function.StarHashPassword(MainProgram.config.proxyPass, this.mParent.myInfo.account + passwordSalt, MainProgram.config.passwordRounds);
-                                if (passwordHash != verifyHash)
-                                {
-                                    this.mParent.rejectPreConnected("Your password was incorrect.");
-                                }
-
-                                this.mParent.clientState = ClientState.PendingConnectResponse;
+                                string claimResponse = packetData.ReadString();
+                                string passwordHash = packetData.ReadString();
+                                
+                                _clientSender.statusOfCurrentClient = ClientState.PendingConnectResponse;
                                 returnData = false;
                             }
-                            else if (packetID == Packet.ModifyTileList || packetID == Packet.DamageTileGroup || packetID == Packet.DamageTile || packetID == Packet.ConnectWire || packetID == Packet.DisconnectAllWires)
-                            {
-                               
-                            }
                         }
-                        #endregion
                         else
-                        #region Handle Server Packets
                         {
                             if (packetID == Packet.ChatReceive)
                             {
-                                returnData = new Packet5ChatReceive(this.mParent, packetData, this.mDirection).onReceive();
-                            }
-                            else if (packetID == Packet.ProtocolVersion)
-                            {
-                                uint protocolVersion = packetData.ReadUInt32BE();
-                                if (protocolVersion != StarryboundServer.ProtocolVersion)
-                                {
-                                    MemoryStream packet = new MemoryStream();
-                                    BinaryWriter packetWrite = new BinaryWriter(packet);
-                                    packetWrite.WriteBE(protocolVersion);
-                                    this.mParent.sendClientPacket(Packet.ProtocolVersion, packet.ToArray());
-
-                                    this.mParent.rejectPreConnected("Starrybound Server was unable to handle the parent server protocol version.");
-                                    returnData = false;
-                                }
+                                returnData = new Packet5ChatReceive(_clientSender, packetData, _messageDirection).OnReceive();
                             }
                             else if (packetID == Packet.HandshakeChallenge)
                             {
                                 string claimMessage = packetData.ReadString();
-                                string passwordSalt = packetData.ReadStarString();
-                                int passwordRounds = packetData.ReadInt32BE();
-
+                                int passwordRounds = packetData.ReadInt32();
+                                
                                 MemoryStream packet = new MemoryStream();
                                 BinaryWriter packetWrite = new BinaryWriter(packet);
-                                string passwordHash = Function.StarHashPassword(MainProgram.config.serverPass, MainProgram.config.serverAccount + passwordSalt, passwordRounds);
-                                packetWrite.WriteStarString("");
-                                packetWrite.WriteStarString(passwordHash);
-                                this.mParent.sendServerPacket(Packet.HandshakeResponse, packet.ToArray());
+                                byte[] buffer = Encoding.UTF8.GetBytes("");
+                                packetWrite.Write((short)buffer.Length);
+                                packetWrite.Write(buffer);
+                                _clientSender.SendServerPacket(Packet.HandshakeResponse, packet.ToArray());
 
                                 returnData = false;
                             }
                             else if (packetID == Packet.ConnectResponse)
                             {
-                                while (this.mParent.clientState != ClientState.PendingConnectResponse) { } //TODO: needs timeout
-                                returnData = new Packet2ConnectResponse(this.mParent, packetData, this.mDirection).onReceive();
-                            }
-                            else if (packetID == Packet.WorldStart)
-                            {
-                                byte[] planet = packetData.ReadStarByteArray();
-                                byte[] worldStructure = packetData.ReadStarByteArray();
-                                byte[] sky = packetData.ReadStarByteArray();
-                                byte[] serverWeather = packetData.ReadStarByteArray();
-                                float spawnX = packetData.ReadSingleBE();
-                                float spawnY = packetData.ReadSingleBE();
-                                uint clientID = packetData.ReadUInt32BE();
-                                bool bool1 = packetData.ReadBoolean();
-                            }
-                            else if (packetID == Packet.WorldStop)
-                            {
-                                string status = packetData.ReadStarString();
-                            }
-                            else if (packetID == Packet.GiveItem)
-                            {
-                                string name = packetData.ReadStarString();
-                                uint count = packetData.ReadVarUInt32();
-                                List<object> itemDesc = packetData.ReadStarVariant();
+                                while (_clientSender.statusOfCurrentClient != ClientState.PendingConnectResponse) { } //TODO: needs timeout
+                                returnData = new Packet2ConnectResponse(_clientSender, packetData, _messageDirection).OnReceive();
                             }
                         }
-                        #endregion
                     }
-
-                    //Check return data
-                    if (returnData is bool)
+                    
+                    if (returnData is bool)                                                                 //Check return data
                     {
                         if ((bool)returnData == false) continue;
                     }
@@ -214,32 +136,28 @@ namespace NaNiT
                     {
                         if ((int)returnData == -1)
                         {
-                            this.mParent.forceDisconnect("Command processor requested to drop client");
+                            _clientSender.ForceDisconnect("Command processor requested to drop client");
                         }
                     }
-
-                    #region Forward Packet
-                    //Write data to dest
-                    this.mOutput.WriteVarUInt32((uint)packetID);
-                        this.mOutput.WriteVarInt32(packetSize);
-                        this.mOutput.Write(dataBuffer, 0, packetSize);
-                    this.mOutput.Flush();
-                    #endregion
-
-                    //If disconnect was forwarded to client, lets disconnect.
-                    if (packetID == Packet.ServerDisconnect && mDirection == Direction.Server)
+                    
+                    _biWriterClient.Write((short)packetID);                                         //Write data to dest
+                    _biWriterClient.Write(packetSize);
+                        _biWriterClient.Write(dataBuffer, 0, packetSize);
+                    _biWriterClient.Flush();
+                    
+                    if (packetID == Packet.ServerDisconnect && _messageDirection == Direction.Server)       //If disconnect was forwarded to client, lets disconnect.
                     {
-                        this.mParent.forceDisconnect();
+                        _clientSender.forceDisconnect();
                     }
                 }
             }
             catch (EndOfStreamException)
             {
-                this.mParent.forceDisconnect();
+                _clientSender.forceDisconnect();
             }
             catch (Exception e)
             {
-                this.mParent.errorDisconnect(mDirection, "ForwardThread Exception: " + e.ToString());
+                _clientSender.ErrorDisconnect(_messageDirection, "ForwardThread Exception: " + e.ToString());
             }
         }
     }
