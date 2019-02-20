@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using NaNiT.Packets;
 using System.Text;
+using System.Threading;
 
 namespace NaNiT
 {
@@ -19,6 +20,9 @@ namespace NaNiT
             _biReaderClient = _biReader;
             _biWriterClient = _biWriter;
             _messageDirection = _clientSendDirection;
+            Thread MyThread = Thread.CurrentThread;
+            if (MyThread.Name == null)
+                MyThread.Name = "ФорвардТред";
         }
 
         public void Run()

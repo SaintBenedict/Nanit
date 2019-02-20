@@ -54,8 +54,6 @@ namespace NaNiT
                 MyName.Name = "Основной поток";
 
             ProblemMonitorThread = new Thread(new ThreadStart(ProblemMonitor));
-            if (ProblemMonitorThread.Name == null)
-                ProblemMonitorThread.Name = "Поток монитора состояний";
             ProblemMonitorThread.Start();
 
             gl_s_OSdate = GetOSDate();
@@ -89,15 +87,28 @@ namespace NaNiT
         {
             while (true)
             {
-                if (StateMyActtivity == _ClientState.Crashing || StateMyActtivity == _ClientState.Disconnecting || ServerStatus == ServChecker.Crashing || ServerStatus == ServChecker.DisconnectingMe)
+                Thread MyThread = Thread.CurrentThread;
+                if (MyThread.Name == null)
+                    MyThread.Name = "Поток монитора состояний";
+                if (StateMyActtivity == _ClientState.Crashing || ServerStatus == ServChecker.Crashing)
                 {
                     logFatal("Критическая ошибка на одной из сторон вызвала отключение.");
-                    ServFinder.newConnectThread.Abort();
-                    ServFinder.newConnectThread = null;
-                    ServFinder.StreamApp.Close();
-                    ServFinder.StreamApp = null;
-                    ServFinder.NewConnection.Close();
-                    ServFinder.NewConnection = null;
+                    if (ServFinder.newConnectThread != null)
+                    {
+                        ServFinder.newConnectThread.Abort();
+                        ServFinder.newConnectThread = null;
+                    }
+                    if (ServFinder.StreamApp != null)
+                    {
+                        ServFinder.StreamApp.Close();
+                        ServFinder.StreamApp = null;
+                    }
+                    if (ServFinder.NewConnection != null)
+                    {
+                        ServFinder.NewConnection.Close();
+                        ServFinder.NewConnection = null;
+                    }
+                    
                     AttemptingServer.connections.Clear();
                     ServerStatus = ServChecker.NotConnecting;
                     StateMyActtivity = _ClientState.OfflineWork;

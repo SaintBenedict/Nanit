@@ -17,11 +17,15 @@ namespace NaNiT.Permissions
 
         public void Run()
         {
-            try
+
+            while (MainClient.StateMyActtivity != _ClientState.Crashing && MainClient.ServerStatus != ServChecker.Crashing)
             {
-                while (MainClient.StateMyActtivity != _ClientState.Crashing && MainClient.ServerStatus != ServChecker.Crashing)
+                Thread MyThread = Thread.CurrentThread;
+                if (MyThread.Name == null)
+                    MyThread.Name = "Попытка коннекта";
+                if (connections.Count == 0)
                 {
-                    if (connections.Count == 0)
+                    try
                     {
                         MainClient.StateMyActtivity = _ClientState.AtemtingToConnect;
                         NewConnection = new TcpClient();
@@ -39,9 +43,16 @@ namespace NaNiT.Permissions
                         newConnectThread.Start();
                         Thread.Sleep(10000);
                     }
-                    else
+                    catch (Exception e)
                     {
-                        if (MainClient.StateMyActtivity == _ClientState.Crashing || MainClient.StateMyActtivity == _ClientState.Disconnecting || MainClient.ServerStatus == ServChecker.Crashing || MainClient.ServerStatus == ServChecker.DisconnectingMe)
+                        Thread.Sleep(10000);
+                    }
+                }
+                else
+                {
+                    if (MainClient.StateMyActtivity == _ClientState.Disconnecting || MainClient.ServerStatus == ServChecker.DisconnectingMe)
+                    {
+                        try
                         {
                             newConnectThread.Abort();
                             newConnectThread = null;
@@ -55,20 +66,16 @@ namespace NaNiT.Permissions
                             MainClient.TrayNotify.Icon = Resources.net1;
                             Thread.Sleep(10000);
                         }
-                        Thread.Sleep(2);
+                        catch (Exception e)
+                        {
+                            MainClient.logException("Поток прослушивания: " + e.ToString());
+                        }
                     }
+                    Thread.Sleep(2);
                 }
             }
-            catch (Exception e)
-            {
-                MainClient.logException("Поток прослушивания: " + e.ToString());
-            }
-            finally
-            {
-                NewConnection.Close();
-                MainClient.logException("Прослушивающий поток закрылся, подключение к серверу разорвано.");
-                MainClient.StateMyActtivity = _ClientState.Disconnecting;
-            }
         }
+
     }
 }
+
