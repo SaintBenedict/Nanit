@@ -49,22 +49,18 @@ namespace NaNiT
             StateMyActtivity = _ClientState.OfflineWork;
             ServerStatus = ServChecker.NotConnecting;
 
-            Thread MyName = Thread.CurrentThread;
-            if (MyName.Name == null)
-                MyName.Name = "Основной поток";
+            ThreadName.Current("Main поток");
 
             ProblemMonitorThread = new Thread(new ThreadStart(ProblemMonitor));
             ProblemMonitorThread.Start();
 
             gl_s_OSdate = GetOSDate();
-            // Проверка наличия настроек в реестре // Обязательно после ГетОСДаты, она там используется
             RegCheck();
 
             gl_s_myHostName = Dns.GetHostName();
             gl_f_soft = new FormSoft();
             gl_s_userName = gl_s_myHostName + @"*" + gl_s_OSdate.Substring(4, 2) + gl_s_OSdate.Substring(2, 2);
-
-            // Копирование себя в папку сервисов, запуск оттуда удаление лишнего
+            
             AutoSelfInstall(false);
 
             writeLog("", LogType.FileOnly);
@@ -72,8 +68,6 @@ namespace NaNiT
 
             ServFinder = new AttemptingServer();
             MainClientThread = new Thread(new ThreadStart(ServFinder.Run));
-            if (MainClientThread.Name == null)
-                MainClientThread.Name = "Попытка подлючиться";
             MainClientThread.Start();
             
             // Старт таймеров и тредов
@@ -87,32 +81,21 @@ namespace NaNiT
         {
             while (true)
             {
-                Thread MyThread = Thread.CurrentThread;
-                if (MyThread.Name == null)
-                    MyThread.Name = "Поток монитора состояний";
+                ThreadName.Current("Поток Краш-монитора");
                 if (StateMyActtivity == _ClientState.Crashing || ServerStatus == ServChecker.Crashing)
                 {
                     logFatal("Критическая ошибка на одной из сторон вызвала отключение.");
-                    if (ServFinder.newConnectThread != null)
-                    {
-                        ServFinder.newConnectThread.Abort();
-                        ServFinder.newConnectThread = null;
-                    }
-                    if (ServFinder.StreamApp != null)
-                    {
-                        ServFinder.StreamApp.Close();
-                        ServFinder.StreamApp = null;
-                    }
-                    if (ServFinder.NewConnection != null)
-                    {
-                        ServFinder.NewConnection.Close();
-                        ServFinder.NewConnection = null;
-                    }
-                    
-                    AttemptingServer.connections.Clear();
                     ServerStatus = ServChecker.NotConnecting;
                     StateMyActtivity = _ClientState.OfflineWork;
                     TrayNotify.Icon = Resources.net1;
+                    AttemptingServer.connections.Clear();
+
+                    ServFinder.newConnectThread.Abort();
+                    ServFinder.newConnectThread = null;
+                    ServFinder.StreamApp.Close();
+                    ServFinder.StreamApp = null;
+                    ServFinder.NewConnection.Close();
+                    ServFinder.NewConnection = null;
                     Thread.Sleep(10000);
                     break;
                 }
@@ -170,9 +153,7 @@ namespace NaNiT
 
         public static void CheckServiceUpdate(object obj)
         {
-            Thread MyThread = Thread.CurrentThread;
-            if (MyThread.Name == null)
-                MyThread.Name = "Update Timer";
+            ThreadName.Current("Update Timer");
 
             ServiceWork.CheckUpdServer();
             ServiceWork.ServiceInit();

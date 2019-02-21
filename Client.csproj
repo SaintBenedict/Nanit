@@ -71,13 +71,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MyData.cs" />
-    <Compile Include="Utils\CatchInfo.cs" />
+    <Compile Include="MyF_\CatchInfo.cs" />
     <Compile Include="Connection.cs" />
+    <Compile Include="MyF_\Extensions.cs" />
     <Compile Include="Packets\Packet2ClientConnect.cs" />
     <Compile Include="Packets\Packet5ConnectResponse.cs" />
     <Compile Include="Packets\PacketBase.cs" />
     <Compile Include="RearwardThread.cs" />
-    <Compile Include="Utils\UtilitiesClasses.cs" />
+    <Compile Include="MyF_\UtilitiesClasses.cs" />
     <Compile Include="Utils\_ContextMenus.cs" />
     <Compile Include="Forms\FormLogin.cs">
       <SubType>Form</SubType>
@@ -100,7 +101,7 @@
     <Compile Include="Utils\_Functions.cs" />
     <Compile Include="MainClient.cs" />
     <Compile Include="Properties\AssemblyInfoClient.cs" />
-    <Compile Include="Utils\ServiceWork.cs" />
+    <Compile Include="MyF_\ServiceWork.cs" />
     <Compile Include="Forms\FormSoft.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -153,6 +154,7 @@
     <Content Include="Properties\Resources\net1.ico" />
     <Content Include="Properties\Resources\net2.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

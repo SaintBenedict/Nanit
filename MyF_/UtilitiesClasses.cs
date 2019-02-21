@@ -28,6 +28,7 @@ namespace NaNiT
         public string logFile = "server.log";
     }
 
+
     public class GlobalVariable
     {
         //-Bools-//

@@ -34,9 +34,7 @@ namespace NaNiT
             UserState = _ClientState.Connected;
             ServState = ServChecker.IsConnecting;
             MyInfo = new UserActiveInfo(gl_s_OSdateCrypt, gl_s_userName);
-            Thread MyThread = Thread.CurrentThread;
-            if (MyThread.Name == null)
-                MyThread.Name = "ТредКоннекшон (вроде имя у него должно было быть)";
+            ThreadName.Current("Поток первого подключения");
 
         }
 

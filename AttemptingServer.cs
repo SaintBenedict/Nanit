@@ -20,9 +20,7 @@ namespace NaNiT.Permissions
 
             while (MainClient.StateMyActtivity != _ClientState.Crashing && MainClient.ServerStatus != ServChecker.Crashing)
             {
-                Thread MyThread = Thread.CurrentThread;
-                if (MyThread.Name == null)
-                    MyThread.Name = "Попытка коннекта";
+                ThreadName.Current("Попытка подключения");
                 if (connections.Count == 0)
                 {
                     try
@@ -39,7 +37,6 @@ namespace NaNiT.Permissions
                         MainClient.ServerStatus = ServChecker.IsConnecting;
                         MainClient.TrayNotify.Icon = Resources.net2;
                         newConnectThread = new Thread(new ThreadStart(ThisServerConnection.Start));
-                        newConnectThread.Name = "Новое соединение";
                         newConnectThread.Start();
                         Thread.Sleep(10000);
                     }

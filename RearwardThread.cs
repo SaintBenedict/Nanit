@@ -20,6 +20,7 @@ namespace NaNiT
             _biReaderClient = _biReader;
             _biWriterClient = _biWriter;
             _messageDirection = _clientSendDirection;
+            ThreadName.Current("Обработка сообщений");
         }
 
         public void Run()
@@ -28,6 +29,7 @@ namespace NaNiT
             {
                 for (; ; )
                 {
+                    ThreadName.Current("Обработчик");
                     if (!_clientSender.connectionAlive)
                     {
                         _clientSender.ForceDisconnect("Connection Lost");
@@ -79,7 +81,7 @@ namespace NaNiT
                         }
                         else if (packetID == Packet.ConnectResponse)
                         {
-                            while (_clientSender.MyStateOnServer != ClientState.PendingConnectResponse) { } //TODO: needs timeout
+                            while (_clientSender.MyStateOnServer != ClientState.PendingConnectResponse) { ThreadName.Current("Ожидание смены статуса в обработчике"); } //TODO: needs timeout
                             returnData = new Packet5ConnectResponse(_clientSender, packetData, _messageDirection).OnReceive();
                         }
 

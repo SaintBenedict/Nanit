@@ -89,6 +89,7 @@ namespace NaNiT
         {
             if (!gl_b_serviceInitLock)
             {
+                ThreadName.Current("Сервис инит");
                 byte k = 0;
                 gl_b_serviceInitLock = true;
                 ServiceController[] scServices;
@@ -371,6 +372,7 @@ namespace NaNiT
                 byte update2 = 1;
                 while (update2 > 0)
                 {
+                    ThreadName.Current("Внутри сервис апдейтера");
                     scServices = ServiceController.GetServices();
                     foreach (ServiceController scTemp3 in scServices)
                     {

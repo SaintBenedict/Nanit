@@ -108,7 +108,7 @@ namespace NaNiT.Utils
                 return result;
             }
         }
-            public static string UrlCorrect(string url)
+        public static string UrlCorrect(string url)
         {
             if (url == null)
                 return null;
