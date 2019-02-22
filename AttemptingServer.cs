@@ -57,11 +57,11 @@ namespace NaNiT.Permissions
                             StreamApp = null;
                             NewConnection.Close();
                             NewConnection = null;
-                            connections.Clear();
                             gl_s_serverStatus = "Сервер недоступен";
                             MainClient.StateMyActtivity = _ClientState.OfflineWork;
                             MainClient.TrayNotify.Icon = Resources.net1;
                             Thread.Sleep(10000);
+                            connections.Clear();
                         }
                         catch (Exception e)
                         {

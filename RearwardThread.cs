@@ -27,7 +27,7 @@ namespace NaNiT
         {
             try
             {
-                for (; ; )
+                while (true)
                 {
                     ThreadName.Current("Обработчик");
                     if (!_clientSender.connectionAlive)

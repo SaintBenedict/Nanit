@@ -47,7 +47,7 @@ namespace NaNiT.Utils
                 return unixTimeStamp;
             }
 
-            public static void WriteToString(short _id, BinaryWriter _bw, string _message)
+            public static void WriteToString(Packet _id, BinaryWriter _bw, string _message)
             {
                 MemoryStream packet = new MemoryStream();
                 BinaryWriter packetWrite = new BinaryWriter(packet);
@@ -55,6 +55,35 @@ namespace NaNiT.Utils
                 packetWrite.Write((short)buffer.Length);
                 packetWrite.Write(buffer);
                 byte[] message = packet.ToArray();
+                _bw.Write((short)_id);
+                _bw.Write(message.Length);
+                _bw.Write(message);
+                _bw.Flush();
+            }
+
+            public static void WriteToString(Packet _id, BinaryWriter _bw, params string[] _message)
+            {
+                MemoryStream packet = new MemoryStream();
+                BinaryWriter packetWrite = new BinaryWriter(packet);
+                byte[] message;
+                string allstring = "";
+
+                for (int i = 0; i < _message.Length; i++)
+                {
+                    allstring = allstring + _message[i];
+                }
+
+                byte[] buffer;
+                byte[] bufferAll = Encoding.Unicode.GetBytes(allstring);
+                packetWrite.Write((short)bufferAll.Length);
+
+                for (int k = 0; k < _message.Length; k++)
+                {
+                    buffer = Encoding.Unicode.GetBytes(_message[k]);
+                    packetWrite.Write((short)buffer.Length);
+                }
+                packetWrite.Write(bufferAll);
+                message = packet.ToArray();
                 _bw.Write((short)_id);
                 _bw.Write(message.Length);
                 _bw.Write(message);
@@ -72,39 +101,28 @@ namespace NaNiT.Utils
                 string _result = builder.ToString();
                 return _result;
             }
+
             public static string[] ReadStrings(BinaryReader _packetData, int _val)
             {
-                short[] len = new short[_val];
-                int[] bytes = new int[_val];
+                short[] len = new short[_val + 1];
                 string[] result = new string[_val];
                 StringBuilder builder = new StringBuilder();
-                len[0] = _packetData.ReadInt16();
-                byte[] data = new byte[len[0]];
 
-                for (int i = 1; i < _val; i++)
+
+                for (int i = 0; i < _val + 1; i++)
                 {
                     len[i] = _packetData.ReadInt16();
                 }
-                int u = 0;
-                short y = new short();
-                bytes[0] = _packetData.Read(data, u, len[1]);
-                builder.Append(Encoding.Unicode.GetString(data, 0, bytes[0]));
-                result[0] = builder.ToString();
-                for (short k = 1; k < _val - 1; k++)
+                byte[] data = new byte[len[0] - (_val + 1) * 2];
+                int f = 0;
+                for (short k = 1; k < _val + 1; k++)
                 {
-                    u = u + len[k];
-                    y = Convert.ToInt16(y + len[k + 1]);
-                    bytes[k] = _packetData.Read(data, u, len[k + 1]);
                     builder = new StringBuilder();
-                    builder.Append(Encoding.Unicode.GetString(data, len[k], bytes[k]));
-                    result[k] = builder.ToString();
+                    int bytes = 0;
+                    bytes = _packetData.Read(data, 0, Convert.ToInt16(len[k]));
+                    builder.Append(Encoding.Unicode.GetString(data, 0, len[k]));
+                    result[k - 1] = builder.ToString();
                 }
-                u = u + len[_val - 1];
-                y = Convert.ToInt16(y + len[_val - 1]);
-                bytes[_val - 1] = _packetData.Read(data, u, len[0] - u);
-                builder = new StringBuilder();
-                builder.Append(Encoding.Unicode.GetString(data, len[_val - 1], bytes[_val - 1]));
-                result[_val - 1] = builder.ToString();
                 return result;
             }
         }

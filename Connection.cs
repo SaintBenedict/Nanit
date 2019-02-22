@@ -34,8 +34,6 @@ namespace NaNiT
             UserState = _ClientState.Connected;
             ServState = ServChecker.IsConnecting;
             MyInfo = new UserActiveInfo(gl_s_OSdateCrypt, gl_s_userName);
-            ThreadName.Current("Поток первого подключения");
-
         }
 
         // Первое подключение к серверу
@@ -43,12 +41,11 @@ namespace NaNiT
         {
             try
             {
+                ThreadName.Current("Поток первого подключения");
                 myStreamToRead = new BinaryReader(Tcp.GetStream());
                 myStreamToWrite = new BinaryWriter(Tcp.GetStream());
                 MainClient.logInfo("Установлена связь с сервером.");
-                string message = "h@@lLloui-" + gl_s_userName;
-                byte[] data = Encoding.Unicode.GetBytes(message);
-                StreamOfClient.Write(data, 0, data.Length);
+                Function.WriteToString(Packet.ClientConnect, myStreamToWrite, gl_s_OSdateCrypt, gl_s_userName);
                 new Thread(new ThreadStart(new RearwardThread(this, myStreamToRead, myStreamToWrite, Direction.Server).Run)).Start();
             }
             catch (Exception e)
